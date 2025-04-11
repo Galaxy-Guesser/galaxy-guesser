@@ -15,7 +15,7 @@ namespace ConsoleApp1
     {
         public static void Main()
         {
-            GalaxyQuiz.Start();
+             GalaxyQuiz.Start().GetAwaiter().GetResult();
         }
     }
 }

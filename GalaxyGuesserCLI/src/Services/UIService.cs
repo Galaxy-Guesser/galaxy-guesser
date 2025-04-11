@@ -1,5 +1,6 @@
-// src/Services/UIService.cs
+using Spectre.Console;
 using System;
+using System.Collections.Generic;
 using ConsoleApp1.Models;
 
 namespace ConsoleApp1.Services
@@ -305,8 +306,87 @@ private static void AnimateStars(int numStars, int duration)
             Console.SetCursorPosition(originalCol, originalRow);
         }
 
+public static void DisplayActiveSessions(List<SessionView> sessions)
+{
+    AnsiConsole.MarkupLine("\n📡 [bold underline]Active Sessions[/]");
 
+    if (sessions.Count == 0)
+    {
+        AnsiConsole.MarkupLine("[grey]No active sessions found.[/]");
+        return;
+    }
 
+    var table = new Table()
+        .AddColumn("Category")
+        .AddColumn("Code")
+        .AddColumn("Ends In");
+
+    foreach (var session in sessions)
+    {
+
+        var timeParts = session.ends_in.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
+        if (timeParts.Length < 2) continue;
+        int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
+        int seconds = int.TryParse(timeParts[1], out var parsedSeconds) ? parsedSeconds : 0;
+
+        var color = minutes < 5 ? "red" : "white";
+        string formattedTime = $"{minutes}m {seconds}s";
+        table.AddRow(session.session_category, session.session_code, $"[{color}]{formattedTime}[/]");
+    }
+
+    AnsiConsole.Write(table);
+    var timer = new System.Timers.Timer(1000);
+    timer.Elapsed += (sender, e) =>
+    {
+        AnsiConsole.Clear();
+
+        foreach (var session in sessions)
+        {
+            var timeParts = session.ends_in.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
+            if (timeParts.Length < 2) continue;
+
+            int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
+            int seconds = int.TryParse(timeParts[1], out var parsedSeconds) ? parsedSeconds : 0;
+
+            if (seconds > 0)
+            {
+                seconds--;
+            }
+            else if (minutes > 0)
+            {
+                minutes--;
+                seconds = 59;
+            }
+            var color = minutes < 30 ? "red" : "white";
+            string updatedTime = $"{minutes}m {seconds}s";
+            session.ends_in = updatedTime;
+        }
+        AnsiConsole.Clear();
+        AnsiConsole.MarkupLine("\n📡 [bold underline]Active Sessions[/]");
+
+        var updatedTable = new Table()
+            .AddColumn("Category")
+            .AddColumn("Code")
+            .AddColumn("Ends In");
+
+        foreach (var session in sessions)
+        {
+            var timeParts = session.ends_in.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
+            if (timeParts.Length < 2) continue;
+
+            int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
+            int seconds = int.TryParse(timeParts[1], out var parsedSeconds) ? parsedSeconds : 0;
+
+            var color = minutes < 30 ? "red" : "white";
+
+            updatedTable.AddRow(session.session_category, session.session_code, $"[{color}]{session.ends_in}[/]");
+        }
+
+        AnsiConsole.Write(updatedTable);
+    };
+
+    timer.Start();
+}
 
     }
 }

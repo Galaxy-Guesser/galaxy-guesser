@@ -8,12 +8,13 @@ using ConsoleApp1.Models;
 using ConsoleApp1.Services;
 using ConsoleApp1.Data;
 using ConsoleApp1.Utilities;
+using Spectre.Console;
 
 namespace ConsoleApp1
 {
     class GalaxyQuiz
     {
-        public static void Start()
+        public static async Task Start()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.Title = "🌌 Galaxy Quiz";
@@ -23,7 +24,8 @@ namespace ConsoleApp1
             {
                 UIService.PrintGalaxyHeader();
                 Player player = AuthenticatePlayer();
-                MainMenuLoop(player);
+                await MainMenuLoop(player);
+
             }
             catch (Exception exception)
             {
@@ -31,10 +33,10 @@ namespace ConsoleApp1
             }
         }
 
-        static void MainMenuLoop(Player player)
+        static async Task MainMenuLoop(Player player)
         {
             bool exitRequested = false;
-            
+
             while (!exitRequested)
             {
                 UIService.PrintGalaxyHeader();
@@ -42,18 +44,19 @@ namespace ConsoleApp1
                 Console.WriteLine("\nMAIN MENU");
                 Console.WriteLine("1. Create new quiz session");
                 Console.WriteLine("2. Join existing session");
-                Console.WriteLine("3. View categories");
-                Console.WriteLine("4. View leaderboard");
-                Console.WriteLine("5. My profile");
-                Console.WriteLine("6. How to play");
-                Console.WriteLine("7. Exit");
+                Console.WriteLine("3. View active sessions");
+                Console.WriteLine("4. View categories");
+                Console.WriteLine("5. View leaderboard");
+                Console.WriteLine("6. My profile");
+                Console.WriteLine("7. How to play");
+                Console.WriteLine("8. Exit");
                 Console.WriteLine("\nType a command (e.g., '/help') or select an option (1-7):");
-                
+
                 Console.Write("\n👉 ");
                 Console.CursorVisible = true;
                 string input = Console.ReadLine().Trim();
                 Console.CursorVisible = false;
-                
+
                 // Check if input is a command
                 if (CommandService.IsCommand(input))
                 {
@@ -66,27 +69,50 @@ namespace ConsoleApp1
                     switch (option)
                     {
                         case 1:
-                            Session newSession = CreateSession(player);
-                            if (newSession != null)
+                            var (category, questionCount) = SessionUIService.PromptSessionDetails();
+                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount);
+
+                            if (!string.IsNullOrEmpty(sessionCode))
                             {
-                                PlayQuizSession(player, newSession);
-                                UIService.ShowFinalResults(player, newSession);
+                                UIService.ShowFeedback($"✅ Session created! Code: [bold yellow]{sessionCode}[/]", ConsoleColor.Green);
                             }
+                            else
+                            {
+                                UIService.ShowFeedback("❌ Failed to create session.", ConsoleColor.Red);
+                            }
+
                             UIService.Continue();
                             break;
                         case 2:
-                            Session joinSession = JoinSession(player);
-                            if (joinSession != null)
+                           var activeSessions = await SessionViewService.GetActiveSessions();
+
+                            if (activeSessions.Count == 0)
                             {
-                                PlayQuizSession(player, joinSession);
-                                UIService.ShowFinalResults(player, joinSession);
+                                AnsiConsole.MarkupLine("[red]No active sessions available.[/]");
+                                break;
                             }
+
+                            var selected = AnsiConsole.Prompt(
+                                new SelectionPrompt<string>()
+                                    .Title("Select a session to join")
+                                    .PageSize(10)
+                                    .AddChoices(activeSessions.Select(s =>
+                                        $"{s.session_code} - {s.session_category}")));
+
+                            sessionCode = selected.Split(" - ")[0];
+                            //need to grad this guid from logged in suer
+                            await SessionService.JoinSessionAsync(sessionCode, "77777777-7777-4777-8777-777777777777");
+
                             UIService.Continue();
                             break;
+
+
                         case 3:
-                            CommandService.ProcessCommand("categories", player);
+                            var sessions = await SessionViewService.GetActiveSessions();
+                            UIService.DisplayActiveSessions(sessions);
                             UIService.Continue();
                             break;
+
                         case 4:
                             CommandService.ProcessCommand("leaderboard", player);
                             UIService.Continue();
@@ -125,10 +151,10 @@ namespace ConsoleApp1
                 Console.WriteLine("\n1. Login\n2. Register new account");
                 Console.Write("\n👉 Enter your choice (1 or 2): ");
                 Console.CursorVisible = true;
-                
+
                 ConsoleKey choice = Console.ReadKey(true).Key;
                 Console.CursorVisible = false;
-                
+
                 if (choice == ConsoleKey.D1)
                 {
                     Console.WriteLine("1");
@@ -137,14 +163,14 @@ namespace ConsoleApp1
                     Console.CursorVisible = true;
                     string username = Console.ReadLine();
                     Console.CursorVisible = false;
-                    
+
                     Console.Write("Password: ");
                     Console.CursorVisible = true;
                     string password = AuthenticationService.ReadPassword();
                     Console.CursorVisible = false;
 
                     Player player = AuthenticationService.Login(username, password);
-                    
+
                     if (player != null)
                     {
                         Console.WriteLine($"\n👋 Welcome back, {player.Name}!");
@@ -156,7 +182,7 @@ namespace ConsoleApp1
                         // Valid credentials but no profile
                         Console.Write("\nEnter your display name: ");
                         Console.CursorVisible = true;
-                        string name = Console.ReadLine();
+                        string name = Console.ReadLine() ?? string.Empty;
                         Console.CursorVisible = false;
 
                         player = AuthenticationService.CreateProfileForExistingCredentials(username, name);
@@ -180,7 +206,8 @@ namespace ConsoleApp1
                     string username = Console.ReadLine();
                     Console.CursorVisible = false;
 
-                    if (SampleData.UserCredentials.ContainsKey(username))
+                    if (!string.IsNullOrWhiteSpace(username) && SampleData.UserCredentials.ContainsKey(username))
+
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("❌ Username already exists. Try another one.");
@@ -192,10 +219,10 @@ namespace ConsoleApp1
                     Console.CursorVisible = true;
                     string password = AuthenticationService.ReadPassword();
                     Console.CursorVisible = false;
-                    
+
                     Console.Write("\nEnter your display name: ");
                     Console.CursorVisible = true;
-                    string name = Console.ReadLine();
+                    string name = Console.ReadLine() ?? string.Empty;
                     Console.CursorVisible = false;
 
                     Player player = AuthenticationService.Register(username, password, name);
@@ -241,9 +268,9 @@ namespace ConsoleApp1
             Console.CursorVisible = false;
 
             Session session = SessionService.CreateSession(
-                player, 
-                SampleData.Categories[catChoice - 1].Id, 
-                questionCount, 
+                player,
+                SampleData.Categories[catChoice - 1].Id,
+                questionCount,
                 questionDuration
             );
 
@@ -290,14 +317,14 @@ namespace ConsoleApp1
                 int timeRemaining = session.QuestionDuration;
 
                 // First render the full question and options (once only)
-                DisplayFullQuestion(sessionQuestions[i], i+1, sessionQuestions.Count, timeRemaining);
+                DisplayFullQuestion(sessionQuestions[i], i + 1, sessionQuestions.Count, timeRemaining);
 
                 // Display timer
                 int timerRow = Console.CursorTop - sessionQuestions[i].Options.Length - 4;
-                
+
                 // Start timer display thread
                 CancellationTokenSource cts = new CancellationTokenSource();
-                Task timerTask = Task.Run(() => 
+                Task timerTask = Task.Run(() =>
                 {
                     try
                     {
@@ -317,12 +344,12 @@ namespace ConsoleApp1
                 Task<(bool answered, int selectedOption)> answerTask = SessionService.WaitForAnswerWithTimeout(
                     sessionQuestions[i], session.QuestionDuration);
                 answerTask.Wait();
-                
+
                 cts.Cancel();
-                
+
                 answered = answerTask.Result.answered;
                 selectedOption = answerTask.Result.selectedOption;
-                
+
                 int inputRow = Console.CursorTop;
                 Console.SetCursorPosition(0, inputRow);
                 Console.Write(new string(' ', Console.WindowWidth));
@@ -340,13 +367,13 @@ namespace ConsoleApp1
                     }
                     else
                     {
-                        UIService.ShowFeedback($"❌ Wrong! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}", 
+                        UIService.ShowFeedback($"❌ Wrong! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}",
                                    ConsoleColor.Red);
                     }
                 }
                 else
                 {
-                    UIService.ShowFeedback($"⏰ Time's up! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}", 
+                    UIService.ShowFeedback($"⏰ Time's up! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}",
                                ConsoleColor.Yellow);
                 }
 
@@ -360,14 +387,14 @@ namespace ConsoleApp1
         {
             Console.Clear();
             UIService.PrintGalaxyHeader();
-            
+
             // Placeholder for timer bar - will be updated separately
             Console.WriteLine($"⏱ Time: {secondsRemaining}s [" + new string(' ', Console.WindowWidth - 20) + "]");
-            
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"\nQuestion {current}/{total}:");
             Console.ResetColor();
-            
+
             // Make the question text much more visible with highlighting
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"\n{q.Text}\n");
@@ -387,7 +414,7 @@ namespace ConsoleApp1
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.Write("\n👉 Press A, B, C or D to select your answer: ");
             Console.ResetColor();
-            
+
             // Make answer input area very visible
             Console.BackgroundColor = ConsoleColor.DarkGray;
             Console.ForegroundColor = ConsoleColor.White;

@@ -37,6 +37,12 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
         /// <param name="session_code">The code of the Session to delete</param>
         /// <returns>A task representing the asynchronous operation</returns>
         Task DeleteSessionAsync(string session_code);
+              /// <summary>
+        /// Adds a player to an existing session
+        /// </summary>
+        /// <param name="session_code">The session code</param>
+        /// <param name="player_guid">The player's GUID</param>
+        Task JoinSessionAsync(string session_code, string player_guid);
       
     }
 }

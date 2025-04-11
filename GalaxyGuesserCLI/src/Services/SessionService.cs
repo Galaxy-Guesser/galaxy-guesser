@@ -3,8 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Spectre.Console;
+using System.Net.Http;
+using System.Text;
+using Spectre.Console;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using ConsoleApp1.Models;
 using ConsoleApp1.Data;
+
 
 namespace ConsoleApp1.Services
 {
@@ -24,13 +31,13 @@ namespace ConsoleApp1.Services
             const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
             Random random = new Random();
             string code;
-            
+
             do
             {
                 code = new string(Enumerable.Repeat(chars, 6)
                     .Select(s => s[random.Next(s.Length)]).ToArray());
             } while (sessions.Any(s => s.Code == code));
-            
+
             return code;
         }
 
@@ -54,14 +61,14 @@ namespace ConsoleApp1.Services
         internal static Session JoinSession(Player player, string sessionCode)
         {
             Session session = sessions.FirstOrDefault(s => s.Code == sessionCode.ToUpper());
-            
+
             if (session != null)
             {
                 // Add player to session
                 AddPlayerToSession(player.Id, session.Id);
                 return session;
             }
-            
+
             return null; // Session not found
         }
 
@@ -82,7 +89,7 @@ namespace ConsoleApp1.Services
                 .OrderBy(q => Guid.NewGuid()) // Random order
                 .Take(questionCount)  // Only take requested number of questions
                 .ToList();
-            
+
             int id = sessionQuestions.Count > 0 ? sessionQuestions.Max(sq => sq.Id) + 1 : 1;
             foreach (var question in categoryQuestions)
             {
@@ -95,9 +102,9 @@ namespace ConsoleApp1.Services
             return sessionQuestions
                 .Where(sq => sq.SessionId == sessionId)
                 .Join(
-                    SampleData.Questions, 
-                    sq => sq.QuestionId, 
-                    q => q.Id, 
+                    SampleData.Questions,
+                    sq => sq.QuestionId,
+                    q => q.Id,
                     (sq, q) => q
                 )
                 .ToList();
@@ -161,5 +168,63 @@ namespace ConsoleApp1.Services
         {
             return sessionQuestions.Count(sq => sq.SessionId == sessionId);
         }
+
+
+         private static readonly HttpClient _httpClient = new HttpClient();
+
+    public static async Task<string?> CreateSessionAsync(string category, int questionsCount)
+    {
+        try
+        {
+            var url = $"http://localhost:5010/api/sessions/session?category={Uri.EscapeDataString(category)}&questionsCount={questionsCount}";
+            HttpResponseMessage response = await _httpClient.PostAsync(url, null);
+            response.EnsureSuccessStatusCode();
+
+            string sessionCode = await response.Content.ReadAsStringAsync();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"✅ Session created: [bold]{sessionCode}[/]");
+            Console.ResetColor();
+
+            return sessionCode;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"❌ Error creating session: {ex.Message}");
+            Console.ResetColor();
+            return null;
+        }
+    }
+
+    public static async Task JoinSessionAsync(string sessionCode, string playerGuid)
+{
+    try
+    {
+        var requestBody = new
+        {
+            sessionCode = sessionCode,
+            playerGuid = playerGuid
+        };
+
+        var json = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var url = "http://localhost:5010/api/sessions"; 
+        HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+        response.EnsureSuccessStatusCode();
+
+        string responseContent = await response.Content.ReadAsStringAsync();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"✅ Successfully joined session: {sessionCode}");
+        Console.ResetColor();
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"❌ Error joining session: {ex.Message}");
+        Console.ResetColor();
+    }
+}
     }
 }
