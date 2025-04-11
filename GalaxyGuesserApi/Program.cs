@@ -19,8 +19,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<DatabaseContext>();
 
 builder.Services.AddScoped<IPlayerRepository,PlayerRepository>();
+builder.Services.AddScoped<ISessionRepository,SessionRepository>();
+builder.Services.AddScoped<ISessionViewRepository, SessionViewRepository>();
 
 builder.Services.AddScoped<PlayerService>();
+builder.Services.AddScoped<SessionService>();
+builder.Services.AddScoped<SessionViewService>();
 
 var app = builder.Build();
 

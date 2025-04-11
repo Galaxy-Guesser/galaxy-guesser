@@ -2,7 +2,7 @@ using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GalaxyGuesserApi.Repositories
+namespace GalaxyGuesserApi.Services
 {
     public class SessionService
     {
@@ -37,5 +37,9 @@ namespace GalaxyGuesserApi.Repositories
         }
 
         public void DeleteSessionAsync(string session_code) => _sessionRepository.DeleteSessionAsync(session_code);
+        public async Task JoinSessionAsync(string sessionCode, string playerGuid)
+        {
+            await _sessionRepository.JoinSessionAsync(sessionCode, playerGuid);
+        }
     }
 }
