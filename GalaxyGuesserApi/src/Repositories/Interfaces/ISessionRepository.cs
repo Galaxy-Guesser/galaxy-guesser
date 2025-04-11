@@ -22,7 +22,7 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
         /// </summary>
         /// <param name="Session">The Session to create</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        Task CreateSessionAsync(string category, int questionsCount);
+        Task CreateSessionAsync(string category, int questionsCount,string user_guid);
 
         /// <summary>
         /// Updates an existing Session in the database

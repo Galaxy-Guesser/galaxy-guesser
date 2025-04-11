@@ -34,7 +34,7 @@ namespace GalaxyGuesserApi.Controllers
         {
             try
             {
-                await _sessionService.CreateSessionAsync(category, questionsCount);
+                await _sessionService.CreateSessionAsync(category, questionsCount,"need");
                 return Ok("created");
             }
             catch (Exception ex)

@@ -29,13 +29,14 @@ namespace GalaxyGuesserApi.Repositories
                 user_name = reader.GetString(2),
             });
         }
-        public async Task CreateSessionAsync(string category, int questionsCount)
+        public async Task CreateSessionAsync(string category, int questionsCount, string user_guid)
         {
-            const string sql = "CALL create_session (@category,@question_count)";
+            const string sql = "CALL create_session (@category,@question_count,@user_guid)";
             var parameters = new Dictionary<string, object>
             {
                 { "@category", category },
                 { "@question_count", questionsCount },
+                { "@user_guid", user_guid },
             };
 
             await _dbContext.ExecuteNonQueryAsync(sql, parameters);
