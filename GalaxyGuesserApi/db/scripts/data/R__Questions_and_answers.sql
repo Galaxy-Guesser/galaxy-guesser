@@ -44,7 +44,7 @@ WITH answer_data AS (
     ('Chandra X-ray Observatory')
   ) AS t(answer)
 )
-INSERT INTO public."Answers"(answer)
+INSERT INTO Answers(answer)
 SELECT answer FROM answer_data
 ON CONFLICT (answer) DO NOTHING;
 
@@ -71,14 +71,14 @@ WITH question_data AS (
     ('Space Exploration', 'Which telescope replaced the Hubble in 2021?', 'James Webb Space Telescope')
   ) AS t(category, question, correct_answer)
 )
-INSERT INTO public."Questions" (question, answer_id, category_id)
+INSERT INTO Questions (question, answer_id, category_id)
 SELECT 
   qd.question,
   a.answer_id,
   c.category_id
 FROM question_data qd
-JOIN public."Categories"c ON qd.category = c.category
-JOIN public."Answers"a ON qd.correct_answer = a.answer
+JOIN Categories c ON qd.category = c.category
+JOIN Answers a ON qd.correct_answer = a.answer
 ON CONFLICT (question) DO UPDATE 
 SET answer_id = EXCLUDED.answer_id;
 
@@ -100,10 +100,10 @@ WITH option_mapping AS (
     ('What causes a star to become a supernova?', 'WIMPs')
   ) AS t(question, answer)
 )
-INSERT INTO public."Options" (question_id, answer_id)
+INSERT INTO Options (question_id, answer_id)
 SELECT 
   q.question_id,
   a.answer_id
 FROM option_mapping om
-JOIN public."Questions" q ON om.question = q.question
-JOIN public."Answers" a ON om.answer = a.answer
+JOIN Questions q ON om.question = q.question
+JOIN Answers a ON om.answer = a.answer
