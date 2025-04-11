@@ -1,6 +1,6 @@
-TRUNCATE TABLE  public."Categories"  RESTART IDENTITY CASCADE;
+TRUNCATE TABLE  Categories  RESTART IDENTITY CASCADE;
 
-INSERT INTO public."Categories" (category)
+INSERT INTO Categories (category)
 VALUES 
   ('Stellar Phenomena'),
   ('Exoplanet Discoveries'),
