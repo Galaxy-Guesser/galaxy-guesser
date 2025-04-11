@@ -7,3 +7,4 @@ namespace GalaxyGuesserApi.Models
         public DateTime CreatedAt { get; set; }
     }
 }
+
