@@ -18,7 +18,7 @@ namespace GalaxyGuesserApi.Data
                 var Username = configuration["DB_USER"] ?? "postgres";
                 var password = configuration["DB_PASSWORD"] ?? "";
 
-                _connectionString = $"Host={host};Port={port};Database={database};Playername={Username};Password={password};";
+                _connectionString = $"Host={host};Port={port};Database={database};Username={Username};Password={password};";
             }
         }
 
