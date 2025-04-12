@@ -21,31 +21,31 @@ jobs:
         working-directory: .
     steps:
       - name: Checkout repository
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: Configure AWS
-      - uses: aws-actions/configure-aws-credentials@v2
-      - with:
-        role-to-assume: ${{ secrets.USER_ROLE }}
-        aws-region: af-south-1
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.USER_ROLE }}
+          aws-region: af-south-1
       
       - name: Setup terraform
-      - uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.10.5
 
       - name: Terraform fmt
-      - id: fmt
-      - run: terraform fmt -check
-      - continue-on-error: true
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
 
       - name: Terraform Init
-      - id: init
-      - run: terraform init
+        id: init
+        run: terraform init
 
       - name: Terraform Plan
-      - id: plan
-      - run: terraform plan -no-color
+        id: plan
+        run: terraform plan -no-color
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
