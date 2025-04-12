@@ -24,7 +24,7 @@ resource "aws_iam_role" "github_actions_role" {
                 # "token.actions.githubusercontent.com:sub" = "repo:Galaxy-Guesser/galaxy-guesser:refs/head/main"
                 }
                 StringLike = {
-                  "token.actions.githubusercontent.com:sub" = "repo:Galaxy-Guesser/galaxy-guesser:ref:refs/head/vusi/terraform"
+                  "token.actions.githubusercontent.com:sub" = "repo:Galaxy-Guesser/galaxy-guesser:ref:refs/heads/*"
                 }
             }
         }]
