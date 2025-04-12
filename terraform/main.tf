@@ -42,3 +42,8 @@ module "security-group" {
 
     vpc_id = module.vpc.vpc_id
 }
+
+module "iam-role" {
+  source = "./modules/iam-role"
+
+}
