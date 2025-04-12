@@ -26,7 +26,7 @@ jobs:
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          role-to-assume: ${{ secrets.USER_ROLE }}
           aws-region: af-south-1
       
       - name: Setup terraform
