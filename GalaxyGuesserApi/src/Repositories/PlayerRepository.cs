@@ -21,6 +21,7 @@ namespace GalaxyGuesserApi.Repositories
             {
                 player_id = reader.GetInt32(0),
                 username = "update me",
+                guid = "1"
                 // Name = reader.GetString(1),
                 // Email = reader.GetString(2),
                 // CreatedAt = reader.GetDateTime(3)
@@ -36,22 +37,52 @@ namespace GalaxyGuesserApi.Repositories
             {
                 player_id = reader.GetInt32(0),
                 username = reader.GetString(1),
-                CreatedAt = reader.GetDateTime(3)
+                guid = reader.GetString(1)
             }, parameters);
             
             return Players.FirstOrDefault()!;
         }
 
-        public async Task CreatePlayerAsync(Player Player)
+        public async Task<Player?> GetUserByGoogleIdAsync(string guid)
         {
-            const string sql = "INSERT INTO Players (name, email, created_at) VALUES (@name, @email, @createdAt)";
+            const string query = @"
+                SELECT player_id, username, guid
+                FROM player
+                WHERE guid = @guid";
+
+            var parameters = new Dictionary<string, object> { { "@guid", guid } };
+
+            var players = await _dbContext.QueryAsync(query, reader => new Player
+            {
+                player_id = reader.GetInt32(0),
+                username = reader.GetString(1),
+                guid = reader.GetString(2)
+            }, parameters);
+
+            return players.FirstOrDefault(); // 👈 this is the key line!
+        }
+
+        public async Task<Player> CreatePlayerAsync(string guid, string username)
+        {
+            const string sql = @"
+            INSERT INTO player (username, guid)
+            VALUES (@username, @guid)
+            RETURNING player_id, username, guid";
             var parameters = new Dictionary<string, object>
             {
-                { "@name", Player.username },
-                { "@createdAt", DateTime.UtcNow }
+                { "@username", username },
+                { "@guid", guid}
             };
             
-            await _dbContext.ExecuteNonQueryAsync(sql, parameters);
+            var result = await _dbContext.QueryAsync(sql, reader => new Player
+            {
+                player_id = reader.GetInt32(0),    
+                username = reader.GetString(1),    
+                guid = reader.GetString(2)       
+            }, parameters);
+
+            return result.First();
+           
         }
 
         public async Task UpdatePlayerAsync(Player Player)
