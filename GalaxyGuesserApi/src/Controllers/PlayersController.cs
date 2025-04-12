@@ -8,11 +8,11 @@ namespace GalaxyGuesserApi.Controllers
     [Route("api/[controller]")]
     public class PlayersController : ControllerBase
     {
-        private readonly PlayerService _PlayerService;
+        private readonly PlayerService _playerService;
 
-        public PlayersController(PlayerService PlayerService)
+        public PlayersController(PlayerService playerService)
         {
-            _PlayerService = PlayerService;
+            _playerService = playerService;
         }
 
         [HttpGet]
@@ -20,7 +20,7 @@ namespace GalaxyGuesserApi.Controllers
         {
             try
             {
-                var Players = await _PlayerService.GetAllPlayersAsync();
+                var Players = await _playerService.GetAllPlayersAsync();
                 return Ok(Players);
             }
             catch (Exception ex)
@@ -29,12 +29,12 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Player>> GetPlayer(int id)
+        [HttpGet("{player_id}")]
+        public async Task<ActionResult<Player>> GetPlayer(int player_id)
         {
             try
             {
-                var Player = await _PlayerService.GetPlayerByIdAsync(id);
+                var Player = await _playerService.GetPlayerByIdAsync(player_id);
                 if (Player == null)
                 {
                     return NotFound();
@@ -52,7 +52,7 @@ namespace GalaxyGuesserApi.Controllers
         {
             try
             {
-                var player = await _PlayerService.CreatePlayerAsync(guid, username);
+                var player = await _playerService.CreatePlayerAsync(guid, username);
                 return CreatedAtAction(nameof(GetPlayer), new { id = player.player_id }, player);
             }
             catch (Exception ex)
@@ -61,18 +61,29 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePlayer(int id, Player Player)
+        [HttpPut("{player_id}")]
+        public async Task<IActionResult> UpdatePlayer(int player_id, [FromBody] Player player)
         {
-            if (id != Player.player_id)
+           if (player_id != player.player_id)
             {
-                return BadRequest();
+                return BadRequest("Player ID in the URL does not match the ID in the request body.");
             }
 
             try
             {
-                await _PlayerService.UpdatePlayerAsync(Player);
-                return NoContent();
+                var updated = await _playerService.UpdatePlayerAsync(player_id, player.username);
+
+                if (!updated)
+                {
+                    return NotFound($"Player with ID {player_id} not found.");
+                }
+
+                return Ok(new
+                {
+                    message = "Player updated successfully",
+                    player_id,
+                    updated_username = player.username
+                });
             }
             catch (Exception ex)
             {
@@ -80,18 +91,24 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlayer(int id)
+        [HttpDelete("{player_id}")]
+        public async Task<IActionResult> DeletePlayer(int player_id)
         {
             try
-            {
-                await _PlayerService.DeletePlayerAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+                {
+                    var deleted = await _playerService.DeletePlayerAsync(player_id);
+
+                    if (!deleted)
+                    {
+                        return NotFound($"Player with ID {player_id} not found.");
+                    }
+
+                     return Ok(new { message = "User deleted successfully" });
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Internal server error: {ex.Message}");
+                }
         }
     }
 }

@@ -45,22 +45,6 @@ public class PlayerServiceTests
         Assert.Null(result);
     }
     
-    [Fact]
-    public async Task CreatePlayer_WhenEmailExists_ThrowsDuplicateEmailException()
-    {
-        // Arrange
-        var mockRepo = new Mock<IPlayerRepository>();
-        var Player = new Player { username = "Test Player" , guid = "123456789101112"};
-        
-        mockRepo.Setup(repo => repo.EmailExistsAsync("existing@example.com"))
-                .ReturnsAsync(true);
-        
-        var PlayerService = new PlayerService(mockRepo.Object);
-        
-        // Act & Assert
-        // await Assert.ThrowsAsync<DuplicateEmailException>(() => 
-        //     PlayerService.CreatePlayerAsync(Player));
-    }
 }
 
 }
