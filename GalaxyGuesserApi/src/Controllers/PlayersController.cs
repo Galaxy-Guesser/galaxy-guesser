@@ -48,12 +48,12 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Player>> CreatePlayer(Player Player)
+        public async Task<ActionResult<Player>> CreatePlayer(string guid, string username)
         {
             try
             {
-                await _PlayerService.CreatePlayerAsync(Player);
-                return CreatedAtAction(nameof(GetPlayer), new { id = Player.player_id }, Player);
+                var player = await _PlayerService.CreatePlayerAsync(guid, username);
+                return CreatedAtAction(nameof(GetPlayer), new { id = player.player_id }, player);
             }
             catch (Exception ex)
             {

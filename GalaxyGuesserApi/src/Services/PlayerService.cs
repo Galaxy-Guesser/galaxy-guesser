@@ -22,9 +22,9 @@ namespace GalaxyGuesserApi.Services
             return await _PlayerRepository.GetPlayerByIdAsync(id);
         }
 
-        public async Task CreatePlayerAsync(Player Player)
+        public async Task<Player> CreatePlayerAsync(string guid, string username)
         {
-            await _PlayerRepository.CreatePlayerAsync(Player);
+           return await _PlayerRepository.CreatePlayerAsync(guid, username);
         }
 
         public async Task UpdatePlayerAsync(Player Player)

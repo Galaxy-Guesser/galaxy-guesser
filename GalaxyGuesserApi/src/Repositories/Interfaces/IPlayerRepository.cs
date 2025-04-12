@@ -17,12 +17,14 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
         /// <returns>The Player if found, null otherwise</returns>
         Task<Player> GetPlayerByIdAsync(int id);
 
+        Task<Player> GetUserByGoogleIdAsync (string guid);
+
         /// <summary>
         /// Creates a new Player in the database
         /// </summary>
         /// <param name="Player">The Player to create</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        Task CreatePlayerAsync(Player Player);
+        Task<Player> CreatePlayerAsync(string guid, string username);
 
         /// <summary>
         /// Updates an existing Player in the database
