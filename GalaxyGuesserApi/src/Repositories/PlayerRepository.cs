@@ -15,32 +15,35 @@ namespace GalaxyGuesserApi.Repositories
 
         public async Task<List<Player>> GetAllPlayersAsync()
         {
-            const string sql = "SELECT playerId FROM 'players'";
-            
-            return await _dbContext.QueryAsync(sql, reader => new Player
-            {
-                player_id = reader.GetInt32(0),
-                username = "update me",
-                guid = "1"
-                // Name = reader.GetString(1),
-                // Email = reader.GetString(2),
-                // CreatedAt = reader.GetDateTime(3)
-            });
-        }
+            const string query = @"
+            SELECT player_id, username, guid
+            FROM player";
 
-        public async Task<Player> GetPlayerByIdAsync(int id)
-        {
-            const string sql = "SELECT id, name, email, created_at FROM Players WHERE id = @id";
-            var parameters = new Dictionary<string, object> { { "@id", id } };
-            
-            var Players = await _dbContext.QueryAsync(sql, reader => new Player
+            return await _dbContext.QueryAsync(query, reader => new Player
             {
                 player_id = reader.GetInt32(0),
                 username = reader.GetString(1),
-                guid = reader.GetString(1)
-            }, parameters);
-            
-            return Players.FirstOrDefault()!;
+                guid = reader.GetString(2)
+            });
+            }
+
+        public async Task<Player> GetPlayerByIdAsync(int player_id)
+        {
+            const string query = @"
+            SELECT player_id, username, guid
+            FROM player
+            WHERE player_id = @player_id";
+
+            var parameters = new Dictionary<string, object> { { "@player_id", player_id } };
+
+            var result = await _dbContext.QueryAsync(query, reader => new Player
+                {
+                    player_id = reader.GetInt32(0),
+                    username = reader.GetString(1),
+                    guid = reader.GetString(2)
+                }, parameters);
+
+            return result.FirstOrDefault()!;
         }
 
         public async Task<Player?> GetUserByGoogleIdAsync(string guid)
@@ -59,7 +62,7 @@ namespace GalaxyGuesserApi.Repositories
                 guid = reader.GetString(2)
             }, parameters);
 
-            return players.FirstOrDefault(); // 👈 this is the key line!
+            return players.FirstOrDefault(); 
         }
 
         public async Task<Player> CreatePlayerAsync(string guid, string username)
@@ -85,34 +88,33 @@ namespace GalaxyGuesserApi.Repositories
            
         }
 
-        public async Task UpdatePlayerAsync(Player Player)
+        public async Task<bool> UpdatePlayerAsync(int player_id, string username)
         {
-            const string sql = "UPDATE Players SET name = @name, email = @email WHERE id = @id";
+            const string query = @"
+            UPDATE player
+            SET username = @username
+            WHERE player_id = @player_id";
+
             var parameters = new Dictionary<string, object>
             {
-                { "@id", Player.player_id },
-                { "@name", Player.username },
+                { "@player_id", player_id },
+                { "@username", username }
             };
-            
-            await _dbContext.ExecuteNonQueryAsync(sql, parameters);
+
+            var affectedRows = await _dbContext.ExecuteAsync(query, parameters);
+            return affectedRows > 0;
         }
 
-        public async Task DeletePlayerAsync(int id)
+        public async Task<bool> DeletePlayerAsync(int player_id)
         {
-            const string sql = "DELETE FROM Players WHERE id = @id";
-            var parameters = new Dictionary<string, object> { { "@id", id } };
-            
-            await _dbContext.ExecuteNonQueryAsync(sql, parameters);
-        }
+            const string query = @"
+            DELETE FROM player
+            WHERE player_id = @player_id";
 
-        public Task<Player> GetPlayerByEmailAsync(string email)
-        {
-            throw new NotImplementedException();
-        }
+            var parameters = new Dictionary<string, object> { { "@player_id", player_id } };
 
-        public Task<bool> EmailExistsAsync(string email)
-        {
-            throw new NotImplementedException();
+            var affectedRows = await _dbContext.ExecuteAsync(query, parameters);
+            return affectedRows > 0;
         }
     }
 }
