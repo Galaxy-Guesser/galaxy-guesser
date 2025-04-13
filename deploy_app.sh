@@ -11,5 +11,5 @@ echo "Running Terraform init..."
 terraform init -reconfigure
 echo "Done Running Terraform init..."
 echo "Running terraform plan..."
-terraform plan -auto-approve
+terraform plan
 echo "Done running terraform plan"
