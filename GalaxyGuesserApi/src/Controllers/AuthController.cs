@@ -79,9 +79,9 @@ namespace GalaxyGuesserApi.src.Controllers
             var jwt = handler.ReadJwtToken(idToken);
 
             var guid = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            var username = jwt.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
+            var userName = jwt.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
 
-            if (string.IsNullOrWhiteSpace(guid) || string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(guid) || string.IsNullOrWhiteSpace(userName))
                 return BadRequest("Missing required claims.");
 
                 // Check if user exists in DB
@@ -89,25 +89,25 @@ namespace GalaxyGuesserApi.src.Controllers
 
                 if (player == null)
                 {
-                    player = await _playerRepository.CreatePlayerAsync(guid, username);
+                    player = await _playerRepository.CreatePlayerAsync(guid, userName);
                 }
                 else
                 {
                     return Ok(new
                     {
                         message = "User already exists.",
-                        player.player_id,
+                        player.playerId,
                         player.guid,
-                        player.username
+                        player.userName
                     });
                 }
 
             return Ok(new
             {
                 idToken,
-                player.player_id,
+                player.playerId,
                 player.guid,
-                player.username
+                player.userName
             });
         }
           

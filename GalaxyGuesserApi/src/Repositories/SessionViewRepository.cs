@@ -19,15 +19,15 @@ namespace GalaxyGuesserApi.Repositories
 
             return await _dbContext.QueryAsync(sql, reader => new SessionView
             {
-                session_id = reader.GetInt32(0),
-                session_code = reader.GetString(1),
-                session_category = reader.GetString(2),
-                player_usernames = reader.GetFieldValue<List<string>>(3),
-                player_count = reader.GetInt32(4),
+                sessionId = reader.GetInt32(0),
+                sessionCode = reader.GetString(1),
+                category = reader.GetString(2),
+                playerUserNames = reader.GetFieldValue<List<string>>(3),
+                playerCount = reader.GetInt32(4),
                 duration = reader.GetString(5),
-                question_count = reader.GetInt32(6),
-                highest_score = reader.IsDBNull(7) ? null : reader.GetInt32(7),
-                ends_in = reader.IsDBNull(8) ? null : reader.GetString(8)
+                questionCount = reader.GetInt32(6),
+                highestScore = reader.IsDBNull(7) ? null : reader.GetInt32(7),
+                endsIn = reader.IsDBNull(8) ? null : reader.GetString(8)
             });
         }
     }

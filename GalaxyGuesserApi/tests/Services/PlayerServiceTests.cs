@@ -12,7 +12,7 @@ public class PlayerServiceTests
     {
         // Arrange
         var mockRepo = new Mock<IPlayerRepository>();
-        var expectedPlayer = new Player { player_id = 1, username = "Test Player", guid = "123456789101112"};
+        var expectedPlayer = new Player { playerId = 1, userName = "Test Player", guid = "123456789101112"};
         
         mockRepo.Setup(repo => repo.GetPlayerByIdAsync(1))
                 .ReturnsAsync(expectedPlayer);
@@ -23,8 +23,8 @@ public class PlayerServiceTests
         var result = await PlayerService.GetPlayerByIdAsync(1);
         
         // Assert
-        Assert.Equal(expectedPlayer.player_id, result.player_id);
-        Assert.Equal(expectedPlayer.username, result.username);
+        Assert.Equal(expectedPlayer.playerId, result.playerId);
+        Assert.Equal(expectedPlayer.userName, result.userName);
         Assert.Equal(expectedPlayer.guid, result.guid);
     }
     

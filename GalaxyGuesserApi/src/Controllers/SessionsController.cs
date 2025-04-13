@@ -61,7 +61,7 @@ public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest reque
 {
     try
     {
-        await _sessionService.JoinSessionAsync(request.SessionCode, request.PlayerGuid);
+        await _sessionService.JoinSessionAsync(request.sessionCode, request.playerGuid);
         return Ok("Player successfully joined the session.");
     }
     catch (Exception ex)

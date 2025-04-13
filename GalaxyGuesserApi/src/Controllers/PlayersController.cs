@@ -29,12 +29,12 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpGet("{player_id}")]
-        public async Task<ActionResult<Player>> GetPlayer(int player_id)
+        [HttpGet("{playerId}")]
+        public async Task<ActionResult<Player>> GetPlayer(int playerId)
         {
             try
             {
-                var Player = await _playerService.GetPlayerByIdAsync(player_id);
+                var Player = await _playerService.GetPlayerByIdAsync(playerId);
                 if (Player == null)
                 {
                     return NotFound();
@@ -48,12 +48,12 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Player>> CreatePlayer(string guid, string username)
+        public async Task<ActionResult<Player>> CreatePlayer(string guid, string userName)
         {
             try
             {
-                var player = await _playerService.CreatePlayerAsync(guid, username);
-                return CreatedAtAction(nameof(GetPlayer), new { id = player.player_id }, player);
+                var player = await _playerService.CreatePlayerAsync(guid, userName);
+                return CreatedAtAction(nameof(GetPlayer), new { id = player.playerId }, player);
             }
             catch (Exception ex)
             {
@@ -61,28 +61,28 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpPut("{player_id}")]
-        public async Task<IActionResult> UpdatePlayer(int player_id, [FromBody] Player player)
+        [HttpPut("{playerId}")]
+        public async Task<IActionResult> UpdatePlayer(int playerId, [FromBody] Player player)
         {
-           if (player_id != player.player_id)
+           if (playerId != player.playerId)
             {
                 return BadRequest("Player ID in the URL does not match the ID in the request body.");
             }
 
             try
             {
-                var updated = await _playerService.UpdatePlayerAsync(player_id, player.username);
+                var updated = await _playerService.UpdatePlayerAsync(playerId, player.userName);
 
                 if (!updated)
                 {
-                    return NotFound($"Player with ID {player_id} not found.");
+                    return NotFound($"Player with ID {playerId} not found.");
                 }
 
                 return Ok(new
                 {
                     message = "Player updated successfully",
-                    player_id,
-                    updated_username = player.username
+                    playerId,
+                    updated_username = player.userName
                 });
             }
             catch (Exception ex)
@@ -91,16 +91,16 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpDelete("{player_id}")]
-        public async Task<IActionResult> DeletePlayer(int player_id)
+        [HttpDelete("{playerId}")]
+        public async Task<IActionResult> DeletePlayer(int playerId)
         {
             try
                 {
-                    var deleted = await _playerService.DeletePlayerAsync(player_id);
+                    var deleted = await _playerService.DeletePlayerAsync(playerId);
 
                     if (!deleted)
                     {
-                        return NotFound($"Player with ID {player_id} not found.");
+                        return NotFound($"Player with ID {playerId} not found.");
                     }
 
                      return Ok(new { message = "User deleted successfully" });
