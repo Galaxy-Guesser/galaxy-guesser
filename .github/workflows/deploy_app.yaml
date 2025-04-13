@@ -39,20 +39,21 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
+      # - name: Terraform Init
+      #   id: init
+      #   run: terraform init
 
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color
+      # - name: Terraform Plan
+      #   id: plan
+      #   run: terraform plan -no-color
 
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+      # - name: Terraform Plan Status
+      #   if: steps.plan.outcome == 'failure'
+      #   run: exit 1
 
-      - name: Terraform Apply
-        # if: github.ref == "ref/head/main" && github.event_name == "push"
-        run: terraform apply -auto-approve -input=false
-      # - name: Build and deploy app
-      #   run: chmod +x ./deploy_app.sh 
+      # - name: Terraform Apply
+      #   # if: github.ref == "ref/head/main" && github.event_name == "push"
+      #   run: terraform apply -auto-approve -input=false
+
+      - name: Build and deploy app
+        run: chmod +x ./deploy_app.sh && ./deploy_app.sh
