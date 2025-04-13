@@ -8,7 +8,7 @@ namespace GalaxyGuesserApi.Data
 
         public DatabaseContext(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("PostgresConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
             
             if (string.IsNullOrEmpty(_connectionString))
             {
