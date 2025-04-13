@@ -56,4 +56,4 @@ jobs:
       #   run: terraform apply -auto-approve -input=false
 
       - name: Build and deploy app
-        run: chmod +x ./deploy_app.sh && ./deploy_app.sh
+        run: chmod +x ./deploy_app.sh
