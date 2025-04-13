@@ -17,24 +17,36 @@ namespace GalaxyGuesserApi.Services
             return await _PlayerRepository.GetAllPlayersAsync();
         }
 
-        public async Task<Player> GetPlayerByIdAsync(int id)
+        public async Task<Player> GetPlayerByIdAsync(int player_id)
         {
-            return await _PlayerRepository.GetPlayerByIdAsync(id);
+            return await _PlayerRepository.GetPlayerByIdAsync(player_id);
         }
 
-        public async Task CreatePlayerAsync(Player Player)
+        public async Task<Player> CreatePlayerAsync(string guid, string username)
         {
-            await _PlayerRepository.CreatePlayerAsync(Player);
+           return await _PlayerRepository.CreatePlayerAsync(guid, username);
         }
 
-        public async Task UpdatePlayerAsync(Player Player)
+        public async Task<bool> UpdatePlayerAsync(int player_id, string username)
         {
-            await _PlayerRepository.UpdatePlayerAsync(Player);
+            var existingPlayer = await _PlayerRepository.GetPlayerByIdAsync(player_id);
+            if (existingPlayer == null)
+            {
+                return false; // Player not found
+            }
+
+            return await _PlayerRepository.UpdatePlayerAsync(player_id, username);
         }
 
-        public async Task DeletePlayerAsync(int id)
+        public async Task<bool> DeletePlayerAsync(int player_id)
         {
-            await _PlayerRepository.DeletePlayerAsync(id);
+           var existingPlayer = await _PlayerRepository.GetPlayerByIdAsync(player_id);
+            if (existingPlayer == null)
+            {
+                return false; // Player not found
+            }
+
+            return await _PlayerRepository.DeletePlayerAsync(player_id);
         }
     }
 }

@@ -68,5 +68,22 @@ namespace GalaxyGuesserApi.Data
             
             return results;
         }
+        public async Task<int> ExecuteAsync(string sql, Dictionary<string, object>? parameters = null)
+        {
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+
+            await using var cmd = new NpgsqlCommand(sql, conn);
+
+            if (parameters != null)
+            {
+                foreach (var param in parameters)
+                {
+                    cmd.Parameters.AddWithValue(param.Key, param.Value);
+                }
+            }
+
+            return await cmd.ExecuteNonQueryAsync();
+        }
     }
 }

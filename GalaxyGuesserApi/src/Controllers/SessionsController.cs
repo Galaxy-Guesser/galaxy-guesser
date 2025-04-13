@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using GalaxyGuesserApi.Models;
-using GalaxyGuesserApi.Repositories;
+using  GalaxyGuesserApi.Services;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -55,5 +55,19 @@ namespace GalaxyGuesserApi.Controllers
                 return StatusCode(500, $"Internal server error {ex.Message}"); 
             }
         }
+
+        [HttpPost]
+public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest request)
+{
+    try
+    {
+        await _sessionService.JoinSessionAsync(request.SessionCode, request.PlayerGuid);
+        return Ok("Player successfully joined the session.");
+    }
+    catch (Exception ex)
+    {
+        return BadRequest($"Join failed: {ex.Message}");
+    }
+}
     }
 }

@@ -13,6 +13,18 @@ namespace GalaxyGuesserApi.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task JoinSessionAsync(string sessionCode, string playerGuid)
+        {
+            const string sql = "CALL join_session(@session_code, @player_guid)";
+            var parameters = new Dictionary<string, object>
+            {
+                { "@session_code", sessionCode },
+                { "@player_guid",playerGuid }
+            };
+
+            await _dbContext.ExecuteNonQueryAsync(sql, parameters);
+        }
+
         public async Task<List<SessionDTO>> GetAllSessionsAsync()
         {
             const string sql = "SELECT session_code, " +
@@ -31,7 +43,7 @@ namespace GalaxyGuesserApi.Repositories
         }
         public async Task CreateSessionAsync(string category, int questionsCount, string user_guid)
         {
-            const string sql = "CALL create_session (@category,@question_count,@user_guid)";
+            const string sql = "CALL create_session (@category,@user_guid,@question_count)";
             var parameters = new Dictionary<string, object>
             {
                 { "@category", category },

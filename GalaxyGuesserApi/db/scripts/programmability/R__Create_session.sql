@@ -54,13 +54,6 @@ BEGIN
     ORDER BY random()
     LIMIT p_question_count;
 
-  
-    INSERT INTO SessionPlayers (session_id, player_id)
-    VALUES (v_session_id, v_created_by);
-
-    INSERT INTO SessionScores (session_id, player_id, score)
-    VALUES (v_session_id, v_created_by, 0);
-
     CREATE TEMP TABLE IF NOT EXISTS session_result (
         session_code VARCHAR(6)
     ) ON COMMIT DROP;
