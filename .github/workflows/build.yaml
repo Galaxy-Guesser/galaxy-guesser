@@ -1,0 +1,306 @@
+name: Terraform, Build, and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    outputs:
+      ecr_repository_url: ${{ steps.get-ecr-url.outputs.ecr_repository_url }}
+      ec2: ${{ steps.get-ec2-ip.outputs.ec2 }}
+      ssh_private_key: ${{ steps.get-ssh-key.outputs.ssh_private_key }}
+      rds_endpoint: ${{ steps.get-rds-endpoint.outputs.rds_endpoint }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: af-south-1
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform
+        run: terraform plan -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -auto-approve -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+      - name: Get ECR Repository URL
+        id: get-ecr-url
+        working-directory: terraform
+        run: |
+          FULL_OUTPUT=$(terraform output -raw ecr_repository_url)
+          if [[ $FULL_OUTPUT =~ ([0-9]+\.dkr\.ecr\.[a-z0-9-]+\.amazonaws\.com/[a-z0-9-]+) ]]; then
+            ECR_URL="${BASH_REMATCH[1]}"
+            echo "Extracted ECR URL: ${ECR_URL}"
+            echo "ecr_repository_url=${ECR_URL}" >> $GITHUB_OUTPUT
+          else
+            echo "Failed to extract ECR URL from output: $FULL_OUTPUT"
+            exit 1
+          fi
+
+      - name: Get EC2 Public IP
+        id: get-ec2-ip
+        working-directory: terraform
+        run: |
+          FULL_OUTPUT=$(terraform output -raw ec2)
+          if [[ $FULL_OUTPUT =~ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) ]]; then
+            EC2_IP="${BASH_REMATCH[1]}"
+            echo "Extracted EC2 IP: ${EC2_IP}"
+            echo "ec2=${EC2_IP}" >> $GITHUB_OUTPUT
+          else
+            echo "Failed to extract EC2 IP from output: $FULL_OUTPUT"
+            exit 1
+          fi
+
+      - name: Get SSH Private Key
+        id: get-ssh-key
+        working-directory: terraform
+        run: |
+          # Capture raw output and errors
+          if ! terraform output -raw ssh_private_key > temp_ssh_key.pem 2> terraform_error.log; then
+            echo "Terraform output failed:"
+            cat terraform_error.log
+            exit 1
+          fi
+          # Check if file is empty
+          if [ ! -s temp_ssh_key.pem ]; then
+            echo "temp_ssh_key.pem is empty"
+            exit 1
+          fi
+          # Validate PEM format
+          if grep -q -- "-----BEGIN RSA PRIVATE KEY-----" temp_ssh_key.pem && grep -q -- "-----END RSA PRIVATE KEY-----" temp_ssh_key.pem; then
+            echo "SSH key format valid"
+            # Clean and encode
+            SSH_KEY=$(tr -d '\r' < temp_ssh_key.pem | base64 -w 0)
+            echo "ssh_private_key=${SSH_KEY}" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid SSH key format in temp_ssh_key.pem"
+            echo "File size: $(wc -c temp_ssh_key.pem)"
+            echo "Line count: $(wc -l temp_ssh_key.pem)"
+            echo "First 3 lines (sanitized):"
+            head -n 3 temp_ssh_key.pem
+            echo "First 10 characters:"
+            head -c 10 temp_ssh_key.pem
+            exit 1
+          fi
+          rm temp_ssh_key.pem terraform_error.log || true
+
+      - name: Get RDS Endpoint
+        id: get-rds-endpoint
+        working-directory: terraform
+        run: |
+          FULL_OUTPUT=$(terraform output -raw rds_endpoint)
+          if [[ $FULL_OUTPUT =~ ([a-z0-9-]+\.[a-z0-9]+\.[a-z0-9-]+\.rds\.amazonaws\.com:[0-9]+) ]]; then
+            RDS_ENDPOINT="${BASH_REMATCH[1]}"
+            echo "Extracted RDS endpoint: ${RDS_ENDPOINT}"
+            echo "rds_endpoint=${RDS_ENDPOINT}" >> $GITHUB_OUTPUT
+          else
+            echo "Failed to extract RDS endpoint from output: $FULL_OUTPUT"
+            exit 1
+          fi
+
+  build-and-push:
+    needs: terraform
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.push-image.outputs.image }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0'
+
+      - name: Restore dependencies
+        run: dotnet restore GalaxyGuesserApi/GalaxyGuesserApi.csproj
+
+      - name: Build .NET API
+        run: dotnet build GalaxyGuesserApi/GalaxyGuesserApi.csproj --configuration Release --no-restore
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: af-south-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push Docker image to ECR
+        id: push-image
+        env:
+          ECR_REPOSITORY_URL: ${{ needs.terraform.outputs.ecr_repository_url }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          echo "Building image: ${ECR_REPOSITORY_URL}:${IMAGE_TAG}"
+          docker build -t ${ECR_REPOSITORY_URL}:${IMAGE_TAG} -f GalaxyGuesserApi/Dockerfile GalaxyGuesserApi/
+          docker push ${ECR_REPOSITORY_URL}:${IMAGE_TAG}
+          echo "image=${ECR_REPOSITORY_URL}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+  flyway-migration:
+    name: Flyway Database Migrations
+    needs: [terraform, build-and-push]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Flyway
+        working-directory: GalaxyGuesserApi
+        run: |
+          FLYWAY_VERSION="11.7.0"
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz | tar xvz
+          sudo ln -s $(pwd)/flyway-${FLYWAY_VERSION}/flyway /usr/local/bin/flyway
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: af-south-1
+      
+      - name: Wait for RDS Availability
+        run: |
+          echo "Waiting for RDS to be available..."
+          sleep 30 # Increased to 2 minutes to ensure RDS is ready
+      
+      - name: Run Flyway Migrations
+        working-directory: GalaxyGuesserApi/db/
+        env:
+          RDS_ENDPOINT: ${{ needs.terraform.outputs.rds_endpoint }}
+        run: |
+          # Debug: Print RDS endpoint to verify
+          echo "Using RDS Endpoint: $RDS_ENDPOINT"
+          if [ -z "$RDS_ENDPOINT" ]; then
+            echo "Error: RDS_ENDPOINT is empty"
+            exit 1
+          fi
+          
+          # Create Flyway config file
+          cat > flyway.conf << EOF
+          flyway.url=jdbc:postgresql://${RDS_ENDPOINT}/guesserDB
+          flyway.user=iamuser
+          flyway.password=${{ secrets.DB_PASSWORD }}
+          flyway.validateMigrationNaming=true
+          flyway.locations=filesystem:./scripts
+          flyway.baselineOnMigrate=true
+          flyway.schemas=public
+          EOF
+          chmod 600 flyway.conf
+          
+          # Run migrations
+          flyway info
+          flyway migrate
+          flyway info
+
+  deploy:
+    needs: [terraform, build-and-push, flyway-migration]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Debug Outputs
+        run: |
+          echo "EC2 IP: ${{ needs.terraform.outputs.ec2 }}"
+          echo "RDS Endpoint: ${{ needs.terraform.outputs.rds_endpoint }}"
+          echo "ECR URL: ${{ needs.terraform.outputs.ecr_repository_url }}"
+          echo "Image: ${{ needs.build-and-push.outputs.image }}"
+
+      - name: Write SSH private key to file
+        run: |
+          echo "${{ needs.terraform.outputs.ssh_private_key }}" | base64 -d > deploy-key.pem
+          chmod 400 deploy-key.pem
+          if grep -q -- "-----BEGIN RSA PRIVATE KEY-----" deploy-key.pem && grep -q -- "-----END RSA PRIVATE KEY-----" deploy-key.pem; then
+            echo "deploy-key.pem format valid"
+          else
+            echo "Invalid deploy-key.pem format"
+            echo "File size: $(wc -c deploy-key.pem)"
+            echo "Line count: $(wc -l deploy-key.pem)"
+            echo "First 5 lines:"
+            head -n 5 deploy-key.pem
+            exit 1
+          fi
+          if ssh-keygen -y -P "" -f deploy-key.pem > /dev/null 2> keygen_error.log; then
+            echo "deploy-key.pem is usable"
+          else
+            echo "deploy-key.pem is not a valid SSH key"
+            cat keygen_error.log
+            exit 1
+          fi
+
+      - name: SSH to EC2 and Deploy
+        env:
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+          DB_CONNECTION_STRING: "Host=${{ needs.terraform.outputs.rds_endpoint }};Database=guesserDB;Username=iamuser;Password=${{ secrets.DB_PASSWORD }}"
+        run: |
+          ssh -v -o StrictHostKeyChecking=no -i deploy-key.pem ec2-user@${{ needs.terraform.outputs.ec2 }} << EOF
+            if ! command -v docker >/dev/null 2>&1; then
+              sudo dnf update -y
+              sudo dnf install -y docker
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ec2-user
+            fi
+            
+            if ! docker info >/dev/null 2>&1; then
+              echo "Fixing Docker permissions"
+              sudo chown ec2-user:docker /var/run/docker.sock
+              sudo chmod 660 /var/run/docker.sock
+            fi
+            
+            docker --version
+            
+            if ! command -v aws >/dev/null 2>&1; then
+              sudo dnf install -y awscli
+            fi
+            
+            aws --version
+            
+            IMAGE="${IMAGE}"
+            echo "Image: \$IMAGE"
+            
+            if [ -z "\$IMAGE" ]; then
+              echo "Error: IMAGE variable is empty, using fallback"
+              IMAGE="${{ needs.terraform.outputs.ecr_repository_url }}:${{ github.sha }}"
+              echo "Fallback Image: \$IMAGE"
+            fi
+            
+            DB_CONNECTION="${DB_CONNECTION_STRING}"
+            if [ -z "\$DB_CONNECTION" ]; then
+              echo "Error: DB_CONNECTION_STRING variable is empty, using hardcoded value"
+              DB_CONNECTION="Host=${{ needs.terraform.outputs.rds_endpoint }};Database=guesserDB;Username=iamuser;${{ secrets.DB_PASSWORD }}"
+            fi
+            
+            aws ecr get-login-password --region af-south-1 | docker login --username AWS --password-stdin \${IMAGE%/*}
+            docker pull \$IMAGE
+            docker stop galaxy-guesser-api || true
+            docker rm galaxy-guesser-api || true
+            docker run -d --name galaxy-guesser-api -p 80:8080 -e "ConnectionStrings__DefaultConnection=\$DB_CONNECTION" \$IMAGE
+          EOF
