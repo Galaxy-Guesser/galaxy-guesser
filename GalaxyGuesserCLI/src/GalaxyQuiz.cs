@@ -97,11 +97,11 @@ namespace ConsoleApp1
                                     .Title("Select a session to join")
                                     .PageSize(10)
                                     .AddChoices(activeSessions.Select(s =>
-                                        $"{s.session_code} - {s.session_category}")));
+                                        $"{s.sessionCode} - {s.category}")));
 
                             sessionCode = selected.Split(" - ")[0];
                             //need to grad this guid from logged in suer
-                            await SessionService.JoinSessionAsync(sessionCode, "77777777-7777-4777-8777-777777777777");
+                            await SessionService.JoinSessionAsync(sessionCode, "55555555-5555-4555-8555-555555555555");
 
                             UIService.Continue();
                             break;

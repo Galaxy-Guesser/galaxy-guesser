@@ -324,14 +324,14 @@ public static void DisplayActiveSessions(List<SessionView> sessions)
     foreach (var session in sessions)
     {
 
-        var timeParts = session.ends_in.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
+        var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
         if (timeParts.Length < 2) continue;
         int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
         int seconds = int.TryParse(timeParts[1], out var parsedSeconds) ? parsedSeconds : 0;
 
         var color = minutes < 5 ? "red" : "white";
         string formattedTime = $"{minutes}m {seconds}s";
-        table.AddRow(session.session_category, session.session_code, $"[{color}]{formattedTime}[/]");
+        table.AddRow(session.category, session.sessionCode, $"[{color}]{formattedTime}[/]");
     }
 
     AnsiConsole.Write(table);
@@ -342,7 +342,7 @@ public static void DisplayActiveSessions(List<SessionView> sessions)
 
         foreach (var session in sessions)
         {
-            var timeParts = session.ends_in.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
+            var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
             if (timeParts.Length < 2) continue;
 
             int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
@@ -359,7 +359,7 @@ public static void DisplayActiveSessions(List<SessionView> sessions)
             }
             var color = minutes < 30 ? "red" : "white";
             string updatedTime = $"{minutes}m {seconds}s";
-            session.ends_in = updatedTime;
+            session.endsIn = updatedTime;
         }
         AnsiConsole.Clear();
         AnsiConsole.MarkupLine("\n📡 [bold underline]Active Sessions[/]");
@@ -371,7 +371,7 @@ public static void DisplayActiveSessions(List<SessionView> sessions)
 
         foreach (var session in sessions)
         {
-            var timeParts = session.ends_in.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
+            var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
             if (timeParts.Length < 2) continue;
 
             int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
@@ -379,7 +379,7 @@ public static void DisplayActiveSessions(List<SessionView> sessions)
 
             var color = minutes < 30 ? "red" : "white";
 
-            updatedTable.AddRow(session.session_category, session.session_code, $"[{color}]{session.ends_in}[/]");
+            updatedTable.AddRow(session.category, session.sessionCode, $"[{color}]{session.endsIn}[/]");
         }
 
         AnsiConsole.Write(updatedTable);

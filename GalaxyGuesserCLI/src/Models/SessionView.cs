@@ -3,13 +3,13 @@ namespace ConsoleApp1.Models
     public class SessionView
     {
         public int SessionId { get; set; }
-        public string session_code { get; set; }
-        public string session_category { get; set; }
-        public List<string> PlayerUsernames { get; set; }
-        public int PlayerCount { get; set; }
-        public string Duration { get; set; }
-        public int QuestionCount { get; set; }
-        public int? HighestScore { get; set; }
-        public string ends_in { get; set; }
+        public string sessionCode { get; set; }
+        public string category { get; set; }
+        public List<string> playerUserNames { get; set; }
+        public int playerCount { get; set; }
+        public string duration { get; set; }
+        public int questionCount { get; set; }
+        public int? highestScore { get; set; }
+        public string endsIn { get; set; }
     }
 }

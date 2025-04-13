@@ -16,30 +16,30 @@ namespace GalaxyGuesserApi.Repositories
         public async Task<List<Player>> GetAllPlayersAsync()
         {
             const string query = @"
-            SELECT player_id, username, guid
-            FROM player";
+            SELECT player_id, user_name, guid
+            FROM players";
 
             return await _dbContext.QueryAsync(query, reader => new Player
             {
-                player_id = reader.GetInt32(0),
-                username = reader.GetString(1),
+                playerId = reader.GetInt32(0),
+                userName = reader.GetString(1),
                 guid = reader.GetString(2)
             });
             }
 
-        public async Task<Player> GetPlayerByIdAsync(int player_id)
+        public async Task<Player> GetPlayerByIdAsync(int playerId)
         {
             const string query = @"
-            SELECT player_id, username, guid
-            FROM player
-            WHERE player_id = @player_id";
+            SELECT player_id, user_name, guid
+            FROM players
+            WHERE player_id = @playerId";
 
-            var parameters = new Dictionary<string, object> { { "@player_id", player_id } };
+            var parameters = new Dictionary<string, object> { { "@playerId", playerId } };
 
             var result = await _dbContext.QueryAsync(query, reader => new Player
                 {
-                    player_id = reader.GetInt32(0),
-                    username = reader.GetString(1),
+                    playerId = reader.GetInt32(0),
+                    userName = reader.GetString(1),
                     guid = reader.GetString(2)
                 }, parameters);
 
@@ -49,38 +49,38 @@ namespace GalaxyGuesserApi.Repositories
         public async Task<Player?> GetUserByGoogleIdAsync(string guid)
         {
             const string query = @"
-                SELECT player_id, username, guid
-                FROM player
+                SELECT player_id, user_name, guid
+                FROM players
                 WHERE guid = @guid";
 
             var parameters = new Dictionary<string, object> { { "@guid", guid } };
 
             var players = await _dbContext.QueryAsync(query, reader => new Player
             {
-                player_id = reader.GetInt32(0),
-                username = reader.GetString(1),
+                playerId = reader.GetInt32(0),
+                userName = reader.GetString(1),
                 guid = reader.GetString(2)
             }, parameters);
 
             return players.FirstOrDefault(); 
         }
 
-        public async Task<Player> CreatePlayerAsync(string guid, string username)
+        public async Task<Player> CreatePlayerAsync(string guid, string userName)
         {
             const string sql = @"
-            INSERT INTO player (username, guid)
-            VALUES (@username, @guid)
-            RETURNING player_id, username, guid";
+            INSERT INTO players (user_name, guid)
+            VALUES (@userName, @guid)
+            RETURNING player_id, user_name, guid";
             var parameters = new Dictionary<string, object>
             {
-                { "@username", username },
+                { "@userName", userName },
                 { "@guid", guid}
             };
             
             var result = await _dbContext.QueryAsync(sql, reader => new Player
             {
-                player_id = reader.GetInt32(0),    
-                username = reader.GetString(1),    
+                playerId = reader.GetInt32(0),    
+                userName = reader.GetString(1),    
                 guid = reader.GetString(2)       
             }, parameters);
 
@@ -88,30 +88,30 @@ namespace GalaxyGuesserApi.Repositories
            
         }
 
-        public async Task<bool> UpdatePlayerAsync(int player_id, string username)
+        public async Task<bool> UpdatePlayerAsync(int playerId, string userName)
         {
             const string query = @"
-            UPDATE player
-            SET username = @username
-            WHERE player_id = @player_id";
+            UPDATE players
+            SET user_name = @userName
+            WHERE player_id = @playerId";
 
             var parameters = new Dictionary<string, object>
             {
-                { "@player_id", player_id },
-                { "@username", username }
+                { "@playerId", playerId },
+                { "@userName", userName }
             };
 
             var affectedRows = await _dbContext.ExecuteAsync(query, parameters);
             return affectedRows > 0;
         }
 
-        public async Task<bool> DeletePlayerAsync(int player_id)
+        public async Task<bool> DeletePlayerAsync(int playerId)
         {
             const string query = @"
-            DELETE FROM player
-            WHERE player_id = @player_id";
+            DELETE FROM players
+            WHERE player_id = @playerId";
 
-            var parameters = new Dictionary<string, object> { { "@player_id", player_id } };
+            var parameters = new Dictionary<string, object> { { "@playerId", playerId } };
 
             var affectedRows = await _dbContext.ExecuteAsync(query, parameters);
             return affectedRows > 0;

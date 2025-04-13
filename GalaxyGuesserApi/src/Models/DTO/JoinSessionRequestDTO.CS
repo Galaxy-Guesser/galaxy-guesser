@@ -2,7 +2,7 @@ namespace GalaxyGuesserApi.Models
 {
     public class JoinSessionRequest
     {
-        public string SessionCode { get; set; }
-        public string PlayerGuid { get; set; }
+        public string sessionCode { get; set; }
+        public string playerGuid { get; set; }
     }
 }

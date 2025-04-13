@@ -15,11 +15,11 @@ namespace GalaxyGuesserApi.Repositories
 
         public async Task JoinSessionAsync(string sessionCode, string playerGuid)
         {
-            const string sql = "CALL join_session(@session_code, @player_guid)";
+            const string sql = "CALL join_session(@sessionCode, @playerGuid)";
             var parameters = new Dictionary<string, object>
             {
-                { "@session_code", sessionCode },
-                { "@player_guid",playerGuid }
+                { "@sessionCode", sessionCode },
+                { "@playerGuid",playerGuid }
             };
 
             await _dbContext.ExecuteNonQueryAsync(sql, parameters);
@@ -38,17 +38,17 @@ namespace GalaxyGuesserApi.Repositories
             {
                 sessionCode = reader.GetString(0),
                 category = reader.GetString(1),
-                user_name = reader.GetString(2),
+                userName = reader.GetString(2),
             });
         }
-        public async Task CreateSessionAsync(string category, int questionsCount, string user_guid)
+        public async Task CreateSessionAsync(string category, int questionsCount, string userGuid)
         {
-            const string sql = "CALL create_session (@category,@user_guid,@question_count)";
+            const string sql = "CALL create_session (@category,@userGuid,@questionCount)";
             var parameters = new Dictionary<string, object>
             {
                 { "@category", category },
-                { "@question_count", questionsCount },
-                { "@user_guid", user_guid },
+                { "@questionCount", questionsCount },
+                { "@userGuid", "00000000-0000-4000-8000-000000000000" },
             };
 
             await _dbContext.ExecuteNonQueryAsync(sql, parameters);
@@ -62,13 +62,13 @@ namespace GalaxyGuesserApi.Repositories
                 "FROM sessions " +
                 "INNER JOIN categories ON sessions.category_id = categories.category_id " +
                 "INNER JOIN players ON players.guid = session.player_guid "+
-                "WHERE sessions.session_code= @session_code";
-            var parameters = new Dictionary<string, object> { { "@session_code", sessionCode } };
+                "WHERE sessions.session_code= @sessionCode";
+            var parameters = new Dictionary<string, object> { { "@sessionCode", sessionCode } };
             var sessions = await _dbContext.QueryAsync(sql, reader => new SessionDTO
             {
                 sessionCode = reader.GetString(0),
                 category = reader.GetString(1),
-                user_name = reader.GetString(3),
+                userName = reader.GetString(3),
             }, parameters);
 
             return sessions.FirstOrDefault()!;
@@ -86,10 +86,10 @@ namespace GalaxyGuesserApi.Repositories
             await _dbContext.ExecuteNonQueryAsync(sql, parameters);
         }
 
-        public async Task DeleteSessionAsync(string session_code)
+        public async Task DeleteSessionAsync(string sessionCode)
         {
-            const string sql = "Update sessions set end_date=now() WHERE session_code = @session_code";
-            var parameters = new Dictionary<string, object> { { "@id", session_code } };
+            const string sql = "Update sessions set end_date=now() WHERE session_code = @sessionCode";
+            var parameters = new Dictionary<string, object> { { "@id", sessionCode } };
 
             await _dbContext.ExecuteNonQueryAsync(sql, parameters);
         }
