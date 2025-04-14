@@ -2,6 +2,8 @@ using GalaxyGuesserApi.Data;
 using GalaxyGuesserApi.Repositories;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using GalaxyGuesserApi.Services;
+using GalaxyGuesserApi.src.Repositories;
+using GalaxyGuesserApi.src.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -64,6 +66,7 @@ builder.Services.AddSingleton<DatabaseContext>();
 builder.Services.AddScoped<IPlayerRepository,PlayerRepository>();
 builder.Services.AddScoped<ISessionRepository,SessionRepository>();
 builder.Services.AddScoped<ISessionViewRepository, SessionViewRepository>();
+builder.Services.AddScoped<ISessionScoreRepository, SessionScoreRepository>();
 
 builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<SessionService>();
