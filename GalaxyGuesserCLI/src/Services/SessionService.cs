@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Spectre.Console;
 using System.Net.Http;
 using System.Text;
-using Spectre.Console;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using ConsoleApp1.Models;
@@ -178,29 +177,44 @@ namespace ConsoleApp1.Services
 
          private static readonly HttpClient _httpClient = new HttpClient();
 
-    public static async Task<string?> CreateSessionAsync(string category, int questionsCount)
+  public static async Task<string?> CreateSessionAsync(string category, int questionsCount string startDate, int questionDuration)
+{
+    try
     {
-        try
-        {
-            string jwt = Helper.GetStoredToken();
+        string jwt = Helper.GetStoredToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-            var url = $"http://localhost:5010/api/sessions/session?category={Uri.EscapeDataString(category)}&questionsCount={questionsCount}";
-            HttpResponseMessage response = await _httpClient.PostAsync(url, null);
-            response.EnsureSuccessStatusCode();
-            string sessionCode = await response.Content.ReadAsStringAsync();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"✅ Session created: [bold]{sessionCode}[/]");
-            Console.ResetColor();
-            return sessionCode;
-        }
-        catch (Exception ex)
+        var url = $"http://localhost:5010/api/sessions/session";
+
+        var request = new CreateSessionRequest
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"❌ Error creating session: {ex.Message}");
-            Console.ResetColor();
-            return null;
-        }
+            category = category,
+            questionsCount = questionsCount,
+            startDate = startDate,
+            questionDuration = questionDuration
+        };
+        var json = JsonSerializer.Serialize(request);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync(url, content);
+        response.EnsureSuccessStatusCode();
+
+        string sessionCode = await response.Content.ReadAsStringAsync();
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"✅ Session created: {sessionCode}");
+        Console.ResetColor();
+
+        return sessionCode;
     }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"❌ Error creating session: {ex.Message}");
+        Console.ResetColor();
+        return null;
+    }
+}
+
 
     public static async Task JoinSessionAsync(string sessionCode)
 {

@@ -1,8 +1,10 @@
+
 CREATE OR REPLACE PROCEDURE create_session(
     p_category_name VARCHAR(255),
     p_player_guid VARCHAR(36),
+    p_start_time TIMESTAMP,
     p_question_count INTEGER DEFAULT 10,
-    p_end_date TIMESTAMP DEFAULT NULL
+    p_question_duration INTEGER DEFAULT 15
 )
 LANGUAGE plpgsql
 AS $$
@@ -12,6 +14,7 @@ DECLARE
     v_category_id INTEGER;
     v_created_by INTEGER;
     v_chars TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    v_end_time TIMESTAMP;
 BEGIN
     SELECT category_id INTO v_category_id
     FROM Categories
@@ -43,8 +46,10 @@ BEGIN
         );
     END LOOP;
 
-    INSERT INTO Sessions (session_code, created_by, category_id, end_date)
-    VALUES (v_session_code, v_created_by, v_category_id, p_end_date)
+     v_end_time := p_start_time + (p_question_count * p_question_duration) * INTERVAL '1 second';
+
+    INSERT INTO Sessions (session_code, created_by, category_id, start_date, end_date)
+    VALUES (v_session_code, v_created_by, v_category_id, p_start_time, v_end_time)
     RETURNING session_id INTO v_session_id;
 
     INSERT INTO SessionQuestions (question_id, session_id)

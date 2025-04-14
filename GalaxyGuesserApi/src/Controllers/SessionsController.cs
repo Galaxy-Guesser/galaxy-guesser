@@ -34,13 +34,15 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [HttpPost("session")]
-        public async Task<ActionResult<string>> CreateSession(string category, int questionsCount)
+        public async Task<ActionResult<string>> CreateSession([FromBody] CreateSessionRequestDTO request)
         {
             try
             {
                 var googleId = User.FindFirst("sub")?.Value 
                         ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                await _sessionService.CreateSessionAsync(category, questionsCount,googleId);
+                 request.userGuid = googleId
+                await _sessionService.CreateSessionAsync(request);
+
                 return Ok("created");
             }
             catch (Exception ex)

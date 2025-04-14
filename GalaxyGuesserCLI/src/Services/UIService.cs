@@ -306,7 +306,7 @@ private static void AnimateStars(int numStars, int duration)
             Console.SetCursorPosition(originalCol, originalRow);
         }
 
-public static void DisplayActiveSessions(List<SessionView> sessions)
+public static async Task DisplayActiveSessionsAsync(List<SessionView> sessions)
 {
     AnsiConsole.MarkupLine("\n📡 [bold underline]Active Sessions[/]");
 
@@ -316,77 +316,55 @@ public static void DisplayActiveSessions(List<SessionView> sessions)
         return;
     }
 
-    var table = new Table()
-        .AddColumn("Category")
-        .AddColumn("Code")
-        .AddColumn("Ends In");
+    var grid = new Grid();
+    grid.AddColumn();
+    grid.AddColumn();
 
-    foreach (var session in sessions)
+    var panels = sessions.Select(session =>
     {
-
         var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
-        if (timeParts.Length < 2) continue;
         int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
-        int seconds = int.TryParse(timeParts[1], out var parsedSeconds) ? parsedSeconds : 0;
 
-        var color = minutes < 5 ? "red" : "white";
-        string formattedTime = $"{minutes}m {seconds}s";
-        table.AddRow(session.category, session.sessionCode, $"[{color}]{formattedTime}[/]");
+        var color = minutes < 5 ? "red" : "green";
+
+        return new Panel(new Markup(
+            $"[bold]{session.category}[/]\n" +
+            $"[blue]Code:[/] {session.sessionCode}\n" +
+            $"[blue]Ends In:[/] [{color}]{minutes}m[/]"))
+        {
+            Border = BoxBorder.Double,
+            Padding = new Padding(1, 0, 1, 0)
+        };
+    }).ToList();
+
+    for (int i = 0; i < panels.Count; i += 2)
+    {
+        if (i + 1 < panels.Count)
+            grid.AddRow(panels[i], panels[i + 1]);
+        else
+            grid.AddRow(panels[i]);
     }
 
-    AnsiConsole.Write(table);
-    var timer = new System.Timers.Timer(1000);
-    timer.Elapsed += (sender, e) =>
+    AnsiConsole.Write(grid);
+
+    var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
+
+    if (!string.IsNullOrWhiteSpace(sessionCode))
     {
-        AnsiConsole.Clear();
-
-        foreach (var session in sessions)
+        var selectedSession = sessions.FirstOrDefault(s => s.sessionCode.Equals(sessionCode, StringComparison.OrdinalIgnoreCase));
+        if (selectedSession != null)
         {
-            var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
-            if (timeParts.Length < 2) continue;
-
-            int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
-            int seconds = int.TryParse(timeParts[1], out var parsedSeconds) ? parsedSeconds : 0;
-
-            if (seconds > 0)
-            {
-                seconds--;
-            }
-            else if (minutes > 0)
-            {
-                minutes--;
-                seconds = 59;
-            }
-            var color = minutes < 30 ? "red" : "white";
-            string updatedTime = $"{minutes}m {seconds}s";
-            session.endsIn = updatedTime;
+            await SessionService.JoinSessionAsync(sessionCode, "77777777-7777-4777-8777-777777777777");
         }
-        AnsiConsole.Clear();
-        AnsiConsole.MarkupLine("\n📡 [bold underline]Active Sessions[/]");
-
-        var updatedTable = new Table()
-            .AddColumn("Category")
-            .AddColumn("Code")
-            .AddColumn("Ends In");
-
-        foreach (var session in sessions)
+        else
         {
-            var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
-            if (timeParts.Length < 2) continue;
-
-            int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
-            int seconds = int.TryParse(timeParts[1], out var parsedSeconds) ? parsedSeconds : 0;
-
-            var color = minutes < 30 ? "red" : "white";
-
-            updatedTable.AddRow(session.category, session.sessionCode, $"[{color}]{session.endsIn}[/]");
+            AnsiConsole.MarkupLine($"❌ [red]Invalid session code:[/] {sessionCode}");
         }
-
-        AnsiConsole.Write(updatedTable);
-    };
-
-    timer.Start();
+    }
+    else
+    {
+        AnsiConsole.MarkupLine("[grey]No session joined.[/]");
+    }
 }
-
     }
 }
