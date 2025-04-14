@@ -11,6 +11,12 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using ConsoleApp1.Models;
 using ConsoleApp1.Data;
+using ConsoleApp1.Helpers;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+
 
 
 namespace ConsoleApp1.Services
@@ -176,16 +182,15 @@ namespace ConsoleApp1.Services
     {
         try
         {
+            string jwt = Helper.GetStoredToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
             var url = $"http://localhost:5010/api/sessions/session?category={Uri.EscapeDataString(category)}&questionsCount={questionsCount}";
             HttpResponseMessage response = await _httpClient.PostAsync(url, null);
             response.EnsureSuccessStatusCode();
-
             string sessionCode = await response.Content.ReadAsStringAsync();
-
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"✅ Session created: [bold]{sessionCode}[/]");
             Console.ResetColor();
-
             return sessionCode;
         }
         catch (Exception ex)
@@ -197,18 +202,29 @@ namespace ConsoleApp1.Services
         }
     }
 
-    public static async Task JoinSessionAsync(string sessionCode, string playerGuid)
+    public static async Task JoinSessionAsync(string sessionCode)
 {
     try
     {
+        string jwt = Helper.GetStoredToken();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(jwt);
+        
+        // Try to get sub  or nameidentifier
+        var playerGuid = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value 
+                    ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+      
         var requestBody = new
         {
             sessionCode = sessionCode,
-            playerGuid = playerGuid
         };
 
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+       
 
         var url = "http://localhost:5010/api/sessions"; 
         HttpResponseMessage response = await _httpClient.PostAsync(url, content);

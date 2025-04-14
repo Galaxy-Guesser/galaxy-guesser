@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ConsoleApp1.Models;
+using ConsoleApp1.Helpers;
 using ConsoleApp1.Data;
 using System.Net;
 using System.Web;
@@ -62,8 +63,9 @@ namespace ConsoleApp1.Services
             return password.ToString();
         }
 
-        internal async Task<Player> AuthOrRegisterWithBackend(string jwt)
+        internal async Task<Player> AuthOrRegisterWithBackend()
         {
+            string jwt = Helper.GetStoredToken();
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
@@ -72,7 +74,6 @@ namespace ConsoleApp1.Services
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
-                // New user, ask for name
                 Console.Write("\n🌟 Enter your display name: ");
                 Console.CursorVisible = true;
                 var displayName = Console.ReadLine();
@@ -91,15 +92,12 @@ namespace ConsoleApp1.Services
 
         public async Task<string> AuthenticateWithGoogle()
         {
-            // Create a local listener to catch the OAuth callback
             var listener = new HttpListener();
             listener.Prefixes.Add("http://localhost:5000/");
             listener.Start();
 
-            // Generate a state parameter to protect against CSRF
             var state = Guid.NewGuid().ToString();
             
-            // Construct the Google OAuth URL
             var authorizationEndpoint = 
                 "https://accounts.google.com/o/oauth2/v2/auth" +
                 "?client_id="+ _configuration["Google:client_id"] +
@@ -158,7 +156,6 @@ namespace ConsoleApp1.Services
             var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
             var tokenData = JsonSerializer.Deserialize<TokenResponse>(tokenContent);
 
-            // Store the token securely
             await StoreTokenInFile(tokenData);
             
             return tokenData.AccessToken;
@@ -188,7 +185,6 @@ namespace ConsoleApp1.Services
         {
             var tokenJson = JsonSerializer.Serialize(tokenData, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync("token.json", tokenJson);
-            Console.WriteLine("Token saved to token.json");
         }
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using ConsoleApp1.Helpers;
 using ConsoleApp1.Models;
 
 namespace ConsoleApp1.Services
@@ -16,6 +18,9 @@ namespace ConsoleApp1.Services
         {
             try
             {
+                 string jwt = Helper.GetStoredToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
                 HttpResponseMessage response = await _httpClient.GetAsync(ActiveSessionsApiUrl);
                 response.EnsureSuccessStatusCode();
                 
