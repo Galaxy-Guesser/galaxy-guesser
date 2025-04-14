@@ -53,7 +53,7 @@ namespace ConsoleApp1.Services
             AddQuestionsToSession(session.Id, categoryId, questionCount);
             
             // Add player to session
-            AddPlayerToSession(player.Id, session.Id);
+            AddPlayerToSession(player.playerId, session.Id);
             
             return session;
         }
@@ -65,7 +65,7 @@ namespace ConsoleApp1.Services
             if (session != null)
             {
                 // Add player to session
-                AddPlayerToSession(player.Id, session.Id);
+                AddPlayerToSession(player.playerId, session.Id);
                 return session;
             }
 
@@ -126,7 +126,7 @@ namespace ConsoleApp1.Services
                 .Where(s => s.SessionId == sessionId)
                 .OrderByDescending(s => s.Score + s.TimeRemaining)
                 .Select(s => new { 
-                    Name = players.First(p => p.Id == s.PlayerId).Name, 
+                    Name = players.First(p => p.playerId == s.PlayerId).userName, 
                     Score = s.Score,
                     TimeBonus = s.TimeRemaining,
                     Total = s.Score + s.TimeRemaining

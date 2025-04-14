@@ -11,5 +11,7 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
         Task<bool> UpdatePlayerAsync(int playerId, string userName);
         Task<bool> DeletePlayerAsync(int playerId);
 
+        Task<Player> GetPlayerByGuidAsync(string guid);
+
     }
 }

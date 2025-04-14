@@ -20,12 +20,19 @@ namespace ConsoleApp1
             Console.Title = "🌌 Galaxy Quiz";
             Console.CursorVisible = false;
 
-            try
+           try
             {
                 UIService.PrintGalaxyHeader();
-                Player player = AuthenticatePlayer();
-                await MainMenuLoop(player);
 
+                var authService = new AuthenticationService();
+
+                // Step 1: Login with Google
+                var jwt = await authService.AuthenticateWithGoogle(); // You already have this working!
+
+                // Step 2: Send JWT to backend and try to fetch player
+                var player = await authService.AuthOrRegisterWithBackend(jwt);
+
+                await MainMenuLoop(player);
             }
             catch (Exception exception)
             {
@@ -40,7 +47,7 @@ namespace ConsoleApp1
             while (!exitRequested)
             {
                 UIService.PrintGalaxyHeader();
-                Console.WriteLine($"\n👋 Welcome, {player.Name}!");
+                Console.WriteLine($"\n👋 Welcome, {player.userName}!");
                 Console.WriteLine("\nMAIN MENU");
                 Console.WriteLine("1. Create new quiz session");
                 Console.WriteLine("2. Join existing session");
@@ -140,98 +147,6 @@ namespace ConsoleApp1
                 {
                     Console.WriteLine("Invalid input. Please enter a number or command.");
                     UIService.Continue();
-                }
-            }
-        }
-
-        static Player AuthenticatePlayer()
-        {
-            while (true)
-            {
-                Console.WriteLine("\n1. Login\n2. Register new account");
-                Console.Write("\n👉 Enter your choice (1 or 2): ");
-                Console.CursorVisible = true;
-
-                ConsoleKey choice = Console.ReadKey(true).Key;
-                Console.CursorVisible = false;
-
-                if (choice == ConsoleKey.D1)
-                {
-                    Console.WriteLine("1");
-                    // Login
-                    Console.Write("\nUsername: ");
-                    Console.CursorVisible = true;
-                    string username = Console.ReadLine();
-                    Console.CursorVisible = false;
-
-                    Console.Write("Password: ");
-                    Console.CursorVisible = true;
-                    string password = AuthenticationService.ReadPassword();
-                    Console.CursorVisible = false;
-
-                    Player player = AuthenticationService.Login(username, password);
-
-                    if (player != null)
-                    {
-                        Console.WriteLine($"\n👋 Welcome back, {player.Name}!");
-                        Thread.Sleep(1500);
-                        return player;
-                    }
-                    else if (SampleData.UserCredentials.ContainsKey(username))
-                    {
-                        // Valid credentials but no profile
-                        Console.Write("\nEnter your display name: ");
-                        Console.CursorVisible = true;
-                        string name = Console.ReadLine() ?? string.Empty;
-                        Console.CursorVisible = false;
-
-                        player = AuthenticationService.CreateProfileForExistingCredentials(username, name);
-                        Console.WriteLine($"\n👋 Welcome, {player.Name}!");
-                        Thread.Sleep(1500);
-                        return player;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\n❌ Invalid username or password. Try again.");
-                        Console.ResetColor();
-                    }
-                }
-                else if (choice == ConsoleKey.D2)
-                {
-                    Console.WriteLine("2");
-                    // Register
-                    Console.Write("\nCreate username: ");
-                    Console.CursorVisible = true;
-                    string username = Console.ReadLine();
-                    Console.CursorVisible = false;
-
-                    if (!string.IsNullOrWhiteSpace(username) && SampleData.UserCredentials.ContainsKey(username))
-
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("❌ Username already exists. Try another one.");
-                        Console.ResetColor();
-                        continue;
-                    }
-
-                    Console.Write("Create password: ");
-                    Console.CursorVisible = true;
-                    string password = AuthenticationService.ReadPassword();
-                    Console.CursorVisible = false;
-
-                    Console.Write("\nEnter your display name: ");
-                    Console.CursorVisible = true;
-                    string name = Console.ReadLine() ?? string.Empty;
-                    Console.CursorVisible = false;
-
-                    Player player = AuthenticationService.Register(username, password, name);
-                    if (player != null)
-                    {
-                        Console.WriteLine($"\n✅ Registration successful! Welcome, {player.Name}!");
-                        Thread.Sleep(1500);
-                        return player;
-                    }
                 }
             }
         }
@@ -381,7 +296,7 @@ namespace ConsoleApp1
             }
 
             // Save score
-            SessionService.SaveScore(player.Id, session.Id, score, totalTimeRemaining);
+            SessionService.SaveScore(player.playerId, session.Id, score, totalTimeRemaining);
         }
         static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
         {

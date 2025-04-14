@@ -7,6 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using GalaxyGuesserApi.Repositories.Interfaces;
+using System.Text.Json.Serialization;
+using System.Text;
+using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 
 namespace GalaxyGuesserApi.src.Controllers
 {
@@ -16,20 +23,87 @@ namespace GalaxyGuesserApi.src.Controllers
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _config;
+        private readonly HttpClient _httpClient;  // Change field type from IHttpClientFactory to HttpClient
 
-        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration config, IPlayerRepository playerRepository)
+        private readonly IConfiguration _configuration;
+
+        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration config, IPlayerRepository playerRepository , HttpClient httpClient)
         {
             _httpClientFactory = httpClientFactory;
-            _config = config;
+            _httpClient = httpClient;  
+            _configuration = config;
             _playerRepository = playerRepository;
+        }
+
+        [HttpPost("token")]
+        public async Task<IActionResult> ExchangeToken([FromForm] TokenRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.Code))
+            {
+                return BadRequest("Invalid request");
+            }
+
+            try 
+            {
+                var tokenRequestParams = new Dictionary<string, string>
+                {
+                    ["client_id"] =   _configuration["Google:client_id"],
+                    ["client_secret"] =  _configuration["Google:client_secret"],
+                    ["code"] = request.Code,
+                    ["redirect_uri"] = request.RedirectUri,
+                    ["grant_type"] = "authorization_code"
+                };
+
+                var content = new FormUrlEncodedContent(tokenRequestParams);
+                var response = await _httpClient.PostAsync(
+                    "https://oauth2.googleapis.com/token", 
+                    content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return BadRequest("Failed to exchange code for token" + request.RedirectUri);
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                var googleTokens = JsonSerializer.Deserialize<GoogleTokenResponse>(responseContent);
+
+                
+                return Ok(new { access_token = googleTokens.IdToken });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+        
+        public class TokenRequest
+        {
+            public string Code { get; set; }
+            public string RedirectUri { get; set; }
+        }
+
+        public class GoogleTokenResponse
+        {
+            [JsonPropertyName("access_token")]
+            public string AccessToken { get; set; }
+            
+            [JsonPropertyName("id_token")]
+            public string IdToken { get; set; }
+            
+            [JsonPropertyName("refresh_token")]
+            public string RefreshToken { get; set; }
+            
+            [JsonPropertyName("expires_in")]
+            public int ExpiresIn { get; set; }
         }
 
         [HttpGet("login")]
         public IActionResult Login( )
         {
-            var clientId = _config["Google:ClientId"];
-            var redirectUri = _config["Google:RedirectUri"];
+            var clientId =  _configuration["Google:client_id"];
+            var redirectUri = _configuration["Google:RedirectUri"];
             var scope = "openid email profile";
 
             var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
@@ -47,9 +121,9 @@ namespace GalaxyGuesserApi.src.Controllers
         [HttpGet("callback")]
         public async Task<IActionResult> Callback([FromQuery] string code)
         {
-            var clientId = _config["Google:ClientId"];
-            var clientSecret = _config["Google:ClientSecret"];
-            var redirectUri = _config["Google:RedirectUri"];
+            var clientId =  _configuration["Google:client_id"];
+            var clientSecret =  _configuration["GoogleAuth:client_secret"];
+            var redirectUri = _configuration["Google:RedirectUri"];
 
             var httpClient = _httpClientFactory.CreateClient();
 
