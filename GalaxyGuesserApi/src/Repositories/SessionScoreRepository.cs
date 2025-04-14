@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GalaxyGuesserApi.Data;
-using GalaxyGuesserApi.src.Repositories.Interfaces;
+using GalaxyGuesserApi.Repositories.Interfaces;
 
-namespace GalaxyGuesserApi.src.Repositories
+namespace GalaxyGuesserApi.Repositories
 {
     public class SessionScoreRepository : ISessionScoreRepository
     {

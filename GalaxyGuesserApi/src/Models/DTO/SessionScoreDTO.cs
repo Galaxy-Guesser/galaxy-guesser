@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GalaxyGuesserApi.src.Models.DTO
+namespace GalaxyGuesserApi.Models.DTO
 {
     public class SessionScoreDTO
     {

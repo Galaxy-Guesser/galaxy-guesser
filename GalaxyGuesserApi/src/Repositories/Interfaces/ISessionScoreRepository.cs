@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GalaxyGuesserApi.src.Repositories.Interfaces
+namespace GalaxyGuesserApi.Repositories.Interfaces
 {
     public interface ISessionScoreRepository
     {

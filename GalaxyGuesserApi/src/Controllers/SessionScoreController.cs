@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GalaxyGuesserApi.src.Models;
-using GalaxyGuesserApi.src.Services;
+using GalaxyGuesserApi.Models;
+using GalaxyGuesserApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GalaxyGuesserApi.src.Controllers
+namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
