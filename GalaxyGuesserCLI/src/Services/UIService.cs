@@ -257,7 +257,7 @@ private static void AnimateStars(int numStars, int duration)
             Console.Clear();
             UIService.PrintGalaxyHeader();
 
-            SessionScore playerScore = SessionService.GetPlayerScore(player.Id, session.Id);
+            SessionScore playerScore = SessionService.GetPlayerScore(player.playerId, session.Id);
             int score = playerScore != null ? playerScore.Score : 0;
             int timeBonus = playerScore != null ? playerScore.TimeRemaining : 0;
 

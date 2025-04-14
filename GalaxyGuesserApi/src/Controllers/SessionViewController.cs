@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Services;
 
 namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
+    [Authorize] 
     [Route("api/change")]
     public class SessionViewController : ControllerBase
     {

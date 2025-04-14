@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
 using  GalaxyGuesserApi.Services;
 
@@ -6,6 +7,8 @@ namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] 
+
     public class SessionsController : ControllerBase
     {
         private readonly SessionService _sessionService;
