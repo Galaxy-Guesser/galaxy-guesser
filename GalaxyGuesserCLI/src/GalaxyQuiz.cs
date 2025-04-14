@@ -80,7 +80,7 @@ namespace ConsoleApp1
                             var (category, questionCount, startTime,questionDuration) = SessionUIService.PromptSessionDetails();
                             Console.WriteLine($"Category: {category}, Question Count: {questionCount}, Start Time: {startTime}");
 
-                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount, "88888888-8888-4888-8888-888888888888", startTime, questionDuration);
+                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount,startTime, questionDuration);
 
                             if (!string.IsNullOrEmpty(sessionCode))
                             {

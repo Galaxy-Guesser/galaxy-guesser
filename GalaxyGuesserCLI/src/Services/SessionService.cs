@@ -177,12 +177,12 @@ namespace ConsoleApp1.Services
 
          private static readonly HttpClient _httpClient = new HttpClient();
 
-  public static async Task<string?> CreateSessionAsync(string category, int questionsCount string startDate, int questionDuration)
+  public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string startDate, int questionDuration)
 {
     try
     {
         string jwt = Helper.GetStoredToken();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
         var url = $"http://localhost:5010/api/sessions/session";
 
         var request = new CreateSessionRequest
