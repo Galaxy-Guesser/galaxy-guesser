@@ -7,6 +7,8 @@ using System.Text;
 using ConsoleApp1.Models;
 using ConsoleApp1.Services;
 using ConsoleApp1.Data;
+using ConsoleApp1.Helpers;
+
 using ConsoleApp1.Utilities;
 using Spectre.Console;
 
@@ -25,12 +27,10 @@ namespace ConsoleApp1
                 UIService.PrintGalaxyHeader();
 
                 var authService = new AuthenticationService();
+                var jwt = await authService.AuthenticateWithGoogle();
+                
 
-                // Step 1: Login with Google
-                var jwt = await authService.AuthenticateWithGoogle(); // You already have this working!
-
-                // Step 2: Send JWT to backend and try to fetch player
-                var player = await authService.AuthOrRegisterWithBackend(jwt);
+                var player = await authService.AuthOrRegisterWithBackend();
 
                 await MainMenuLoop(player);
             }
@@ -107,8 +107,7 @@ namespace ConsoleApp1
                                         $"{s.sessionCode} - {s.category}")));
 
                             sessionCode = selected.Split(" - ")[0];
-                            //need to grad this guid from logged in suer
-                            await SessionService.JoinSessionAsync(sessionCode, "55555555-5555-4555-8555-555555555555");
+                            await SessionService.JoinSessionAsync(sessionCode);
 
                             UIService.Continue();
                             break;
