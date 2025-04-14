@@ -11,6 +11,8 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Net.Http.Headers;
+using Microsoft.Extensions.Configuration;
+
 
 
 namespace ConsoleApp1.Services
@@ -22,9 +24,13 @@ namespace ConsoleApp1.Services
         private static Dictionary<string, string> userCredentials = SampleData.UserCredentials;
         private readonly IConfiguration _configuration;
 
-        public AuthenticationService(IConfiguration config){
-            _configuration = config;
+        public AuthenticationService()
+        {
+            _configuration = _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build(); 
         }
+      
 
         internal static List<Player> GetAllPlayers()
         {
