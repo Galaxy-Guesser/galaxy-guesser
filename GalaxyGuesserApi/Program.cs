@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidAudience = builder.Configuration["Google:ClientId"],
         ValidateLifetime = true,
-        NameClaimType = "given_name",
+        NameClaimType = "given_name"
     };
 })
 .AddCookie()

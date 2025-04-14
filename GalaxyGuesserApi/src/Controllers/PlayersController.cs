@@ -7,6 +7,7 @@ namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class PlayersController : ControllerBase
     {
         private readonly PlayerService _playerService;

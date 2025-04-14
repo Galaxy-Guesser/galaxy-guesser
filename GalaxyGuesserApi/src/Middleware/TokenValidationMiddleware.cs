@@ -42,7 +42,7 @@ namespace GalaxyGuesserApi.src.Middleware
                 }
 
                 var claims = TokenHelper.ParseIdToken(idToken);
-                context.Items["Guid"] = claims["sub"];
+                context.Items["UserId"] = claims["sub"];
                 context.Items["Username"] = claims["given_name"];
             }
             else
