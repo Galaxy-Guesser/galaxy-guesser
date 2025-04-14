@@ -13,9 +13,9 @@ namespace GalaxyGuesserApi.Services
             _sessionRepository = _sessionRespository;
         }
 
-        public async Task CreateSessionAsync(string category, int questionsCount,string user_guid)
+        public async Task CreateSessionAsync(CreateSessionRequestDTO requestBody)
         {
-            await _sessionRepository.CreateSessionAsync(category, questionsCount, user_guid);
+            await _sessionRepository.CreateSessionAsync(requestBody);
         }
 
         public async Task<ActionResult<SessionDTO>> GetSessionAsync(string session_code)

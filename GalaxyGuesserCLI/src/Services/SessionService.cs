@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Spectre.Console;
 using System.Net.Http;
 using System.Text;
-using Spectre.Console;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using ConsoleApp1.Models;
@@ -172,30 +171,44 @@ namespace ConsoleApp1.Services
 
          private static readonly HttpClient _httpClient = new HttpClient();
 
-    public static async Task<string?> CreateSessionAsync(string category, int questionsCount)
+  public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string userGuid, string startDate, int questionDuration)
+{
+    try
     {
-        try
+        var url = $"http://localhost:5010/api/sessions/session";
+
+        var request = new CreateSessionRequest
         {
-            var url = $"http://localhost:5010/api/sessions/session?category={Uri.EscapeDataString(category)}&questionsCount={questionsCount}";
-            HttpResponseMessage response = await _httpClient.PostAsync(url, null);
-            response.EnsureSuccessStatusCode();
+            category = category,
+            questionsCount = questionsCount,
+            userGuid = userGuid,
+            startDate = startDate,
+            questionDuration = questionDuration
+        };
+       Console.WriteLine(request);
+        var json = JsonSerializer.Serialize(request);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            string sessionCode = await response.Content.ReadAsStringAsync();
+        var response = await _httpClient.PostAsync(url, content);
+        response.EnsureSuccessStatusCode();
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"✅ Session created: [bold]{sessionCode}[/]");
-            Console.ResetColor();
+        string sessionCode = await response.Content.ReadAsStringAsync();
 
-            return sessionCode;
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"❌ Error creating session: {ex.Message}");
-            Console.ResetColor();
-            return null;
-        }
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"✅ Session created: {sessionCode}");
+        Console.ResetColor();
+
+        return sessionCode;
     }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"❌ Error creating session: {ex.Message}");
+        Console.ResetColor();
+        return null;
+    }
+}
+
 
     public static async Task JoinSessionAsync(string sessionCode, string playerGuid)
 {

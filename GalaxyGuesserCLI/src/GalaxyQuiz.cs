@@ -35,6 +35,7 @@ namespace ConsoleApp1
 
         static async Task MainMenuLoop(Player player)
         {
+
             bool exitRequested = false;
 
             while (!exitRequested)
@@ -69,8 +70,10 @@ namespace ConsoleApp1
                     switch (option)
                     {
                         case 1:
-                            var (category, questionCount) = SessionUIService.PromptSessionDetails();
-                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount);
+                            var (category, questionCount, startTime,questionDuration) = SessionUIService.PromptSessionDetails();
+                            Console.WriteLine($"Category: {category}, Question Count: {questionCount}, Start Time: {startTime}");
+
+                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount, "88888888-8888-4888-8888-888888888888", startTime, questionDuration);
 
                             if (!string.IsNullOrEmpty(sessionCode))
                             {
@@ -84,7 +87,7 @@ namespace ConsoleApp1
                             UIService.Continue();
                             break;
                         case 2:
-                           var activeSessions = await SessionViewService.GetActiveSessions();
+                            var activeSessions = await SessionViewService.GetActiveSessions();
 
                             if (activeSessions.Count == 0)
                             {
@@ -101,7 +104,7 @@ namespace ConsoleApp1
 
                             sessionCode = selected.Split(" - ")[0];
                             //need to grad this guid from logged in suer
-                            await SessionService.JoinSessionAsync(sessionCode, "55555555-5555-4555-8555-555555555555");
+                            await SessionService.JoinSessionAsync(sessionCode, "66666666-6666-4666-8666-666666666666");
 
                             UIService.Continue();
                             break;
@@ -109,7 +112,7 @@ namespace ConsoleApp1
 
                         case 3:
                             var sessions = await SessionViewService.GetActiveSessions();
-                            UIService.DisplayActiveSessions(sessions);
+                            UIService.DisplayActiveSessionsAsync(sessions);
                             UIService.Continue();
                             break;
 
