@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -20,6 +21,9 @@ namespace GalaxyGuesserApi.Controllers
         {
             try
             {
+                var userId = HttpContext.Items["UserId"]?.ToString();
+                if (string.IsNullOrEmpty(userId)) return Unauthorized("Could Not Determine Logged In User");
+
                 var Players = await _playerService.GetAllPlayersAsync();
                 return Ok(Players);
             }
@@ -34,6 +38,9 @@ namespace GalaxyGuesserApi.Controllers
         {
             try
             {
+                var userId = HttpContext.Items["UserId"]?.ToString();
+                if (string.IsNullOrEmpty(userId)) return Unauthorized("Could Not Determine Logged In User");
+
                 var Player = await _playerService.GetPlayerByIdAsync(player_id);
                 if (Player == null)
                 {
@@ -52,6 +59,12 @@ namespace GalaxyGuesserApi.Controllers
         {
             try
             {
+                var userId = HttpContext.Items["UserId"]?.ToString();
+                var userName = HttpContext.Items["Username"]?.ToString();
+
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName))
+                    return Unauthorized("Token did not contain required user info.");
+
                 var player = await _playerService.CreatePlayerAsync(guid, username);
                 return CreatedAtAction(nameof(GetPlayer), new { id = player.player_id }, player);
             }
@@ -71,6 +84,9 @@ namespace GalaxyGuesserApi.Controllers
 
             try
             {
+                var userId = HttpContext.Items["UserId"]?.ToString();
+                if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
                 var updated = await _playerService.UpdatePlayerAsync(player_id, player.username);
 
                 if (!updated)
@@ -89,26 +105,6 @@ namespace GalaxyGuesserApi.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-        }
-
-        [HttpDelete("{player_id}")]
-        public async Task<IActionResult> DeletePlayer(int player_id)
-        {
-            try
-                {
-                    var deleted = await _playerService.DeletePlayerAsync(player_id);
-
-                    if (!deleted)
-                    {
-                        return NotFound($"Player with ID {player_id} not found.");
-                    }
-
-                     return Ok(new { message = "User deleted successfully" });
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
         }
     }
 }

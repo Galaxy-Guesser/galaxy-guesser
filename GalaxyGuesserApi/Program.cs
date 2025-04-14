@@ -2,8 +2,13 @@ using GalaxyGuesserApi.Data;
 using GalaxyGuesserApi.Repositories;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using GalaxyGuesserApi.Services;
+using GalaxyGuesserApi.src.Middleware;
+using GalaxyGuesserApi.src.Repositories.Interfaces;
+using GalaxyGuesserApi.src.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,20 +21,29 @@ builder.Configuration
 
 builder.Services.AddHttpClient();
 
-// Add authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie(options =>
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.HttpOnly = true;
-    // Increase cookie size limit if needed
-    options.Cookie.MaxAge = TimeSpan.FromMinutes(5);
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    options.Authority = "https://accounts.google.com";
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = "https://accounts.google.com",
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Google:ClientId"],
+        ValidateLifetime = true,
+        NameClaimType = "given_name",
+    };
+})
+.AddCookie()
+.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+{
+    options.ClientId = builder.Configuration["Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Google:ClientSecret"];
 });
 
 builder.Services.AddControllers();
@@ -40,6 +54,8 @@ builder.Services.AddSingleton<DatabaseContext>();
 
 builder.Services.AddScoped<IPlayerRepository,PlayerRepository>();
 
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddScoped<PlayerService>();
 
 var app = builder.Build();
@@ -49,8 +65,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
+app.UseRouting();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

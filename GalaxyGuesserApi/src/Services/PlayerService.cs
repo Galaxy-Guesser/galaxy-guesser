@@ -5,48 +5,68 @@ namespace GalaxyGuesserApi.Services
 {
     public class PlayerService
     {
-        private readonly IPlayerRepository _PlayerRepository;
+        private readonly IPlayerRepository _playerRepository;
 
-        public PlayerService(IPlayerRepository PlayerRepository)
+        public PlayerService(IPlayerRepository playerRepository)
         {
-            _PlayerRepository = PlayerRepository;
+            _playerRepository = playerRepository;
         }
 
         public async Task<List<Player>> GetAllPlayersAsync()
         {
-            return await _PlayerRepository.GetAllPlayersAsync();
+            return await _playerRepository.GetAllPlayersAsync();
         }
 
-        public async Task<Player> GetPlayerByIdAsync(int player_id)
+        public async Task<Player?> GetUserByGoogleIdAsync(string guid)
         {
-            return await _PlayerRepository.GetPlayerByIdAsync(player_id);
+            if (string.IsNullOrEmpty(guid))
+                throw new ArgumentException("Google ID cannot be null or empty");
+
+            return await _playerRepository.GetUserByGoogleIdAsync(guid);
+        }
+
+        public async Task<Player?> GetPlayerByIdAsync(int playerId)
+        {
+            if (playerId <= 0)
+                throw new ArgumentException("Player ID must be positive");
+
+            return await _playerRepository.GetPlayerByIdAsync(playerId);
         }
 
         public async Task<Player> CreatePlayerAsync(string guid, string username)
         {
-           return await _PlayerRepository.CreatePlayerAsync(guid, username);
+            return await _playerRepository.CreatePlayerAsync(guid, username);
         }
 
-        public async Task<bool> UpdatePlayerAsync(int player_id, string username)
+        public async Task<bool> UpdatePlayerAsync(int playerId, string username)
         {
-            var existingPlayer = await _PlayerRepository.GetPlayerByIdAsync(player_id);
+            if (playerId <= 0)
+                throw new ArgumentException("Player ID must be positive");
+
+            if (string.IsNullOrEmpty(username))
+                throw new ArgumentException("Username cannot be null or empty");
+
+            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(playerId);
             if (existingPlayer == null)
             {
-                return false; // Player not found
+                return false;
             }
 
-            return await _PlayerRepository.UpdatePlayerAsync(player_id, username);
+            return await _playerRepository.UpdatePlayerAsync(playerId, username);
         }
 
-        public async Task<bool> DeletePlayerAsync(int player_id)
+        public async Task<bool> DeletePlayerAsync(int playerId)
         {
-           var existingPlayer = await _PlayerRepository.GetPlayerByIdAsync(player_id);
+            if (playerId <= 0)
+                throw new ArgumentException("Player ID must be positive");
+
+            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(playerId);
             if (existingPlayer == null)
             {
-                return false; // Player not found
+                return false;
             }
 
-            return await _PlayerRepository.DeletePlayerAsync(player_id);
+            return await _playerRepository.DeletePlayerAsync(playerId);
         }
     }
 }
