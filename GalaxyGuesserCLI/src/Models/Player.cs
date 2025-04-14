@@ -2,17 +2,9 @@
 {
     class Player
     {
-        public int Id { get; set; }
-        public Guid Guid { get; set; }
-        public string Username { get; set; }
-        public string Name { get; set; }
+        public int playerId { get; set; }
+        public string guid { get; set; }
+        public string userName { get; set; }
 
-        public Player(int id, Guid guid, string username, string name)
-        {
-            Id = id;
-            Guid = guid;
-            Username = username;
-            Name = name;
-        }
     }
 }

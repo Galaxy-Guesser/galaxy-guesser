@@ -10,6 +10,12 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using ConsoleApp1.Models;
 using ConsoleApp1.Data;
+using ConsoleApp1.Helpers;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+
 
 
 namespace ConsoleApp1.Services
@@ -52,7 +58,7 @@ namespace ConsoleApp1.Services
             AddQuestionsToSession(session.Id, categoryId, questionCount);
             
             // Add player to session
-            AddPlayerToSession(player.Id, session.Id);
+            AddPlayerToSession(player.playerId, session.Id);
             
             return session;
         }
@@ -64,7 +70,7 @@ namespace ConsoleApp1.Services
             if (session != null)
             {
                 // Add player to session
-                AddPlayerToSession(player.Id, session.Id);
+                AddPlayerToSession(player.playerId, session.Id);
                 return session;
             }
 
@@ -125,7 +131,7 @@ namespace ConsoleApp1.Services
                 .Where(s => s.SessionId == sessionId)
                 .OrderByDescending(s => s.Score + s.TimeRemaining)
                 .Select(s => new { 
-                    Name = players.First(p => p.Id == s.PlayerId).Name, 
+                    Name = players.First(p => p.playerId == s.PlayerId).userName, 
                     Score = s.Score,
                     TimeBonus = s.TimeRemaining,
                     Total = s.Score + s.TimeRemaining
@@ -171,21 +177,21 @@ namespace ConsoleApp1.Services
 
          private static readonly HttpClient _httpClient = new HttpClient();
 
-  public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string userGuid, string startDate, int questionDuration)
+  public static async Task<string?> CreateSessionAsync(string category, int questionsCount string startDate, int questionDuration)
 {
     try
     {
+        string jwt = Helper.GetStoredToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
         var url = $"http://localhost:5010/api/sessions/session";
 
         var request = new CreateSessionRequest
         {
             category = category,
             questionsCount = questionsCount,
-            userGuid = userGuid,
             startDate = startDate,
             questionDuration = questionDuration
         };
-       Console.WriteLine(request);
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -210,18 +216,29 @@ namespace ConsoleApp1.Services
 }
 
 
-    public static async Task JoinSessionAsync(string sessionCode, string playerGuid)
+    public static async Task JoinSessionAsync(string sessionCode)
 {
     try
     {
+        string jwt = Helper.GetStoredToken();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(jwt);
+        
+        // Try to get sub  or nameidentifier
+        var playerGuid = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value 
+                    ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+      
         var requestBody = new
         {
             sessionCode = sessionCode,
-            playerGuid = playerGuid
         };
 
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+       
 
         var url = "http://localhost:5010/api/sessions"; 
         HttpResponseMessage response = await _httpClient.PostAsync(url, content);

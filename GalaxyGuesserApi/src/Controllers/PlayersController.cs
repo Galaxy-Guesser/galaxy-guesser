@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
+using System.Security.Claims; // Add this line
 using GalaxyGuesserApi.Services;
+using Microsoft.AspNetCore.Authentication; // Add this line
 
 namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] 
     public class PlayersController : ControllerBase
     {
         private readonly PlayerService _playerService;
@@ -64,6 +68,7 @@ namespace GalaxyGuesserApi.Controllers
         [HttpPut("{playerId}")]
         public async Task<IActionResult> UpdatePlayer(int playerId, [FromBody] Player player)
         {
+            
            if (playerId != player.playerId)
             {
                 return BadRequest("Player ID in the URL does not match the ID in the request body.");
@@ -90,6 +95,39 @@ namespace GalaxyGuesserApi.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [Authorize] 
+        [HttpPost("auth")]
+        public async Task<ActionResult<Player>> AuthenticateOrRegister([FromBody] string? displayName = null)
+        {
+            var googleId = User.FindFirst("sub")?.Value 
+                        ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = User.FindFirst("email")?.Value;
+
+            if (string.IsNullOrEmpty(googleId))
+            {
+                return Unauthorized(new {
+                    Message = "Google ID (sub claim) missing",
+                    AllClaims = User.Claims.Select(c => new { c.Type, c.Value })
+                });
+            }
+
+            var player = await _playerService.GetPlayerByGuidAsync(googleId);
+
+            if (player != null)
+            {
+                return Ok(player); // Already exists
+            }
+
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                return BadRequest("Display name required for new users.");
+            }
+
+            player = await _playerService.CreatePlayerAsync(googleId, displayName);
+            return player;
+        }
+
 
         [HttpDelete("{playerId}")]
         public async Task<IActionResult> DeletePlayer(int playerId)

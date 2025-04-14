@@ -75,10 +75,9 @@ namespace ConsoleApp1.Services
 
         private static void ViewProfile(Player player)
         {
-            Console.WriteLine($"\nProfile for {player.Name}:");
-            Console.WriteLine($"Username: {player.Username}");
-            Console.WriteLine($"Player ID: {player.Id}");
-            Console.WriteLine($"GUID: {player.Guid}");
+            Console.WriteLine($"\nProfile for {player.userName}:");
+            Console.WriteLine($"Player ID: {player.playerId}");
+            Console.WriteLine($"GUID: {player.guid}");
             // You could add more stats here like games played, win ratio, etc.
         }
 

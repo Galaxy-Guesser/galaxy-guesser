@@ -8,15 +8,15 @@ namespace GalaxyGuesserApi.Data
 
         public DatabaseContext(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("PostgresConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
             
             if (string.IsNullOrEmpty(_connectionString))
             {
-                var host = configuration["DB_HOST"] ?? "localhost";
-                var port = configuration["DB_PORT"] ?? "5432";
-                var database = configuration["DB_NAME"] ?? "testGuesser";
-                var Username = configuration["DB_USER"] ?? "postgres";
-                var password = configuration["DB_PASSWORD"] ?? "";
+                var host = "localhost";
+                var port = "5433";
+                var database = "galaxyGuesser";
+                var Username = "postgres";
+                var password = "12345";
 
                 _connectionString = $"Host={host};Port={port};Database={database};Username={Username};Password={password};";
             }

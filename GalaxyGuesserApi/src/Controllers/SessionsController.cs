@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
 using  GalaxyGuesserApi.Services;
+using System.Security.Claims; // Add this line
 
 namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] 
+
     public class SessionsController : ControllerBase
     {
         private readonly SessionService _sessionService;
@@ -34,7 +38,11 @@ namespace GalaxyGuesserApi.Controllers
         {
             try
             {
+                var googleId = User.FindFirst("sub")?.Value 
+                        ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                 request.userGuid = googleId
                 await _sessionService.CreateSessionAsync(request);
+
                 return Ok("created");
             }
             catch (Exception ex)
@@ -57,17 +65,20 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [HttpPost]
-public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest request)
-{
-    try
-    {
-        await _sessionService.JoinSessionAsync(request.sessionCode, request.playerGuid);
-        return Ok("Player successfully joined the session.");
-    }
-    catch (Exception ex)
-    {
-        return BadRequest($"Join failed: {ex.Message}");
-    }
-}
+        public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest request)
+        {
+            try
+            {
+                var playerGuid = User.FindFirst("sub")?.Value 
+                    ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                await _sessionService.JoinSessionAsync(request.sessionCode, playerGuid);
+                return Ok("Player successfully joined the session.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Join failed: {ex.Message}");
+            }
+        }
     }
 }
