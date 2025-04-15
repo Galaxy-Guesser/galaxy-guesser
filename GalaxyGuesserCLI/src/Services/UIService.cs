@@ -362,7 +362,6 @@ namespace ConsoleApp1.Services
             AnsiConsole.Write(grid);
 
             var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
-            var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
 
             if (!string.IsNullOrWhiteSpace(sessionCode))
             {
@@ -380,6 +379,36 @@ namespace ConsoleApp1.Services
             {
                 AnsiConsole.MarkupLine("[grey]No session joined.[/]");
             }
+        }
+
+           public static void DisplaySpaceFact(string fact)
+        {
+            Console.Clear();
+            PrintGalaxyHeader();
+            
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("🌟 Space Fact of the Day 🌟");
+            Console.WriteLine(new string('─', Console.WindowWidth));
+            Console.ResetColor();
+            
+            var words = fact.Split(' ');
+            var line = new StringBuilder();
+            foreach (var word in words)
+            {
+                if (line.Length + word.Length > Console.WindowWidth - 4)
+                {
+                    Console.WriteLine($"  {line}");
+                    line.Clear();
+                }
+                line.Append(word + " ");
+            }
+            Console.WriteLine($"  {line}");
+            
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("\nCourtesy of NASA's Astronomy Picture of the Day");
+            Console.ResetColor();
+            
+            Continue();
         }
     }
 }

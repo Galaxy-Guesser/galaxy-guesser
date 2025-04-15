@@ -8,7 +8,7 @@ using Spectre.Console;
 
 public static class SessionUIService
 {
-    
+
     public static async Task<string> PromptCategory()
     {
         var categories = await CategoryService.GetCategoriesAsync();
@@ -108,15 +108,17 @@ public static double PromptSessionDuration(int questionCount)
 }
 
 
-    public static (string category, int questionCount, string startTime, decimal sessionDuration) PromptSessionDetails()
-    {
-        var category = await PromptCategory();
-        var questionCount = PromptQuestionCount();
-        decimal sessionDuration = (decimal)PromptSessionDuration(questionCount);
-        var startTime = PromptStartDateTime();
+   public static async Task<(string category, int questionCount, string startTime, decimal sessionDuration)> PromptSessionDetails()
+{
+    var category = await PromptCategory(); 
+    var questionCount = PromptQuestionCount();
+    decimal sessionDuration = (decimal)PromptSessionDuration(questionCount);
+    var startTime = PromptStartDateTime();
 
-        string formattedStartTime = startTime.ToString("yyyy-MM-ddTHH:mm:ss");
+    string formattedStartTime = startTime.ToString("yyyy-MM-ddTHH:mm:ss");
 
-        return (category, questionCount, formattedStartTime, sessionDuration);
-    }
+    return (category, questionCount, formattedStartTime, sessionDuration);
+}
+
+
 }
