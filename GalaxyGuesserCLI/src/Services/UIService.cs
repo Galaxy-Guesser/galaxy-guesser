@@ -354,7 +354,7 @@ public static async Task DisplayActiveSessionsAsync(List<SessionView> sessions)
         var selectedSession = sessions.FirstOrDefault(s => s.sessionCode.Equals(sessionCode, StringComparison.OrdinalIgnoreCase));
         if (selectedSession != null)
         {
-            await SessionService.JoinSessionAsync(sessionCode, "77777777-7777-4777-8777-777777777777");
+            await SessionService.JoinSessionAsync(sessionCode);
         }
         else
         {
