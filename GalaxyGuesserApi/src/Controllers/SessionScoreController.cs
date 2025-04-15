@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using static GalaxyGuesserApi.Models.SessionScore;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -20,15 +21,18 @@ namespace GalaxyGuesserApi.Controllers
         }
 
 
-        [HttpPut("{sessionId:int}/{playerId:int}")]
-        public async Task<IActionResult> UpdateScore(int sessionId, int playerId, [FromBody] SessionScore request)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateScore([FromBody] ScoreUpdateRequest request)
         {
-            var updated = await _sessionScoreService.UpdatePlayerScoreAsync(sessionId, playerId, request.score);
+            var response = await _sessionScoreService.UpdateScoreAsync(request);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
 
-            if (!updated)
-                return NotFound($"No score found for session {sessionId} and player {playerId}");
-
-            return Ok("Score updated successfully.");
+        [HttpGet("finalScore/{sessionId}/{playerId}")]
+        public async Task<IActionResult> GetFinalScore(int sessionId, int playerId)
+        {
+            var response = await _sessionScoreService.GetFinalScoreAsync(playerId, sessionId);
+            return response.Success ? Ok(response) : BadRequest(response);
         }
     }
 }
