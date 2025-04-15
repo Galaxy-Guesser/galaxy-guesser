@@ -2,24 +2,9 @@ TRUNCATE TABLE  Categories  RESTART IDENTITY CASCADE;
 
 INSERT INTO Categories (category)
 VALUES 
-  ('Stellar Phenomena'),
-  ('Exoplanet Discoveries'),
-  ('Galactic Structures'),
-  ('Cosmic Mysteries'),
-  ('Space Exploration'),
-  ('Black Holes'),
   ('The Solar System'),
-  ('Astrobiology'),
-  ('Cosmology'),
-  ('Space Telescopes'),
-  ('Missions to Mars'),
+  ('Galaxy Types'),
+  ('Stars and Planets'),
   ('The Moon'),
-  ('Asteroids and Comets'),
-  ('Interstellar Medium'),
-  ('Gravitational Waves'),
-  ('Neutron Stars'),
-  ('The Big Bang'),
-  ('Alien Life Theories'),
-  ('Space Technology'),
-  ('Astronomical Instruments')
+  ('Basic Astronomy')
 ON CONFLICT (category) DO NOTHING;
