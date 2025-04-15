@@ -3,7 +3,7 @@ WITH answer_data AS (
     ('Sun'), ('Mercury'), ('Venus'), ('Earth'), ('Mars'), ('Jupiter'), ('Saturn'), ('Uranus'), ('Neptune'), ('Pluto'),
     ('Asteroid Belt'), ('Comet'), ('Moon'), ('Solar eclipse'), ('Milky Way'), ('Black hole'), ('Galaxy'), ('Star'), ('Orbit'), ('Atmosphere'),
     
-    ('Spiral'), ('Elliptical'), ('Irregular'), ('Milky Way'), ('Andromeda'), ('Barred spiral'), ('Dwarf galaxy'), ('Ring galaxy'), ('Lenticular'), ('Pinwheel'),
+    ('Spiral'), ('Elliptical'), ('Irregular'), ('Andromeda'), ('Barred spiral'), ('Dwarf galaxy'), ('Ring galaxy'), ('Lenticular'), ('Pinwheel'),
     
     ('Red'), ('Blue'), ('Yellow'), ('White'), ('Giant'), ('Dwarf'), ('Rocky'), ('Gas giant'), ('Habitable zone'), ('Constellation'),
     
@@ -65,18 +65,15 @@ WITH question_data AS (
     ('Stars and Planets', 'What type of planet is Earth?', 'Rocky'),
     ('Stars and Planets', 'What type of planet is Jupiter?', 'Gas giant'),
     ('Stars and Planets', 'What is the closest star to Earth?', 'Sun'),
-    ('Stars and Planets', 'What is a group of stars called?', 'Constellation'),
     ('Stars and Planets', 'What star is the North Star?', 'Polaris'),
     ('Stars and Planets', 'What color is the hottest star?', 'Blue'),
     ('Stars and Planets', 'What is a small dense star called?', 'White dwarf'),
     ('Stars and Planets', 'What is the "evening star"?', 'Venus'),
     ('Stars and Planets', 'What planets have no moons?', 'Mercury and Venus'),
     ('Stars and Planets', 'What is the study of stars called?', 'Astronomy'),
-    ('Stars and Planets', 'What is a shooting star?', 'Meteor'),
     ('Stars and Planets', 'What makes stars twinkle?', 'Earth atmosphere'),
     ('Stars and Planets', 'What is a super hot planet called?', 'Hot Jupiter'),
     ('Stars and Planets', 'What is a failed star called?', 'Brown dwarf'),
-    ('Stars and Planets', 'What is the brightest star?', 'Sirius'),
     ('Stars and Planets', 'What is a newborn star called?', 'Protostar'),
     ('Stars and Planets', 'What zone allows liquid water?', 'Habitable zone'),
     
@@ -249,4 +246,3 @@ SELECT
 FROM option_mapping om
 JOIN Questions q ON om.question = q.question
 JOIN Answers a ON om.answer = a.answer
-ON CONFLICT (question_id, answer_id) DO NOTHING;
