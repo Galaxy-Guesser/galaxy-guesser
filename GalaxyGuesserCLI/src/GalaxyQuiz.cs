@@ -84,10 +84,10 @@ namespace ConsoleApp1
                     switch (option)
                     {
                         case 1:
-                            var (category, questionCount, startTime,questionDuration) = await SessionUIService.PromptSessionDetails();
+                            var (category, questionCount, startTime,sessionDuration) = SessionUIService.PromptSessionDetails();
                             Console.WriteLine($"Category: {category}, Question Count: {questionCount}, Start Time: {startTime}");
 
-                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount,startTime, questionDuration);
+                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount,startTime, sessionDuration);
 
                             if (!string.IsNullOrEmpty(sessionCode))
                             {
