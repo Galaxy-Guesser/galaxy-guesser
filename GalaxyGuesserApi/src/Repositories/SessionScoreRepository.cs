@@ -49,7 +49,7 @@ namespace GalaxyGuesserApi.Repositories
         public async Task<string> GetSessionCategoryAsync(int sessionId)
         {
             var result = await _dbContext.QueryAsync<string>(
-                @"SELECT c.Category FROM Sessions s 
+                @"SELECT c.category FROM Sessions s 
                 JOIN Categories c ON s.category_id = c.category_id 
                 WHERE s.session_id = @sessionId",
                 reader => reader.GetString(0),
