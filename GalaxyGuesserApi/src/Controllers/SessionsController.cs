@@ -40,8 +40,7 @@ namespace GalaxyGuesserApi.Controllers
             {
                 var googleId = User.FindFirst("sub")?.Value 
                         ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                 request.userGuid = googleId;
-                await _sessionService.CreateSessionAsync(request);
+                await _sessionService.CreateSessionAsync(request,googleId);
 
                 return Ok("created");
             }
