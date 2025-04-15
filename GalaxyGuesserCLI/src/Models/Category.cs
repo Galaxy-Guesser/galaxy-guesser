@@ -1,14 +1,21 @@
  namespace ConsoleApp1.Models
 {
-     class Category
+     public class Category
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int categoryId { get; set; }
+        public string category { get; set; }
 
         public Category(int id, string name)
         {
-            Id = id;
-            Name = name;
+            categoryId = id;
+            category = name;
         }
+    }
+
+    public class Categories
+    {
+        public int categoryId { get; set; }
+        public string category { get; set; }
+
     }
 }

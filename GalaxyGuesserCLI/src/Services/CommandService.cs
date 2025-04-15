@@ -59,7 +59,7 @@ namespace ConsoleApp1.Services
             Console.WriteLine("\nCategories:");
             foreach (var category in SampleData.Categories)
             {
-                Console.WriteLine($"- {category.Name}");
+                Console.WriteLine($"- {category.category}");
             }
         }
 
