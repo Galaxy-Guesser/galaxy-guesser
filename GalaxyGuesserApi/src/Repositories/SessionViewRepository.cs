@@ -22,12 +22,11 @@ namespace GalaxyGuesserApi.Repositories
                 sessionId = reader.GetInt32(0),
                 sessionCode = reader.GetString(1),
                 category = reader.GetString(2),
-                playerUserNames = reader.GetFieldValue<List<string>>(3),
+                 playerUserNames = reader.IsDBNull(3) ? new List<string>() : reader.GetFieldValue<List<string>>(3),
                 playerCount = reader.GetInt32(4),
-                duration = reader.GetString(5),
-                questionCount = reader.GetInt32(6),
-                highestScore = reader.IsDBNull(7) ? null : reader.GetInt32(7),
-                endsIn = reader.IsDBNull(8) ? null : reader.GetString(8)
+                questionCount = reader.GetInt32(5),
+                highestScore = reader.IsDBNull(6) ? null : reader.GetInt32(6),
+                endsIn = reader.IsDBNull(7) ? null : reader.GetString(7)
             });
         }
     }

@@ -58,18 +58,18 @@ namespace ConsoleApp1.Services
             Console.WriteLine("• Create sessions with friends and compete for high scores");
         }
 
-       
-public static void PrintGalaxyHeader()
-{
-    // Clear console and set up
-    Console.Clear();
-    
-    // Animated stars effect
-    AnimateStars(50, 3000);
-    
-    // Main title with gradient effect
-    string[] galaxyTitle = new string[]
-    {
+
+        public static void PrintGalaxyHeader()
+        {
+            // Clear console and set up
+            Console.Clear();
+
+            // Animated stars effect
+            AnimateStars(50, 3000);
+
+            // Main title with gradient effect
+            string[] galaxyTitle = new string[]
+            {
         @"   ___________________________________________________________",
         @"  /    _____       _             _   _        _               \",
         @" |    / ____|     | |           | | (_)      | |               |",
@@ -78,118 +78,118 @@ public static void PrintGalaxyHeader()
         @" |   | |__| | (_| | | (_| |>  < | |_| | (__  | | | |           |",
         @" |    \_____|\__,_|_|\__,_/_/\_\ \__|_|\___| |_| |_|           |",
         @"  \___________________________________________________________/",
-    };
+            };
 
-    // Display main title with color gradient
-    DisplayColorGradient(galaxyTitle, ConsoleColor.DarkMagenta, ConsoleColor.Cyan);
-    
-    // Subtitle with pulsing effect
-    string[] subtitle = new string[]
-    {
+            // Display main title with color gradient
+            DisplayColorGradient(galaxyTitle, ConsoleColor.DarkMagenta, ConsoleColor.Cyan);
+
+            // Subtitle with pulsing effect
+            string[] subtitle = new string[]
+            {
         @"     ☄️  EXPLORE THE UNIVERSE - DISCOVER NEW WORLDS  ☄️"
-    };
-    
-    Console.ForegroundColor = ConsoleColor.Yellow;
-    Console.WriteLine();
-    foreach (string line in subtitle)
-    {
-        Console.WriteLine(line);
-    }
-    
-    // Elegant separator
-    Console.ForegroundColor = ConsoleColor.DarkCyan;
-    Console.WriteLine("\n⭐ ════════════════════════════════════════════════════ ⭐");
-    Console.ResetColor();
-    Console.WriteLine();
-}
+            };
 
-// Displays text with a color gradient effect
-private static void DisplayColorGradient(string[] text, ConsoleColor startColor, ConsoleColor endColor)
-{
-    // Preserve original colors
-    ConsoleColor originalFg = Console.ForegroundColor;
-    
-    // Define colors for gradient (can be expanded)
-    ConsoleColor[] gradientColors = new ConsoleColor[]
-    {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine();
+            foreach (string line in subtitle)
+            {
+                Console.WriteLine(line);
+            }
+
+            // Elegant separator
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("\n⭐ ════════════════════════════════════════════════════ ⭐");
+            Console.ResetColor();
+            Console.WriteLine();
+        }
+
+        // Displays text with a color gradient effect
+        private static void DisplayColorGradient(string[] text, ConsoleColor startColor, ConsoleColor endColor)
+        {
+            // Preserve original colors
+            ConsoleColor originalFg = Console.ForegroundColor;
+
+            // Define colors for gradient (can be expanded)
+            ConsoleColor[] gradientColors = new ConsoleColor[]
+            {
         startColor,
         ConsoleColor.Magenta,
         ConsoleColor.Blue,
         ConsoleColor.Cyan,
         endColor
-    };
-    
-    // Display each line with appropriate color
-    for (int i = 0; i < text.Length; i++)
-    {
-        // Calculate which color to use based on position
-        int colorIndex = (int)Math.Floor((double)i / text.Length * gradientColors.Length);
-        if (colorIndex >= gradientColors.Length) colorIndex = gradientColors.Length - 1;
-        
-        Console.ForegroundColor = gradientColors[colorIndex];
-        Console.WriteLine(text[i]);
-    }
-    
-    // Reset color
-    Console.ForegroundColor = originalFg;
-}
+            };
 
-// Creates animated stars effect
-private static void AnimateStars(int numStars, int duration)
-{
-    Random rand = new Random();
-    int consoleWidth = Console.WindowWidth;
-    int consoleHeight = Console.WindowHeight;
-    
-    // Generate random star positions
-    (int x, int y, char symbol)[] stars = new (int, int, char)[numStars];
-    for (int i = 0; i < numStars; i++)
-    {
-        stars[i] = (
-            rand.Next(consoleWidth), 
-            rand.Next(consoleHeight), 
-            rand.Next(2) == 0 ? '*' : '.'
-        );
-    }
-    
-    // Animate stars twinkling
-    int frames = 5;
-    for (int frame = 0; frame < frames; frame++)
-    {
-        Console.Clear();
-        
-        // Draw stars
-        foreach (var star in stars)
-        {
-            try
+            // Display each line with appropriate color
+            for (int i = 0; i < text.Length; i++)
             {
-                Console.SetCursorPosition(star.x, star.y);
-                Console.ForegroundColor = frame % 2 == 0 ? ConsoleColor.White : ConsoleColor.Gray;
-                Console.Write(star.symbol);
+                // Calculate which color to use based on position
+                int colorIndex = (int)Math.Floor((double)i / text.Length * gradientColors.Length);
+                if (colorIndex >= gradientColors.Length) colorIndex = gradientColors.Length - 1;
+
+                Console.ForegroundColor = gradientColors[colorIndex];
+                Console.WriteLine(text[i]);
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                // Skip if position is outside console
-            }
+
+            // Reset color
+            Console.ForegroundColor = originalFg;
         }
-        
-        // Pause between frames
-        System.Threading.Thread.Sleep(duration / frames);
-    }
-    
-    Console.Clear();
-}
-        public static void ShowHelp(Dictionary<string,string> COMMANDS)
+
+        // Creates animated stars effect
+        private static void AnimateStars(int numStars, int duration)
+        {
+            Random rand = new Random();
+            int consoleWidth = Console.WindowWidth;
+            int consoleHeight = Console.WindowHeight;
+
+            // Generate random star positions
+            (int x, int y, char symbol)[] stars = new (int, int, char)[numStars];
+            for (int i = 0; i < numStars; i++)
+            {
+                stars[i] = (
+                    rand.Next(consoleWidth),
+                    rand.Next(consoleHeight),
+                    rand.Next(2) == 0 ? '*' : '.'
+                );
+            }
+
+            // Animate stars twinkling
+            int frames = 5;
+            for (int frame = 0; frame < frames; frame++)
+            {
+                Console.Clear();
+
+                // Draw stars
+                foreach (var star in stars)
+                {
+                    try
+                    {
+                        Console.SetCursorPosition(star.x, star.y);
+                        Console.ForegroundColor = frame % 2 == 0 ? ConsoleColor.White : ConsoleColor.Gray;
+                        Console.Write(star.symbol);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        // Skip if position is outside console
+                    }
+                }
+
+                // Pause between frames
+                System.Threading.Thread.Sleep(duration / frames);
+            }
+
+            Console.Clear();
+        }
+        public static void ShowHelp(Dictionary<string, string> COMMANDS)
         {
             Console.Clear();
             PrintGalaxyHeader();
-            
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("\n📖 AVAILABLE COMMANDS");
             Console.ResetColor();
-            
+
             Console.WriteLine($"\nUse {CMD_PREFIX}[command] to execute any of these commands:");
-            
+
             foreach (var cmd in COMMANDS)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -197,7 +197,7 @@ private static void AnimateStars(int numStars, int duration)
                 Console.ResetColor();
                 Console.WriteLine($" - {cmd.Value}");
             }
-            
+
             Console.WriteLine("\nYou can use commands at any input prompt in the application.");
         }
 
@@ -209,23 +209,23 @@ private static void AnimateStars(int numStars, int duration)
         }
 
         public static void Continue()
-    {
-        Console.WriteLine("\nPress any key to continue...");
-        Console.ReadKey(true);
-    }
+        {
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey(true);
+        }
 
-     static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
+        static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
         {
             Console.Clear();
             UIService.PrintGalaxyHeader();
-            
+
             // Placeholder for timer bar - will be updated separately
             Console.WriteLine($"⏱ Time: {secondsRemaining}s [" + new string(' ', Console.WindowWidth - 20) + "]");
-            
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"\nQuestion {current}/{total}:");
             Console.ResetColor();
-            
+
             // Make the question text much more visible with highlighting
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"\n{q.Text}\n");
@@ -245,7 +245,7 @@ private static void AnimateStars(int numStars, int duration)
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.Write("\n👉 Press A, B, C or D to select your answer: ");
             Console.ResetColor();
-            
+
             // Make answer input area very visible
             Console.BackgroundColor = ConsoleColor.DarkGray;
             Console.ForegroundColor = ConsoleColor.White;
@@ -253,7 +253,7 @@ private static void AnimateStars(int numStars, int duration)
             Console.ResetColor();
         }
 
-         internal static void ShowFinalResults(Player player, Session session)
+        internal static void ShowFinalResults(Player player, Session session)
         {
             Console.Clear();
             UIService.PrintGalaxyHeader();
@@ -272,11 +272,11 @@ private static void AnimateStars(int numStars, int duration)
             // Get leaderboard
             Console.WriteLine("🏆 Leaderboard:");
             var leaderboard = SessionService.GetSessionLeaderboard(session.Id, AuthenticationService.GetAllPlayers());
-            
+
             for (int i = 0; i < leaderboard.Count; i++)
             {
                 var entry = leaderboard[i];
-                Console.WriteLine($"{i+1}. {entry.Name}: {entry.Score} correct + {entry.TimeBonus} time bonus = {entry.Total} points");
+                Console.WriteLine($"{i + 1}. {entry.Name}: {entry.Score} correct + {entry.TimeBonus} time bonus = {entry.Total} points");
             }
 
             Console.ResetColor();
@@ -286,23 +286,23 @@ private static void AnimateStars(int numStars, int duration)
         {
             int originalRow = Console.CursorTop;
             int originalCol = Console.CursorLeft;
-            
+
             // Move to timer position
             Console.SetCursorPosition(0, row);
-            
+
             // Calculate bar width
             int barWidth = Console.WindowWidth - 20;
             int filledWidth = (int)((double)secondsRemaining / totalSeconds * barWidth);
-            
+
             // Update timer with appropriate color
-            Console.ForegroundColor = secondsRemaining > 10 ? ConsoleColor.Green : 
+            Console.ForegroundColor = secondsRemaining > 10 ? ConsoleColor.Green :
                                     secondsRemaining > 5 ? ConsoleColor.Yellow : ConsoleColor.Red;
             Console.Write($"⏱ Time: {secondsRemaining}s [");
             Console.Write(new string('■', filledWidth));
             Console.Write(new string('□', barWidth - filledWidth));
             Console.Write("]");
             Console.ResetColor();
-            
+
             // Move cursor back to original position
             Console.SetCursorPosition(originalCol, originalRow);
         }
@@ -329,9 +329,14 @@ private static void AnimateStars(int numStars, int duration)
                 var color = minutes < 5 ? "red" : "green";
 
                 return new Panel(new Markup(
-                    $"[bold]{session.category}[/]\n" +
-                    $"[blue]Code:[/] {session.sessionCode}\n" +
-                    $"[blue]Ends In:[/] [{color}]{minutes}m[/]"))
+                     $"[bold]{session.category}[/]\n" +
+                     $"[blue]Code:[/] {session.sessionCode}\n" +
+                     $"[blue]Players:[/] {session.playerCount} ({string.Join(", ", session.playerUserNames)})\n" +
+                     $"[blue]Questions:[/] {session.questionCount}\n" +
+                     $"[blue]High Score:[/] {session.highestScore}\n" +
+                    $"[blue]Ends In:[/] [{color}]{session.endsIn}[/]"
+
+                    ))
                 {
                     Border = BoxBorder.Double,
                     Padding = new Padding(1, 0, 1, 0)
@@ -345,9 +350,18 @@ private static void AnimateStars(int numStars, int duration)
                 else
                     grid.AddRow(panels[i]);
             }
+            for (int i = 0; i < panels.Count; i += 2)
+            {
+                if (i + 1 < panels.Count)
+                    grid.AddRow(panels[i], panels[i + 1]);
+                else
+                    grid.AddRow(panels[i]);
+            }
 
             AnsiConsole.Write(grid);
+            AnsiConsole.Write(grid);
 
+            var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
             var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
 
             if (!string.IsNullOrWhiteSpace(sessionCode))
@@ -366,36 +380,6 @@ private static void AnimateStars(int numStars, int duration)
             {
                 AnsiConsole.MarkupLine("[grey]No session joined.[/]");
             }
-        }
-
-        public static void DisplaySpaceFact(string fact)
-        {
-            Console.Clear();
-            PrintGalaxyHeader();
-            
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("🌟 Space Fact of the Day 🌟");
-            Console.WriteLine(new string('─', Console.WindowWidth));
-            Console.ResetColor();
-            
-            var words = fact.Split(' ');
-            var line = new StringBuilder();
-            foreach (var word in words)
-            {
-                if (line.Length + word.Length > Console.WindowWidth - 4)
-                {
-                    Console.WriteLine($"  {line}");
-                    line.Clear();
-                }
-                line.Append(word + " ");
-            }
-            Console.WriteLine($"  {line}");
-            
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("\nCourtesy of NASA's Astronomy Picture of the Day");
-            Console.ResetColor();
-            
-            Continue();
         }
     }
 }
