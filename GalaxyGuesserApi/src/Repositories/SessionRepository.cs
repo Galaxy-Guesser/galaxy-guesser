@@ -41,14 +41,14 @@ namespace GalaxyGuesserApi.Repositories
                 userName = reader.GetString(2),
             });
         }
-        public async Task CreateSessionAsync(CreateSessionRequestDTO requestBody)
+        public async Task CreateSessionAsync(CreateSessionRequestDTO requestBody,string loggedInUserGuid)
         {
             const string sql = "CALL create_session (@category,@userGuid,@startDate,@questionCount,@questionDuration)";
             var parameters = new Dictionary<string, object>
              {
                 { "@category", requestBody.category },
                 { "@questionCount", requestBody.questionsCount },
-                { "@userGuid", requestBody.userGuid},
+                { "@userGuid", loggedInUserGuid},
                 {"@startDate" , requestBody.startDate },
                 {"@questionDuration",requestBody.questionDuration},
             };
