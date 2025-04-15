@@ -66,6 +66,7 @@ builder.Services.AddScoped<ISessionRepository,SessionRepository>();
 builder.Services.AddScoped<ISessionViewRepository, SessionViewRepository>();
 builder.Services.AddScoped<ISessionScoreRepository, SessionScoreRepository>();
 
+builder.Services.AddScoped<SessionScoreService>();
 builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<SessionViewService>();
