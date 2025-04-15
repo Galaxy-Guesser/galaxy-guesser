@@ -13,10 +13,10 @@ namespace GalaxyGuesserApi.Data
             if (string.IsNullOrEmpty(_connectionString))
             {
                 var host = "localhost";
-                var port = "5433";
-                var database = "galaxyGuesser";
+                var port = "5432";
+                var database = "galaxydb";
                 var Username = "postgres";
-                var password = "12345";
+                var password = "postgres";
 
                 _connectionString = $"Host={host};Port={port};Database={database};Username={Username};Password={password};";
             }
