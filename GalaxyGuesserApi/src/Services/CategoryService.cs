@@ -6,16 +6,16 @@ namespace GalaxyGuesserApi.Services
 {
     public class CategoryService
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly ICategoryRepository _icategoryRepository;
 
-        public CategoryService(ICategoryRepository categoryRepository)
+        public CategoryService(ICategoryRepository icategoryRepository)
         {
-            _categoryRepository = categoryRepository;
+            _icategoryRepository = icategoryRepository;
         }
 
         public async Task<List<Category>> GetAllCategories()
         {
-            return await _categoryRepository.GetCategoriesAsync();
+            return await _icategoryRepository.GetCategoriesAsync();
         }
 
     }

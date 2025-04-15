@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ConsoleApp1.Models;
+using ConsoleApp1.Services;
+
 using Spectre.Console;
 
 public static class SessionUIService
 {
-    public static string PromptCategory()
+    
+    public static async Task<string> PromptCategory()
     {
+        var categories = await CategoryService.GetCategoriesAsync();
         return AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .Title("Choose a session category:")
-                .AddChoices("Science", "History", "Geography", "Space Exploration"));
+                .AddChoices(categories.Select(c => c.category).ToList()));
     }
 
     public static int PromptQuestionCount()
@@ -85,9 +90,9 @@ public static class SessionUIService
     }
 
 
-    public static (string category, int questionCount, string startTime, int questionDuration) PromptSessionDetails()
+    public static async Task<(string category, int questionCount, string startTime, int questionDuration)> PromptSessionDetails()
     {
-        var category = PromptCategory();
+        var category = await PromptCategory();
         var questionCount = PromptQuestionCount();
         var questionDuration = PromptQuestionDuration();
         var startTime = PromptStartDateTime();
