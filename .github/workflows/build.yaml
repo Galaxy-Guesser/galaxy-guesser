@@ -259,6 +259,8 @@ jobs:
         env:
           IMAGE: ${{ needs.build-and-push.outputs.image }}
           DB_CONNECTION_STRING: "Host=${{ needs.terraform.outputs.rds_endpoint }};Database=guesserDB;Username=iamuser;Password=${{ secrets.DB_PASSWORD }}"
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
           ssh -v -o StrictHostKeyChecking=no -i deploy-key.pem ec2-user@${{ needs.terraform.outputs.ec2 }} << EOF
             if ! command -v docker >/dev/null 2>&1; then
@@ -302,5 +304,11 @@ jobs:
             docker pull \$IMAGE
             docker stop galaxy-guesser-api || true
             docker rm galaxy-guesser-api || true
-            docker run -d --name galaxy-guesser-api -p 80:8080 -e "ConnectionStrings__DefaultConnection=\$DB_CONNECTION" \$IMAGE
+            docker run -d \
+              --name galaxy-guesser-api \
+              -p 80:8080 \
+              -e "ConnectionStrings__DefaultConnection=$DB_CONNECTION" \
+              -e "Google__ClientId=$GOOGLE_CLIENT_ID" \
+              -e "Google__ClientSecret=$GOOGLE_CLIENT_SECRET" \
+              $IMAGE
           EOF

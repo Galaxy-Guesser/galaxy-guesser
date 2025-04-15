@@ -2,14 +2,15 @@ using GalaxyGuesserApi.Data;
 using GalaxyGuesserApi.Repositories;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using GalaxyGuesserApi.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
+using GalaxyGuesserApi.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+var googleAuthSettings = new GoogleAuthSettings();
+builder.Configuration.GetSection("Google").Bind(googleAuthSettings);
 
 builder.Services.AddOpenApi();
 
@@ -20,17 +21,18 @@ builder.Configuration
 
 builder.Services.AddHttpClient();
 
-// In Program.cs of your API project
+builder.Services.AddSingleton(googleAuthSettings);
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://accounts.google.com";
+        options.Authority = googleAuthSettings.authority;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "https://accounts.google.com",
+            ValidIssuer = googleAuthSettings.authority,
             ValidateAudience = true,
-            ValidAudience = "2880504077-78ejpg7rqn6cqr35mjolapla9e232g1b.apps.googleusercontent.com",
+            ValidAudience = googleAuthSettings.clientId,
             ValidateLifetime = true
         };
         options.Events = new JwtBearerEvents
@@ -47,12 +49,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     })
-.AddGoogle(options =>
-{
-    options.ClientId = "2880504077-78ejpg7rqn6cqr35mjolapla9e232g1b.apps.googleusercontent.com";
-    options.ClientSecret ="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";
-});
-
+    .AddGoogle(options =>
+    { 
+        options.ClientId = googleAuthSettings.clientId;
+        options.ClientSecret = googleAuthSettings.clientSecret;
+    });
 // Add authorization
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
