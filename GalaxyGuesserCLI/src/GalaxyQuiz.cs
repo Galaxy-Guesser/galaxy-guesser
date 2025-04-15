@@ -11,6 +11,7 @@ using ConsoleApp1.Helpers;
 
 using ConsoleApp1.Utilities;
 using Spectre.Console;
+using GalaxyGuesserCLI.Services;
 
 namespace ConsoleApp1
 {
@@ -24,13 +25,18 @@ namespace ConsoleApp1
 
            try
             {
+                var httpClient = new HttpClient();
+                var nasaService = new NasaService(httpClient);
+                
                 UIService.PrintGalaxyHeader();
-
                 var authService = new AuthenticationService();
                 var jwt = await authService.AuthenticateWithGoogle();
                 
-
                 var player = await authService.AuthOrRegisterWithBackend();
+
+                var fact = await nasaService.GetSpaceFactAsync();
+                
+                UIService.DisplaySpaceFact(fact);
 
                 await MainMenuLoop(player);
             }
