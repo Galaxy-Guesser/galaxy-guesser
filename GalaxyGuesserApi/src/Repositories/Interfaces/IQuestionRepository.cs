@@ -9,14 +9,6 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
     Task<Question> GetQuestionAsync(int questionId);
     Task<List<OptionResponseDto>> GetOptionsByQuestionIdAsync(int questionId);
     Task<List<Question>> GetAllQuestionsAsync();
-    //Task<List<Player>> GetAllPlayersAsync();
-    //Task<Player> GetPlayerByIdAsync(int playerId);
-    //Task<Player> GetUserByGoogleIdAsync(string guid);
-    //Task<Player> CreatePlayerAsync(string guid, string userName);
-    //Task<bool> UpdatePlayerAsync(int playerId, string userName);
-    //Task<bool> DeletePlayerAsync(int playerId);
-
-    //Task<Player> GetPlayerByGuidAsync(string guid);
 
   }
 }
