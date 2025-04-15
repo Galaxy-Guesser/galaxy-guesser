@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
-using System.Security.Claims; // Add this line
+using System.Security.Claims;
 using GalaxyGuesserApi.Services;
 using Microsoft.AspNetCore.Authentication;
-using System.Threading.Tasks; // Add this line
+using System.Threading.Tasks;
 using GalaxyGuesserApi.Models;
 using System.Collections.Generic;
 
@@ -21,24 +21,6 @@ namespace GalaxyGuesserApi.Controllers
     {
       _questionsService = questionsService;
     }
-
-    //[HttpGet("{sessionId}")]
-    //public async Task<ActionResult<Question>> GetQuestionsBySessionId(int sessionId)
-    //{
-    //  try
-    //  {
-    //    Question question = await _questionsService.GetQuestionsBySessionIdAsync(questionId);
-    //    if (question == null)
-    //    {
-    //      return NotFound();
-    //    }
-    //    return Ok(question);
-    //  }
-    //  catch (Exception ex)
-    //  {
-    //    return StatusCode(500, $"Internal server error: {ex.Message}");
-    //  }
-    //}
 
     [HttpGet("{questionId}")]
     public async Task<ActionResult<Question>> GetQuestion(int questionId)
@@ -79,8 +61,5 @@ namespace GalaxyGuesserApi.Controllers
 
       return Ok(questions);
     }
-
-    //[HttpPost]
-    //public async Task<ActionResult<Question>> CreateQuestion()
   }
 }

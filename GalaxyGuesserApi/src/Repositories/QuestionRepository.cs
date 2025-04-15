@@ -50,17 +50,11 @@ namespace GalaxyGuesserApi.Repositories
         Text = reader.GetString(1)
       }, parameters);
 
-      //foreach (var result in results)
-      //{
-      //  options.Add(new OptionResponseDto { result.Id, });
-      //}
-
       return results.ToList();
     }
 
     public async Task<List<Question>> GetAllQuestionsAsync()
     {
-      //var questions = new Dictionary<int, Question>();
 
       const string query = @"
             SELECT q.question_id AS questionId, q.question AS question_text,
@@ -97,35 +91,6 @@ namespace GalaxyGuesserApi.Repositories
 
       return questions;
 
-      //await _dbContext.QueryAsync(query, reader =>
-      //{
-      //  int questionId = reader.GetInt32(0);
-
-      //  if (!questionsMap.ContainsKey(questionId))
-      //  {
-      //    questionsMap[questionId] = new Question
-      //    {
-      //      questionId = questionId,
-      //      question = reader.GetString(1),
-      //      Options = new List<Option>()
-      //    };
-      //  }
-
-      //  var option = new Option
-      //  {
-      //    Id = reader.GetInt32(2),
-      //    Text = reader.GetString(3),
-      //    IsCorrect = reader.GetBoolean(4)
-      //  };
-
-      //  questionsMap[questionId].Options.Add(option);
-
-      //  // we return null since we build the map ourselves
-      //  return null!;
-      //});
-
-      //return questionsMap.Values.ToList();
-
     }
 
     public class QuestionOptionRow
@@ -136,114 +101,5 @@ namespace GalaxyGuesserApi.Repositories
       public string OptionText { get; set; }
       public bool IsCorrect { get; set; }
     }
-
-    //  public async Task<Player> GetPlayerByIdAsync(int playerId)
-    //  {
-    //    const string query = @"
-    //          SELECT player_id, user_name, guid
-    //          FROM players
-    //          WHERE player_id = @playerId";
-
-    //    var parameters = new Dictionary<string, object> { { "@playerId", playerId } };
-
-    //    var result = await _dbContext.QueryAsync(query, reader => new Player
-    //    {
-    //      playerId = reader.GetInt32(0),
-    //      userName = reader.GetString(1),
-    //      guid = reader.GetString(2)
-    //    }, parameters);
-
-    //    return result.FirstOrDefault()!;
-    //  }
-
-    //  public async Task<Player> GetPlayerByGuidAsync(string guid)
-    //  {
-    //    const string query = @"
-    //          SELECT player_id, user_name, guid
-    //          FROM players
-    //          WHERE guid = @guid";
-
-    //    var parameters = new Dictionary<string, object> { { "@guid", guid } };
-
-    //    var result = await _dbContext.QueryAsync(query, reader => new Player
-    //    {
-    //      playerId = reader.GetInt32(0),
-    //      userName = reader.GetString(1),
-    //      guid = reader.GetString(2)
-    //    }, parameters);
-
-    //    return result.FirstOrDefault()!;
-    //  }
-
-    //  public async Task<Player?> GetUserByGoogleIdAsync(string guid)
-    //  {
-    //    const string query = @"
-    //              SELECT player_id, user_name, guid
-    //              FROM players
-    //              WHERE guid = @guid";
-
-    //    var parameters = new Dictionary<string, object> { { "@guid", guid } };
-
-    //    var players = await _dbContext.QueryAsync(query, reader => new Player
-    //    {
-    //      playerId = reader.GetInt32(0),
-    //      userName = reader.GetString(1),
-    //      guid = reader.GetString(2)
-    //    }, parameters);
-
-    //    return players.FirstOrDefault();
-    //  }
-
-    //  public async Task<Player> CreatePlayerAsync(string guid, string userName)
-    //  {
-    //    const string sql = @"
-    //          INSERT INTO players (user_name, guid)
-    //          VALUES (@userName, @guid)
-    //          RETURNING player_id, user_name, guid";
-    //    var parameters = new Dictionary<string, object>
-    //          {
-    //              { "@userName", userName },
-    //              { "@guid", guid}
-    //          };
-
-    //    var result = await _dbContext.QueryAsync(sql, reader => new Player
-    //    {
-    //      playerId = reader.GetInt32(0),
-    //      userName = reader.GetString(1),
-    //      guid = reader.GetString(2)
-    //    }, parameters);
-
-    //    return result.First();
-
-    //  }
-
-    //  public async Task<bool> UpdatePlayerAsync(int playerId, string userName)
-    //  {
-    //    const string query = @"
-    //          UPDATE players
-    //          SET user_name = @userName
-    //          WHERE player_id = @playerId";
-
-    //    var parameters = new Dictionary<string, object>
-    //          {
-    //              { "@playerId", playerId },
-    //              { "@userName", userName }
-    //          };
-
-    //    var affectedRows = await _dbContext.ExecuteAsync(query, parameters);
-    //    return affectedRows > 0;
-    //  }
-
-    //  public async Task<bool> DeletePlayerAsync(int playerId)
-    //  {
-    //    const string query = @"
-    //          DELETE FROM players
-    //          WHERE player_id = @playerId";
-
-    //    var parameters = new Dictionary<string, object> { { "@playerId", playerId } };
-
-    //    var affectedRows = await _dbContext.ExecuteAsync(query, parameters);
-    //    return affectedRows > 0;
-    //  }
   }
 }
