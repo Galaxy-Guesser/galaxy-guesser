@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Spectre.Console;
-using System.Net.Http;
 using System.Text;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -12,27 +6,19 @@ using ConsoleApp1.Models;
 using ConsoleApp1.Data;
 using ConsoleApp1.Helpers;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
-
-
 
 namespace ConsoleApp1.Services
 {
     public class SessionService
     {
-        // In-memory data storage (could be moved to a repository pattern in future)
         private static List<Session> sessions = new List<Session>();
         private static List<SessionPlayer> sessionPlayers = new List<SessionPlayer>();
         private static List<SessionQuestion> sessionQuestions = new List<SessionQuestion>();
         private static List<SessionScore> sessionScores = new List<SessionScore>();
 
-
-
         public static string GenerateSessionCode()
         {
-            // Generate a unique 6-character code
             const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
             Random random = new Random();
             string code;
@@ -53,11 +39,9 @@ namespace ConsoleApp1.Services
 
             Session session = new Session(sessionId, sessionCode, categoryId, questionDuration, questionCount);
             sessions.Add(session);
-
-            // Add questions to session
+            
             AddQuestionsToSession(session.Id, categoryId, questionCount);
-
-            // Add player to session
+            
             AddPlayerToSession(player.playerId, session.Id);
 
             return session;
@@ -69,17 +53,15 @@ namespace ConsoleApp1.Services
 
             if (session != null)
             {
-                // Add player to session
                 AddPlayerToSession(player.playerId, session.Id);
                 return session;
             }
 
-            return null; // Session not found
+            return null;
         }
 
         public static void AddPlayerToSession(int playerId, int sessionId)
         {
-            // Check if player already in session
             if (!sessionPlayers.Any(sp => sp.PlayerId == playerId && sp.SessionId == sessionId))
             {
                 sessionPlayers.Add(new SessionPlayer(sessionId, playerId));
@@ -88,11 +70,10 @@ namespace ConsoleApp1.Services
 
         public static void AddQuestionsToSession(int sessionId, int categoryId, int questionCount)
         {
-            // Get questions for this category and randomize them
             var categoryQuestions = SampleData.Questions
                 .Where(q => q.CategoryId == categoryId)
-                .OrderBy(q => Guid.NewGuid()) // Random order
-                .Take(questionCount)  // Only take requested number of questions
+                .OrderBy(q => Guid.NewGuid())
+                .Take(questionCount)
                 .ToList();
 
             int id = sessionQuestions.Count > 0 ? sessionQuestions.Max(sq => sq.Id) + 1 : 1;
@@ -167,8 +148,6 @@ namespace ConsoleApp1.Services
                 return (false, -1);
             }
         }
-
-
 
         public static int GetSessionQuestionsCount(int sessionId)
         {

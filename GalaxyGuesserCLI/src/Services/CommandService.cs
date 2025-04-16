@@ -53,7 +53,6 @@ namespace ConsoleApp1.Services
             }
         }
 
-        // Command implementations (stubs for now)
         private static void ViewCategories()
         {
             Console.WriteLine("\nCategories:");
@@ -78,7 +77,6 @@ namespace ConsoleApp1.Services
             Console.WriteLine($"\nProfile for {player.userName}:");
             Console.WriteLine($"Player ID: {player.playerId}");
             Console.WriteLine($"GUID: {player.guid}");
-            // You could add more stats here like games played, win ratio, etc.
         }
 
         private static void ViewMySessionHistory(Player player)

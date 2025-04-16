@@ -1,10 +1,11 @@
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Repositories.Interfaces;
+using GalaxyGuesserApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GalaxyGuesserApi.Services
 {
-    public class SessionService
+    public class SessionService : ISessionService
     {
         private readonly ISessionRepository _sessionRepository;
         

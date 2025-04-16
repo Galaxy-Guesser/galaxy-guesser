@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GalaxyGuesserApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using static GalaxyGuesserApi.Models.SessionScore;

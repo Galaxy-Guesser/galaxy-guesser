@@ -20,7 +20,6 @@ namespace ConsoleApp1.Services
 {
     public class AuthenticationService
     {
-        // In-memory data storage (could be moved to a repository pattern in future)
         private static List<Player> players = new List<Player>();
         private static Dictionary<string, string> userCredentials = SampleData.UserCredentials;
         private readonly IConfiguration _configuration;
@@ -106,7 +105,6 @@ namespace ConsoleApp1.Services
                 "&redirect_uri=http://localhost:5000/" +
                 "&state=" + state;
             
-            // Open the URL in the default browser
             Process.Start(new ProcessStartInfo
             {
                 FileName = authorizationEndpoint,
@@ -115,10 +113,8 @@ namespace ConsoleApp1.Services
             
             Console.WriteLine("A browser window has been opened. Please login with your Google account.");
             
-            // Wait for the callback
             var context = await listener.GetContextAsync();
             
-            // Parse the authorization code from the callback URL
             var query = HttpUtility.ParseQueryString(context.Request.Url.Query);
             var returnedState = query["state"];
             var code = query["code"];
@@ -128,7 +124,6 @@ namespace ConsoleApp1.Services
                 throw new SecurityException("Invalid state parameter");
             }
             
-            // Send a response to the browser
             var response = context.Response;
             var responseString = "<html><body><h1>Authentication successful!</h1><p>You can close this window now.</p></body></html>";
             var buffer = Encoding.UTF8.GetBytes(responseString);
@@ -143,7 +138,7 @@ namespace ConsoleApp1.Services
             new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["Code"] = code,
-                ["RedirectUri"] = "http://localhost:5000/" // Should match token endpoint port
+                ["RedirectUri"] = "http://localhost:5000/" 
             }));
 
 

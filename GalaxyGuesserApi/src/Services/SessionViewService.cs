@@ -1,10 +1,11 @@
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Repositories.Interfaces;
+using GalaxyGuesserApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GalaxyGuesserApi.Services
 {
-    public class SessionViewService
+    public class SessionViewService: ISessionViewService
     {
         private readonly ISessionViewRepository _sessionViewRepository;
 
@@ -17,6 +18,5 @@ namespace GalaxyGuesserApi.Services
         {
             return await _sessionViewRepository.GetAllActiveSessions();
         }
-
     }
 }

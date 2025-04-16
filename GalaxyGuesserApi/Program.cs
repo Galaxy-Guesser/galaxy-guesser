@@ -5,23 +5,10 @@ using GalaxyGuesserApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using GalaxyGuesserApi.Configuration;
+using GalaxyGuesserApi.Services.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("AllowCli", policy =>
-//     {
-//         policy.WithOrigins(
-//             "http://localhost:5000"           
-//         )
-//         .AllowAnyMethod()         
-//         .AllowAnyHeader()       
-//         .AllowCredentials();
-//     });
-// });
 
 var googleAuthSettings = new GoogleAuthSettings();
 builder.Configuration.GetSection("Google").Bind(googleAuthSettings);
@@ -86,12 +73,12 @@ builder.Services.AddScoped<ISessionQuestionViewRepository, SessionQuestionViewRe
 
 
 
+builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<SessionScoreService>();
-builder.Services.AddScoped<PlayerService>();
-builder.Services.AddScoped<SessionService>();
-builder.Services.AddScoped<SessionViewService>();
+builder.Services.AddScoped<IPlayerService,PlayerService>();
+builder.Services.AddScoped<ISessionViewService,SessionViewService>();
 builder.Services.AddScoped<SessionQuestionsViewService>();
-builder.Services.AddScoped<QuestionService>();
+builder.Services.AddScoped<IQuestionService,QuestionService>();
 builder.Services.AddScoped<CategoryService>();
 
 
@@ -102,8 +89,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// app.UseCors("AllowCli");
-// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

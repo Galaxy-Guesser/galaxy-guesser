@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ConsoleApp1.Models;
 using ConsoleApp1.Services;
 
 using Spectre.Console;
 
 public static class SessionUIService
 {
-    
     public static async Task<string> PromptCategory()
     {
         var categories = await CategoryService.GetCategoriesAsync();

@@ -22,7 +22,6 @@ namespace GalaxyGuesserCLI.Services
             }
             catch
             {
-                // Fallback facts
                 var fallbackFacts = new[]
                 {
                     "The Milky Way galaxy is about 100,000 light-years across.",
