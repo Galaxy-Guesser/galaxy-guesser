@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using static GalaxyGuesserApi.Models.SessionScore;
@@ -15,35 +12,36 @@ namespace GalaxyGuesserApi.Services
         {
             _sessionScoreRepository = sessionScoreRepository;
         }
+
         public async Task<ScoreUpdateResponse> UpdateScoreAsync(ScoreUpdateRequest request)
         {
+            // Update the player's score (append points)
             await _sessionScoreRepository.UpdatePlayerScoreAsync(request.PlayerId, request.SessionId, request.Points);
 
+            // Retrieve the updated score
             var updatedScore = await _sessionScoreRepository.GetPlayerScoreAsync(request.PlayerId, request.SessionId);
 
             return new ScoreUpdateResponse(
                 Success: true,
-                IsCorrect: true,
-                basePoints,
-                timeBonus,
-                totalPoints,
-                updatedScore,
-                request.SecondsRemaining,
-                "Answer correct!");
+                NewTotalScore: updatedScore ?? 0,
+                Message: "Score updated successfully!"
+            );
         }
 
         public async Task<FinalScoreResponse> GetFinalScoreAsync(int playerId, int sessionId)
         {
-            if (!await _sessionScoreRepository.IsPlayerInSessionAsync(playerId, sessionId))
-                return new FinalScoreResponse(false, playerId, sessionId, 0, "Player not in session");
-
             var score = await _sessionScoreRepository.GetPlayerScoreAsync(playerId, sessionId);
+            if (score == null)
+            {
+                return new FinalScoreResponse(false, playerId, sessionId, 0, "Player not in session or score not found");
+            }
             return new FinalScoreResponse(
-                true,
-                playerId,
-                sessionId,
-                score ?? 0,
-                "Final score retrieved");
+                Success: true,
+                PlayerId: playerId,
+                SessionId: sessionId,
+                TotalScore: score.Value,
+                Message: "Final score retrieved"
+            );
         }
     }
 }

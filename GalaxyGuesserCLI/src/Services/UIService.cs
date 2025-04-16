@@ -206,7 +206,7 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
          internal static void ShowFinalResults(Player player, Session session)
         {
             Console.Clear();
-            UIService.PrintGalaxyHeader();
+            PrintGalaxyHeader();
 
             SessionScore playerScore = SessionService.GetPlayerScore(player.playerId, session.Id);
             int score = playerScore != null ? playerScore.Score : 0;
