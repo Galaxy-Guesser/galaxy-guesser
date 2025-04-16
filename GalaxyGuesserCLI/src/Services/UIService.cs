@@ -2,6 +2,7 @@ using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using ConsoleApp1.Models;
+using System.Text;
 
 namespace ConsoleApp1.Services
 {
@@ -306,65 +307,95 @@ private static void AnimateStars(int numStars, int duration)
             Console.SetCursorPosition(originalCol, originalRow);
         }
 
-public static async Task DisplayActiveSessionsAsync(List<SessionView> sessions)
-{
-    AnsiConsole.MarkupLine("\n📡 [bold underline]Active Sessions[/]");
-
-    if (sessions.Count == 0)
-    {
-        AnsiConsole.MarkupLine("[grey]No active sessions found.[/]");
-        return;
-    }
-
-    var grid = new Grid();
-    grid.AddColumn();
-    grid.AddColumn();
-
-    var panels = sessions.Select(session =>
-    {
-        var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
-        int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
-
-        var color = minutes < 5 ? "red" : "green";
-
-        return new Panel(new Markup(
-            $"[bold]{session.category}[/]\n" +
-            $"[blue]Code:[/] {session.sessionCode}\n" +
-            $"[blue]Ends In:[/] [{color}]{minutes}m[/]"))
+        public static async Task DisplayActiveSessionsAsync(List<SessionView> sessions)
         {
-            Border = BoxBorder.Double,
-            Padding = new Padding(1, 0, 1, 0)
-        };
-    }).ToList();
+            AnsiConsole.MarkupLine("\n📡 [bold underline]Active Sessions[/]");
 
-    for (int i = 0; i < panels.Count; i += 2)
-    {
-        if (i + 1 < panels.Count)
-            grid.AddRow(panels[i], panels[i + 1]);
-        else
-            grid.AddRow(panels[i]);
-    }
+            if (sessions.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[grey]No active sessions found.[/]");
+                return;
+            }
 
-    AnsiConsole.Write(grid);
+            var grid = new Grid();
+            grid.AddColumn();
+            grid.AddColumn();
 
-    var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
+            var panels = sessions.Select(session =>
+            {
+                var timeParts = session.endsIn.Split(new[] { 'm', 's' }, StringSplitOptions.RemoveEmptyEntries);
+                int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
 
-    if (!string.IsNullOrWhiteSpace(sessionCode))
-    {
-        var selectedSession = sessions.FirstOrDefault(s => s.sessionCode.Equals(sessionCode, StringComparison.OrdinalIgnoreCase));
-        if (selectedSession != null)
-        {
-            await SessionService.JoinSessionAsync(sessionCode);
+                var color = minutes < 5 ? "red" : "green";
+
+                return new Panel(new Markup(
+                    $"[bold]{session.category}[/]\n" +
+                    $"[blue]Code:[/] {session.sessionCode}\n" +
+                    $"[blue]Ends In:[/] [{color}]{minutes}m[/]"))
+                {
+                    Border = BoxBorder.Double,
+                    Padding = new Padding(1, 0, 1, 0)
+                };
+            }).ToList();
+
+            for (int i = 0; i < panels.Count; i += 2)
+            {
+                if (i + 1 < panels.Count)
+                    grid.AddRow(panels[i], panels[i + 1]);
+                else
+                    grid.AddRow(panels[i]);
+            }
+
+            AnsiConsole.Write(grid);
+
+            var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
+
+            if (!string.IsNullOrWhiteSpace(sessionCode))
+            {
+                var selectedSession = sessions.FirstOrDefault(s => s.sessionCode.Equals(sessionCode, StringComparison.OrdinalIgnoreCase));
+                if (selectedSession != null)
+                {
+                    await SessionService.JoinSessionAsync(sessionCode);
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine($"❌ [red]Invalid session code:[/] {sessionCode}");
+                }
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[grey]No session joined.[/]");
+            }
         }
-        else
+
+        public static void DisplaySpaceFact(string fact)
         {
-            AnsiConsole.MarkupLine($"❌ [red]Invalid session code:[/] {sessionCode}");
+            Console.Clear();
+            PrintGalaxyHeader();
+            
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("🌟 Space Fact of the Day 🌟");
+            Console.WriteLine(new string('─', Console.WindowWidth));
+            Console.ResetColor();
+            
+            var words = fact.Split(' ');
+            var line = new StringBuilder();
+            foreach (var word in words)
+            {
+                if (line.Length + word.Length > Console.WindowWidth - 4)
+                {
+                    Console.WriteLine($"  {line}");
+                    line.Clear();
+                }
+                line.Append(word + " ");
+            }
+            Console.WriteLine($"  {line}");
+            
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("\nCourtesy of NASA's Astronomy Picture of the Day");
+            Console.ResetColor();
+            
+            Continue();
         }
-    }
-    else
-    {
-        AnsiConsole.MarkupLine("[grey]No session joined.[/]");
-    }
-}
     }
 }

@@ -14,6 +14,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using GalaxyGuesserApi.Configuration;
 
 namespace GalaxyGuesserApi.src.Controllers
 {
@@ -25,13 +26,13 @@ namespace GalaxyGuesserApi.src.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly HttpClient _httpClient;  // Change field type from IHttpClientFactory to HttpClient
 
-        private readonly IConfiguration _configuration;
+        private readonly GoogleAuthSettings _googleAuth;
 
-        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration config, IPlayerRepository playerRepository , HttpClient httpClient)
+        public AuthController(IHttpClientFactory httpClientFactory, GoogleAuthSettings googleAuth, IPlayerRepository playerRepository , HttpClient httpClient)
         {
             _httpClientFactory = httpClientFactory;
             _httpClient = httpClient;  
-            _configuration = config;
+            _googleAuth = googleAuth;
             _playerRepository = playerRepository;
         }
 
@@ -47,8 +48,8 @@ namespace GalaxyGuesserApi.src.Controllers
             {
                 var tokenRequestParams = new Dictionary<string, string>
                 {
-                    ["client_id"] =   _configuration["Google:client_id"],
-                    ["client_secret"] =  _configuration["Google:client_secret"],
+                    ["client_id"] =   _googleAuth.clientId,
+                    ["client_secret"] =  _googleAuth.clientSecret,
                     ["code"] = request.Code,
                     ["redirect_uri"] = request.RedirectUri,
                     ["grant_type"] = "authorization_code"
@@ -102,8 +103,8 @@ namespace GalaxyGuesserApi.src.Controllers
         [HttpGet("login")]
         public IActionResult Login( )
         {
-            var clientId =  _configuration["Google:client_id"];
-            var redirectUri = _configuration["Google:RedirectUri"];
+            var clientId =  _googleAuth.clientId;
+            var redirectUri = _googleAuth.redirectUri;
             var scope = "openid email profile";
 
             var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
@@ -121,9 +122,9 @@ namespace GalaxyGuesserApi.src.Controllers
         [HttpGet("callback")]
         public async Task<IActionResult> Callback([FromQuery] string code)
         {
-            var clientId =  _configuration["Google:client_id"];
-            var clientSecret =  _configuration["GoogleAuth:client_secret"];
-            var redirectUri = _configuration["Google:RedirectUri"];
+            var clientId =  _googleAuth.clientId;
+            var clientSecret =  _googleAuth.clientSecret;
+            var redirectUri = _googleAuth.redirectUri;
 
             var httpClient = _httpClientFactory.CreateClient();
 
