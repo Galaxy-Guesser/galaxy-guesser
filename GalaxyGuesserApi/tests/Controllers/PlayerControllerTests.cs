@@ -21,6 +21,7 @@ namespace GalaxyGuesserApi.Controllers
             _mockService = new Mock<IPlayerService>();
             _controller = new PlayersController(_mockService.Object);
             
+            // Setup mock user
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
                 new Claim("sub", "test-123"),
