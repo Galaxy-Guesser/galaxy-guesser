@@ -7,16 +7,16 @@ namespace GalaxyGuesserApi.Services
 {
     public class SessionViewService: ISessionViewService
     {
-        private readonly ISessionViewService _sessionViewService;
+        private readonly ISessionViewRepository _sessionViewRepository;
 
-        public SessionViewService(ISessionViewService sessionViewService)
+        public SessionViewService(ISessionViewRepository sessionViewRepository)
         {
-            _sessionViewService = sessionViewService;
+            _sessionViewRepository = sessionViewRepository;
         }
 
         public async Task<List<SessionView>> GetAllActiveSessions()
         {
-            return await _sessionViewService.GetAllActiveSessions();
+            return await _sessionViewRepository.GetAllActiveSessions();
         }
     }
 }
