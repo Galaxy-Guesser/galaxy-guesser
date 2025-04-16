@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
 using ConsoleApp1.Helpers;
 using ConsoleApp1.Models;
 
@@ -11,7 +7,6 @@ namespace ConsoleApp1.Services
     public class SessionViewService
     {
         private static readonly HttpClient _httpClient = new HttpClient();
-        
 
         private const string ActiveSessionsApiUrl = "http://localhost:5010/api/change"; 
         public static async Task<List<SessionView>> GetActiveSessions()

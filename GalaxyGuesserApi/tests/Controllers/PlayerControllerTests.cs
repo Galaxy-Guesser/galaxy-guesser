@@ -21,7 +21,6 @@ namespace GalaxyGuesserApi.Controllers
             _mockService = new Mock<IPlayerService>();
             _controller = new PlayersController(_mockService.Object);
             
-            // Setup mock user
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
                 new Claim("sub", "test-123"),
@@ -48,14 +47,11 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task GetPlayers_ReturnsPlayers()
         {
-            // Arrange
             var mockPlayers = new List<Player> { CreateTestPlayer() };
             _mockService.Setup(x => x.GetAllPlayersAsync()).ReturnsAsync(mockPlayers);
 
-            // Act
             var result = await _controller.GetPlayers();
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             Assert.Equal(mockPlayers, okResult.Value);
         }
@@ -63,14 +59,11 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task GetPlayer_ValidId_ReturnsPlayer()
         {
-            // Arrange
             var mockPlayer = CreateTestPlayer();
             _mockService.Setup(x => x.GetPlayerByIdAsync(1)).ReturnsAsync(mockPlayer);
 
-            // Act
             var result = await _controller.GetPlayer(1);
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             Assert.Equal(mockPlayer, okResult.Value);
         }
@@ -78,27 +71,21 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task GetPlayer_InvalidId_ReturnsNotFound()
         {
-            // Arrange
             _mockService.Setup(x => x.GetPlayerByIdAsync(1)).ReturnsAsync((Player)null);
 
-            // Act
             var result = await _controller.GetPlayer(1);
 
-            // Assert
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
         public async Task CreatePlayer_ReturnsCreatedPlayer()
         {
-            // Arrange
             var newPlayer = CreateTestPlayer();
             _mockService.Setup(x => x.CreatePlayerAsync("guid", "name")).ReturnsAsync(newPlayer);
 
-            // Act
             var result = await _controller.CreatePlayer("guid", "name");
 
-            // Assert
             var createdAtResult = Assert.IsType<CreatedAtActionResult>(result.Result);
             Assert.Equal(newPlayer, createdAtResult.Value);
         }
@@ -106,15 +93,12 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task UpdatePlayer_ValidData_ReturnsSuccess()
         {
-            // Arrange
             var player = CreateTestPlayer();
             player.userName = "newName";
             _mockService.Setup(x => x.UpdatePlayerAsync(1, "newName")).ReturnsAsync(true);
 
-            // Act
             var result = await _controller.UpdatePlayer(1, player);
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult.Value);
         }
@@ -122,14 +106,11 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task AuthenticateOrRegister_ExistingUser_ReturnsPlayer()
         {
-            // Arrange
             var existingPlayer = CreateTestPlayer();
             _mockService.Setup(x => x.GetPlayerByGuidAsync("test-123")).ReturnsAsync(existingPlayer);
 
-            // Act
             var result = await _controller.AuthenticateOrRegister("test");
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             Assert.Equal(existingPlayer, okResult.Value);
         }
@@ -137,13 +118,10 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task DeletePlayer_ValidId_ReturnsSuccess()
         {
-            // Arrange
             _mockService.Setup(x => x.DeletePlayerAsync(1)).ReturnsAsync(true);
 
-            // Act
             var result = await _controller.DeletePlayer(1);
 
-            // Assert
             Assert.IsType<OkObjectResult>(result);
         }
     }

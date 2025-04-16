@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ConsoleApp1.Models;
 using ConsoleApp1.Services;
 
 using Spectre.Console;
 
 public static class SessionUIService
 {
-    
     public static async Task<string> PromptCategory()
     {
         var categories = await CategoryService.GetCategoriesAsync();
@@ -88,7 +83,6 @@ public static class SessionUIService
         var date = DateTime.ParseExact(dateInput, "yyyy-MM-dd", null);
         return new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
     }
-
 
     public static async Task<(string category, int questionCount, string startTime, int questionDuration)> PromptSessionDetails()
     {

@@ -37,15 +37,12 @@ namespace GalaxyGuesserApi.tests.Controllers
         [Fact]
         public async Task GetSession_WhenExceptionThrown_Returns500()
         {
-            // Arrange
             var testCode = "TEST123";
             _mockSessionService.Setup(x => x.GetSessionAsync(testCode))
                 .ThrowsAsync(new System.Exception("Test exception"));
 
-            // Act
             var result = await _controller.GetSession(testCode);
 
-            // Assert
             var actionResult = Assert.IsType<ActionResult<Session>>(result);
             var objectResult = Assert.IsType<ObjectResult>(actionResult.Result);
             Assert.Equal(500, objectResult.StatusCode);
@@ -64,7 +61,6 @@ namespace GalaxyGuesserApi.tests.Controllers
                 It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            // Act
             var result = await _controller.CreateSession(request);
 
             Assert.IsAssignableFrom<ActionResult<string>>(result);
@@ -77,7 +73,6 @@ namespace GalaxyGuesserApi.tests.Controllers
         [Fact]
         public async Task GetSessions_ReturnsAllSessions()
         {
-            // Arrange
             var expectedSessions = new List<SessionDTO>
             {
                 new SessionDTO { userName = "Player1" , category = "Stars" }, 
@@ -87,10 +82,8 @@ namespace GalaxyGuesserApi.tests.Controllers
             _mockSessionService.Setup(x => x.GetAllSessionsAsync())
                 .ReturnsAsync(expectedSessions);
 
-            // Act
             var result = await _controller.GetSessions();
 
-            // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<SessionDTO>>>(result);
             var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var returnedSessions = Assert.IsType<List<SessionDTO>>(okResult.Value);
@@ -100,14 +93,11 @@ namespace GalaxyGuesserApi.tests.Controllers
         [Fact]
         public async Task GetSessions_WhenExceptionThrown_Returns500()
         {
-            // Arrange
             _mockSessionService.Setup(x => x.GetAllSessionsAsync())
                 .ThrowsAsync(new System.Exception("Test exception"));
 
-            // Act
             var result = await _controller.GetSessions();
 
-            // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<SessionDTO>>>(result);
             var objectResult = Assert.IsType<ObjectResult>(actionResult.Result);
             Assert.Equal(500, objectResult.StatusCode);
@@ -116,15 +106,12 @@ namespace GalaxyGuesserApi.tests.Controllers
         [Fact]
         public async Task JoinSession_WithValidRequest_ReturnsOk()
         {
-            // Arrange
             var request = new JoinSessionRequest { sessionCode = "TEST123" };
             _mockSessionService.Setup(x => x.JoinSessionAsync(request.sessionCode, "test-user-id"))
                 .Returns(Task.CompletedTask);
 
-            // Act
             var result = await _controller.JoinSession(request);
 
-            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal("Player successfully joined the session.", okResult.Value);
         }

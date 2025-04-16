@@ -37,7 +37,7 @@ namespace GalaxyGuesserApi.Services
             var existingPlayer = await _playerRepository.GetPlayerByIdAsync(player_id);
             if (existingPlayer == null)
             {
-                return false; // Player not found
+                return false;
             }
 
             return await _playerRepository.UpdatePlayerAsync(player_id, username);
@@ -48,7 +48,7 @@ namespace GalaxyGuesserApi.Services
            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(player_id);
             if (existingPlayer == null)
             {
-                return false; // Player not found
+                return false;
             }
 
             return await _playerRepository.DeletePlayerAsync(player_id);

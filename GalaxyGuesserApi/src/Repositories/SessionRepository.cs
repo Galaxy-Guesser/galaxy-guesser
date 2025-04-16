@@ -79,13 +79,8 @@ namespace GalaxyGuesserApi.Repositories
         public async Task UpdateSessionAsync(SessionDTO session)
         {
             const string sql = "UPDATE sessions SET name = @name, email = @email WHERE id = @id";
-            var parameters = new Dictionary<string, object>
-            {
-                // { "@id", Player.player_id },
-                // { "@name", Player.username },
-            };
 
-            await _dbContext.ExecuteNonQueryAsync(sql, parameters);
+            await _dbContext.ExecuteNonQueryAsync(sql);
         }
 
         public async Task DeleteSessionAsync(string sessionCode)

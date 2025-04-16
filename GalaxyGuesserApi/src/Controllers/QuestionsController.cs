@@ -19,11 +19,15 @@ namespace GalaxyGuesserApi.Controllers
     {
       try
       {
-        var question = await _questionsService.GetNextQuestionForSessionAsync(sessionId);
-        if (question == null)
-          return NotFound(new { message = "No question found for this session." });
-
-        return Ok(question);
+          var question = await _questionsService.GetNextQuestionForSessionAsync(sessionId);
+          if (question == null)
+          {
+            return NotFound(new { message = "No question found for this session." });
+          }
+          else
+          {
+          return Ok(question);
+          }
       }
       catch (Exception ex)
       {
@@ -36,11 +40,15 @@ namespace GalaxyGuesserApi.Controllers
     {
       try
       {
-        var options = await _questionsService.GetOptionsByQuestionIdAsync(questionId);
-        if (options == null || options.Count == 0)
-          return NotFound("No options found for that question.");
-
-        return Ok(options);
+          var options = await _questionsService.GetOptionsByQuestionIdAsync(questionId);
+          if (options == null || options.Count == 0)
+          {
+            return NotFound("No options found for that question.");
+          }
+          else
+          {
+            return Ok(options);
+          }
       }
       catch (Exception ex)
       {
@@ -53,11 +61,16 @@ namespace GalaxyGuesserApi.Controllers
     {
       try
       {
-        var answer = await _questionsService.GetCorrectAnswerAsync(questionId);
-        if (answer == null)
-          return NotFound(new { message = "Answer not found." });
+          var answer = await _questionsService.GetCorrectAnswerAsync(questionId);
+          if (answer == null)
+          {
+            return NotFound(new { message = "Answer not found." });
+          }
+          else
+          {
+            return Ok(answer);
+          }
 
-        return Ok(answer);
       }
       catch (Exception ex)
       {

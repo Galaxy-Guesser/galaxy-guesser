@@ -26,7 +26,6 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task GetAllCategories_ReturnsOkResult_WithListOfCategories()
         {
-            // Arrange
             var mockCategories = new List<Category>
             {
                 new Category { categoryId = 1, category = "Stars" },
@@ -36,10 +35,8 @@ namespace GalaxyGuesserApi.Controllers
             _mockRepository.Setup(repo => repo.GetCategoriesAsync())
                 .ReturnsAsync(mockCategories);
 
-            // Act
             var result = await _controller.GetAllCategories();
 
-            // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<Category>>>(result);
             var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var returnValue = Assert.IsType<List<Category>>(okResult.Value);
@@ -49,14 +46,11 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task GetAllCategories_Returns500_WhenServiceThrowsException()
         {
-            // Arrange
             _mockRepository.Setup(repo => repo.GetCategoriesAsync())
                 .ThrowsAsync(new System.Exception("Test exception"));
 
-            // Act
             var result = await _controller.GetAllCategories();
 
-            // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<Category>>>(result);
             var objectResult = Assert.IsType<ObjectResult>(actionResult.Result);
             Assert.Equal(500, objectResult.StatusCode);

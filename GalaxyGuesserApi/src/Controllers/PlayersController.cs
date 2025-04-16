@@ -42,7 +42,9 @@ namespace GalaxyGuesserApi.Controllers
                 {
                     return NotFound();
                 }
-                return Ok(Player);
+                else{
+                    return Ok(Player);
+                }
             }
             catch (Exception ex)
             {
@@ -72,26 +74,30 @@ namespace GalaxyGuesserApi.Controllers
             {
                 return BadRequest("Player ID in the URL does not match the ID in the request body.");
             }
-
-            try
+            else
             {
-                var updated = await _playerService.UpdatePlayerAsync(playerId, player.userName);
-
-                if (!updated)
+                try
                 {
-                    return NotFound($"Player with ID {playerId} not found.");
+                    var updated = await _playerService.UpdatePlayerAsync(playerId, player.userName);
+
+                    if (!updated)
+                    {
+                        return NotFound($"Player with ID {playerId} not found.");
+                    }
+                    else
+                    {
+                        return Ok(new
+                        {
+                            message = "Player updated successfully",
+                            playerId,
+                            updated_username = player.userName
+                        });
+                    }
                 }
-
-                return Ok(new
+                catch (Exception ex)
                 {
-                    message = "Player updated successfully",
-                    playerId,
-                    updated_username = player.userName
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                    return StatusCode(500, $"Internal server error: {ex.Message}");
+                }
             }
         }
 
@@ -110,21 +116,27 @@ namespace GalaxyGuesserApi.Controllers
                     AllClaims = User.Claims.Select(c => new { c.Type, c.Value })
                 });
             }
-
-            var player = await _playerService.GetPlayerByGuidAsync(googleId);
-
-            if (player != null)
+            else
             {
-                return Ok(player); 
-            }
+                var player = await _playerService.GetPlayerByGuidAsync(googleId);
 
-            if (string.IsNullOrWhiteSpace(displayName))
-            {
-                return BadRequest("Display name required for new users.");
+                if (player != null)
+                {
+                    return Ok(player); 
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(displayName))
+                    {
+                        return BadRequest("Display name required for new users.");
+                    }
+                    else
+                    {
+                        player = await _playerService.CreatePlayerAsync(googleId, displayName);
+                        return player;
+                    }
+                }
             }
-
-            player = await _playerService.CreatePlayerAsync(googleId, displayName);
-            return player;
         }
 
 
@@ -139,8 +151,11 @@ namespace GalaxyGuesserApi.Controllers
                     {
                         return NotFound($"Player with ID {playerId} not found.");
                     }
+                    else
+                    {
+                         return Ok(new { message = "User deleted successfully" });
+                    }
 
-                     return Ok(new { message = "User deleted successfully" });
                 }
                 catch (Exception ex)
                 {

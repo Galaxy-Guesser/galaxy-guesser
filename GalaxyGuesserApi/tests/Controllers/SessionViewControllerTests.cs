@@ -20,7 +20,6 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task GetAllActiveSessions_ReturnsOkWithSessions()
         {
-            // Arrange
             var testSessions = new List<SessionView>
             {
                 new SessionView { sessionId = 1 },
@@ -30,10 +29,8 @@ namespace GalaxyGuesserApi.Controllers
             _mockService.Setup(x => x.GetAllActiveSessions())
                 .ReturnsAsync(testSessions);
 
-            // Act
             var result = await _controller.GetAllActiveSessions();
 
-            // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<SessionView>>>(result);
             var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var returnedSessions = Assert.IsType<List<SessionView>>(okResult.Value);
@@ -43,14 +40,11 @@ namespace GalaxyGuesserApi.Controllers
         [Fact]
         public async Task GetAllActiveSessions_WhenExceptionThrown_Returns500()
         {
-            // Arrange
             _mockService.Setup(x => x.GetAllActiveSessions())
                 .ThrowsAsync(new Exception("Test error"));
 
-            // Act
             var result = await _controller.GetAllActiveSessions();
 
-            // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<SessionView>>>(result);
             var statusCodeResult = Assert.IsType<ObjectResult>(actionResult.Result);
             Assert.Equal(500, statusCodeResult.StatusCode);
