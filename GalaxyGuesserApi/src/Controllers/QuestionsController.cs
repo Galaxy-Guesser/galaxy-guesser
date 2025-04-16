@@ -13,7 +13,7 @@ namespace GalaxyGuesserApi.Controllers
 {
   [ApiController]
   [Route("api/[controller]")]
-  //[Authorize]
+  [Authorize]
   public class QuestionsController : ControllerBase
   {
     private readonly QuestionService _questionsService;
