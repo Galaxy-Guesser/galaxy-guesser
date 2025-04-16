@@ -82,12 +82,15 @@ builder.Services.AddScoped<ISessionViewRepository, SessionViewRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<ISessionScoreRepository, SessionScoreRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ISessionQuestionViewRepository, SessionQuestionViewRepository>();
+
 
 
 builder.Services.AddScoped<SessionScoreService>();
 builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<SessionViewService>();
+builder.Services.AddScoped<SessionQuestionsViewService>();
 builder.Services.AddScoped<QuestionService>();
 builder.Services.AddScoped<CategoryService>();
 
