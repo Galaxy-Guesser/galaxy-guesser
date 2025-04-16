@@ -348,42 +348,69 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             Continue();
         }
 
-       public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
+public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
+{
+    if (questions.Count == 0)
+    {
+        AnsiConsole.MarkupLine("[grey]No questions found for this session.[/]");
+        return;
+    }
+
+    foreach (var question in questions)
+    {
+        AnsiConsole.Clear();
+
+        // Display question + options in card
+        var questionPanel = new Panel(BuildQuestionMarkup(question))
         {
-            AnsiConsole.MarkupLine("\n📚 [bold underline]Session Questions[/]");
+            Border = BoxBorder.Rounded,
+            Padding = new Padding(1, 0, 1, 0),
+            Header = new PanelHeader($"[bold green]Question {question.questionId}[/]", Justify.Center)
+        };
 
-            if (questions.Count == 0)
-            {
-                AnsiConsole.MarkupLine("[grey]No questions found for this session.[/]");
-                return;
-            }
+        AnsiConsole.Write(questionPanel);
 
-            foreach (var question in questions)
-            {
-                var questionPanel = new Panel(BuildQuestionMarkup(question))
-                {
-                    Border = BoxBorder.Rounded,
-                    Padding = new Padding(1, 0, 1, 0),
-                    Header = new PanelHeader($"[bold green]Question {question.QuestionId}[/]", Justify.Center)
-                };
+        var prompt = new SelectionPrompt<string>()
+            .Title("\n[bold]Select your answer:[/]")
+            .HighlightStyle("cyan");
 
-                AnsiConsole.Write(questionPanel);
-                await Task.Delay(150);
-            }
+        var optionMap = new Dictionary<string, Option>();
+
+        for (int i = 0; i < question.options.Count; i++)
+        {
+            var label = $"{i + 1}. {question.options[i].optionText}";
+            prompt.AddChoice(label);
+            optionMap[label] = question.options[i];
         }
 
-        private static string BuildQuestionMarkup(SessionQuestionView question)
-        {
-            var markup = $"[bold underline]{question.QuestionText}[/]\n\n";
+        var selectedLabel = AnsiConsole.Prompt(prompt);
+        var selectedOption = optionMap[selectedLabel];
 
-            foreach (var option in question.Options)
-            {
-                var isCorrect = option.OptionId == question.CorrectAnswerId;
-                var color = isCorrect ? "green" : "default";
-                markup += $"[blue]•[/] [{color}]{option.Text}[/]\n";
-            }
+        bool isCorrect = selectedOption.answerId == question.correctAnswerId;
+        var resultColor = isCorrect ? "green" : "red";
+        var resultText = isCorrect ? "✔ Correct!" : "✘ Incorrect.";
 
-            return markup;
-        }
+        AnsiConsole.MarkupLine($"\n[{resultColor}]{resultText}[/]");
+        await Task.Delay(2000);
+    }
+
+    AnsiConsole.Clear();
+    AnsiConsole.MarkupLine("[bold green]✅ All questions completed.[/]");
+}
+
+
+
+private static string BuildQuestionMarkup(SessionQuestionView question)
+{
+    var markup = $"[bold underline]{question.questionText}[/]\n\n";
+
+    for (int i = 0; i < question.options.Count; i++)
+    {
+        markup += $"[blue]{i + 1}.[/] {question.options[i].optionText}\n";
+    }
+
+    return markup;
+}
+
     }
 }

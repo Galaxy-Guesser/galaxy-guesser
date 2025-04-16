@@ -6,25 +6,26 @@ namespace ConsoleApp1.Models
 {
     public class SessionQuestionView
     {
-        public int SessionId { get; set; }
-        public string SessionCode { get; set; }
+        public int sessionId { get; set; }
+        public string sessionCode { get; set; }
 
-        public int QuestionId { get; set; }
+        public int questionId { get; set; }
 
-        public string QuestionText { get; set; }
+        public string questionText { get; set; }
 
-        public int CategoryId { get; set; }
+        public int categoryId { get; set; }
 
-        public string CategoryName { get; set; }
+        public string categoryName { get; set; }
 
-        public int CorrectAnswerId { get; set; }
+        public int correctAnswerId { get; set; }
 
-        public List<Option> Options { get; set; } = new List<Option>();
+        public List<Option> options { get; set; } = new List<Option>();
     }
 
     public class Option
     {
-        public int OptionId { get; set; }
-        public string Text { get; set; }
+        public int optionId { get; set; }
+        public string optionText { get; set; }
+        public int answerId { get; set; }
     }
 }
