@@ -24,7 +24,7 @@ namespace GalaxyGuesserApi.src.Controllers
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly HttpClient _httpClient;  // Change field type from IHttpClientFactory to HttpClient
+        private readonly HttpClient _httpClient;
 
         private readonly GoogleAuthSettings _googleAuth;
 
@@ -149,7 +149,6 @@ namespace GalaxyGuesserApi.src.Controllers
             if (string.IsNullOrWhiteSpace(idToken))
                 return BadRequest("No ID token received.");
 
-            // Decode ID token
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(idToken);
 
@@ -159,7 +158,6 @@ namespace GalaxyGuesserApi.src.Controllers
             if (string.IsNullOrWhiteSpace(guid) || string.IsNullOrWhiteSpace(userName))
                 return BadRequest("Missing required claims.");
 
-                // Check if user exists in DB
                 var player = await _playerRepository.GetUserByGoogleIdAsync(guid);
 
                 if (string.IsNullOrEmpty(player.ToString()))

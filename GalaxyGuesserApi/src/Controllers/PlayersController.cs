@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
-using System.Security.Claims; // Add this line
+using System.Security.Claims;
 using GalaxyGuesserApi.Services;
-using Microsoft.AspNetCore.Authentication; // Add this line
+using Microsoft.AspNetCore.Authentication;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -116,7 +116,7 @@ namespace GalaxyGuesserApi.Controllers
 
             if (player != null)
             {
-                return Ok(player); // Already exists
+                return Ok(player);
             }
 
             if (string.IsNullOrWhiteSpace(displayName))

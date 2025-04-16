@@ -17,19 +17,16 @@ namespace GalaxyGuesserApi.Services
         }
         public async Task<ScoreUpdateResponse> UpdateScoreAsync(ScoreUpdateRequest request)
         {
-            // Validate player is in session
             if (!await _sessionScoreRepository.IsPlayerInSessionAsync(request.PlayerId, request.SessionId))
             {
                 return new ScoreUpdateResponse(false, Message: "Player is not in this session");
             }
 
-            // Validate question is in session
             if (!await _sessionScoreRepository.IsQuestionInSessionAsync(request.QuestionId, request.SessionId))
             {
                 return new ScoreUpdateResponse(false, Message: "Question not in this session");
             }
 
-            // Check if answer is correct
             var correctAnswerId = await _sessionScoreRepository.GetCorrectAnswerIdAsync(request.QuestionId);
             if (request.AnswerId != correctAnswerId)
             {
@@ -39,12 +36,10 @@ namespace GalaxyGuesserApi.Services
                     Message: "Incorrect answer");
             }
 
-            // Calculate points
             int basePoints = 1;
             double timeBonus = Math.Round((request.SecondsRemaining / 30.0) * 5, 2);
             int totalPoints = basePoints + (int)timeBonus;
 
-            // Update score
             var currentScore = await _sessionScoreRepository.GetPlayerScoreAsync(request.PlayerId, request.SessionId);
             if (currentScore.HasValue)
             {
@@ -55,7 +50,6 @@ namespace GalaxyGuesserApi.Services
                 await _sessionScoreRepository.AddPlayerScoreAsync(request.PlayerId, request.SessionId, totalPoints);
             }
 
-            // Get updated score
             var updatedScore = await _sessionScoreRepository.GetPlayerScoreAsync(request.PlayerId, request.SessionId);
 
             return new ScoreUpdateResponse(
