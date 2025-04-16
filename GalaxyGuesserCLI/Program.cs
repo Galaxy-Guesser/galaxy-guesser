@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Text;
 using ConsoleApp1.Models;
 using ConsoleApp1.Services;
-using ConsoleApp1.Data;
 
 namespace ConsoleApp1
 {

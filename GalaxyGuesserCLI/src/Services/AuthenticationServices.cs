@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using ConsoleApp1.Models;
 using ConsoleApp1.Helpers;
-using ConsoleApp1.Data;
 using System.Net;
 using System.Web;
 using System.Security;
@@ -21,7 +20,6 @@ namespace ConsoleApp1.Services
     public class AuthenticationService
     {
         private static List<Player> players = new List<Player>();
-        private static Dictionary<string, string> userCredentials = SampleData.UserCredentials;
         private readonly IConfiguration _configuration;
 
         public AuthenticationService()
@@ -58,7 +56,6 @@ namespace ConsoleApp1.Services
                 }
             } while (key.Key != ConsoleKey.Enter);
 
-            Console.WriteLine();
             return password.ToString();
         }
 
@@ -69,7 +66,6 @@ namespace ConsoleApp1.Services
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
             var response = await httpClient.PostAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/auth", new StringContent("null", Encoding.UTF8, "application/json"));
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -80,7 +76,6 @@ namespace ConsoleApp1.Services
 
                 var nameJson = JsonSerializer.Serialize(displayName);
                 response = await httpClient.PostAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/auth", new StringContent(nameJson, Encoding.UTF8, "application/json"));
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
                 
             }
             var playerJson = await response.Content.ReadAsStringAsync();

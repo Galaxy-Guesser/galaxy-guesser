@@ -3,7 +3,6 @@ using System.Text;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using ConsoleApp1.Models;
-using ConsoleApp1.Data;
 using ConsoleApp1.Helpers;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,9 +38,10 @@ namespace ConsoleApp1.Services
 
             Session session = new Session(sessionId, sessionCode, categoryId, questionDuration, questionCount);
             sessions.Add(session);
-            
-            AddQuestionsToSession(session.Id, categoryId, questionCount);
-            
+
+            // Add questions to session
+
+            // Add player to session
             AddPlayerToSession(player.playerId, session.Id);
 
             return session;
@@ -68,34 +68,8 @@ namespace ConsoleApp1.Services
             }
         }
 
-        public static void AddQuestionsToSession(int sessionId, int categoryId, int questionCount)
-        {
-            var categoryQuestions = SampleData.Questions
-                .Where(q => q.CategoryId == categoryId)
-                .OrderBy(q => Guid.NewGuid())
-                .Take(questionCount)
-                .ToList();
 
-            int id = sessionQuestions.Count > 0 ? sessionQuestions.Max(sq => sq.Id) + 1 : 1;
-            foreach (var question in categoryQuestions)
-            {
-                sessionQuestions.Add(new SessionQuestion(id++, sessionId, question.Id));
-            }
-        }
-
-        internal static List<Question> GetSessionQuestions(int sessionId)
-        {
-            return sessionQuestions
-                .Where(sq => sq.SessionId == sessionId)
-                .Join(
-                    SampleData.Questions,
-                    sq => sq.QuestionId,
-                    q => q.Id,
-                    (sq, q) => q
-                )
-                .ToList();
-        }
-
+    
         public static void SaveScore(int playerId, int sessionId, int score, int timeRemaining = 0)
         {
             sessionScores.Add(new SessionScore(playerId, sessionId, score, timeRemaining));
