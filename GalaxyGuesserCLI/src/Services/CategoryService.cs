@@ -4,10 +4,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ConsoleApp1.Models;
-using ConsoleApp1.Helpers;
+using GalaxyGuesserCli.Models;
+using GalaxyGuesserCli.Helpers;
 
-namespace ConsoleApp1.Services 
+namespace GalaxyGuesserCli.Services 
 {
     public class CategoryService
     {
