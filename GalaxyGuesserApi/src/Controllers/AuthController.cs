@@ -1,22 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using System.Text.Json.Serialization;
-using System.Text;
 using System.Text.Json;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
 using GalaxyGuesserApi.Configuration;
 
-namespace GalaxyGuesserApi.src.Controllers
+namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -39,43 +30,45 @@ namespace GalaxyGuesserApi.src.Controllers
         [HttpPost("token")]
         public async Task<IActionResult> ExchangeToken([FromForm] TokenRequest request)
         {
-            if (request == null || string.IsNullOrEmpty(request.Code))
-            {
-                return BadRequest("Invalid request");
-            }
-
-            try 
-            {
-                var tokenRequestParams = new Dictionary<string, string>
+                if (request == null || string.IsNullOrEmpty(request.Code))
                 {
-                    ["client_id"] =   _googleAuth.clientId,
-                    ["client_secret"] =  _googleAuth.clientSecret,
-                    ["code"] = request.Code,
-                    ["redirect_uri"] = request.RedirectUri,
-                    ["grant_type"] = "authorization_code"
-                };
-
-                var content = new FormUrlEncodedContent(tokenRequestParams);
-                var response = await _httpClient.PostAsync(
-                    "https://oauth2.googleapis.com/token", 
-                    content);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    return BadRequest("Failed to exchange code for token" + request.RedirectUri);
+                    return BadRequest("Invalid request");
                 }
+                else
+                {
+                    try 
+                    {
+                        var tokenRequestParams = new Dictionary<string, string>
+                        {
+                            ["client_id"] =   _googleAuth.clientId,
+                            ["client_secret"] =  _googleAuth.clientSecret,
+                            ["code"] = request.Code,
+                            ["redirect_uri"] = request.RedirectUri,
+                            ["grant_type"] = "authorization_code"
+                        };
 
-                var responseContent = await response.Content.ReadAsStringAsync();
+                        var content = new FormUrlEncodedContent(tokenRequestParams);
+                        var response = await _httpClient.PostAsync(
+                            "https://oauth2.googleapis.com/token", 
+                            content);
 
-                var googleTokens = JsonSerializer.Deserialize<GoogleTokenResponse>(responseContent);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            var errorContent = await response.Content.ReadAsStringAsync();
+                            return BadRequest("Failed to exchange code for token" + request.RedirectUri);
+                        }
 
-                
-                return Ok(new { access_token = googleTokens.IdToken });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error");
+                        var responseContent = await response.Content.ReadAsStringAsync();
+
+                        var googleTokens = JsonSerializer.Deserialize<GoogleTokenResponse>(responseContent);
+
+                        
+                        return Ok(new { access_token = googleTokens.IdToken });
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, "Internal server error");
+                    }
             }
         }
         
