@@ -6,9 +6,8 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
 {
   public interface IQuestionRepository
   {
-    Task<Question> GetQuestionAsync(int questionId);
-    Task<List<OptionResponseDto>> GetOptionsByQuestionIdAsync(int questionId);
-    Task<List<Question>> GetAllQuestionsAsync();
-
+    Task<QuestionResponse> GetNextQuestionForSessionAsync(int sessionId);
+    Task<List<OptionResponse>> GetOptionsByQuestionIdAsync(int questionId);
+    Task<AnswerResponse> GetCorrectAnswerAsync(int questionId);
   }
 }

@@ -15,91 +15,63 @@ namespace GalaxyGuesserApi.Repositories
       _dbContext = dbContext;
     }
 
-    public async Task<Question> GetQuestionAsync(int questionId)
+    public async Task<QuestionResponse> GetNextQuestionForSessionAsync(int sessionId)
     {
       const string query = @"
-                            SELECT question_id, question, answer_id, category_id
-                            FROM questions
-                            WHERE question_id = @questionId";
-      var parameters = new Dictionary<string, object> { { "@questionId", questionId } };
+        SELECT q.question_id, q.question
+        FROM SessionQuestions sq
+        JOIN Questions q ON q.question_id = sq.question_id
+        WHERE sq.session_id = @sessionId
+        ORDER BY q.question_id
+        LIMIT 1;";
 
-      var result = await _dbContext.QueryAsync(query, reader => new Question
+      var parameters = new Dictionary<string, object> { { "@sessionId", sessionId } };
+
+      var result = await _dbContext.QueryAsync(query, reader => new QuestionResponse
       {
-        questionId = reader.GetInt32(0),
-        question = reader.GetString(1),
-        answerId = reader.GetInt32(2),
-        categoryId = reader.GetInt32(3)
+        QuestionId = reader.GetInt32(0),
+        QuestionText = reader.GetString(1)
       }, parameters);
-      return result.FirstOrDefault()!;
+
+      return result.FirstOrDefault();
     }
 
-    public async Task<List<OptionResponseDto>> GetOptionsByQuestionIdAsync(int questionId)
+    public async Task<List<OptionResponse>> GetOptionsByQuestionIdAsync(int questionId)
     {
       const string query = @"
-                            SELECT question_id, text
-                            FROM options
-                            WHERE question_id = @questionId";
-
-      var options = new List<OptionResponseDto>();
+        SELECT o.answer_id, a.answer
+        FROM Options o
+        JOIN Answers a ON a.answer_id = o.answer_id
+        WHERE o.question_id = @questionId;";
 
       var parameters = new Dictionary<string, object> { { "@questionId", questionId } };
 
-      var results = await _dbContext.QueryAsync(query, reader => new OptionResponseDto
+      var result = await _dbContext.QueryAsync(query, reader => new OptionResponse
       {
-        Id = reader.GetInt32(0),
+        AnswerId = reader.GetInt32(0),
         Text = reader.GetString(1)
       }, parameters);
 
-      return results.ToList();
+      return result.ToList();
     }
 
-    public async Task<List<Question>> GetAllQuestionsAsync()
+    public async Task<AnswerResponse> GetCorrectAnswerAsync(int questionId)
     {
-
       const string query = @"
-            SELECT q.question_id AS questionId, q.question AS question_text,
-            o.options_id AS options_id, o.text AS option_text, o.isCorrect
-            FROM questions q
-            JOIN options o ON q.question_id = o.question_id
-            ORDER BY q.question_id, o.options_id";
+        SELECT a.answer_id, a.answer
+        FROM Questions q
+        JOIN Answers a ON a.answer_id = q.answer_id
+        WHERE q.question_id = @questionId;";
 
-      var questionsMap = new Dictionary<int, Question>();
+      var parameters = new Dictionary<string, object> { { "@questionId", questionId } };
 
-      var rows = await _dbContext.QueryAsync<QuestionOptionRow>(query, reader => new QuestionOptionRow
+      var result = await _dbContext.QueryAsync(query, reader => new AnswerResponse
       {
-        QuestionId = reader.GetInt32(0),
-        QuestionText = reader.GetString(1),
-        OptionId = reader.GetInt32(2),
-        OptionText = reader.GetString(3),
-        IsCorrect = reader.GetBoolean(4)
-      });
+        AnswerId = reader.GetInt32(0),
+        Text = reader.GetString(1)
+      }, parameters);
 
-      var questions = rows
-        .GroupBy(r => new { r.QuestionId, r.QuestionText })
-        .Select(group => new Question
-        {
-          questionId = group.Key.QuestionId,
-          question = group.Key.QuestionText,
-          Options = group.Select(r => new Option
-          {
-            Id = r.OptionId,
-            Text = r.OptionText,
-            IsCorrect = r.IsCorrect
-          }).ToList()
-        })
-        .ToList();
-
-      return questions;
-
-    }
-
-    public class QuestionOptionRow
-    {
-      public int QuestionId { get; set; }
-      public string QuestionText { get; set; }
-      public int OptionId { get; set; }
-      public string OptionText { get; set; }
-      public bool IsCorrect { get; set; }
+      return result.FirstOrDefault();
     }
   }
 }

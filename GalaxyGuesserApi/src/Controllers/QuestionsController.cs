@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Authentication;
 using System.Threading.Tasks;
 using GalaxyGuesserApi.Models;
 using System.Collections.Generic;
+using System;
 
 namespace GalaxyGuesserApi.Controllers
 {
   [ApiController]
   [Route("api/[controller]")]
-  [Authorize]
+  //[Authorize]
   public class QuestionsController : ControllerBase
   {
     private readonly QuestionService _questionsService;
@@ -22,16 +23,15 @@ namespace GalaxyGuesserApi.Controllers
       _questionsService = questionsService;
     }
 
-    [HttpGet("{questionId}")]
-    public async Task<ActionResult<Question>> GetQuestion(int questionId)
+    [HttpGet("ask")]
+    public async Task<IActionResult> AskQuestion([FromQuery] int sessionId)
     {
       try
       {
-        Question question = await _questionsService.GetQuestionAsync(questionId);
+        var question = await _questionsService.GetNextQuestionForSessionAsync(sessionId);
         if (question == null)
-        {
-          return NotFound();
-        }
+          return NotFound(new { message = "No question found for this session." });
+
         return Ok(question);
       }
       catch (Exception ex)
@@ -43,23 +43,35 @@ namespace GalaxyGuesserApi.Controllers
     [HttpGet("{questionId}/options")]
     public async Task<IActionResult> GetOptions(int questionId)
     {
-      var options = await _questionsService.GetOptionsByQuestionIdAsync(questionId);
+      try
+      {
+        var options = await _questionsService.GetOptionsByQuestionIdAsync(questionId);
+        if (options == null || options.Count == 0)
+          return NotFound("No options found for that question.");
 
-      if (options == null || options.Count == 0)
-        return NotFound("No options found for that question.");
-
-      return Ok(options);
+        return Ok(options);
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+      }
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Question>>> GetQuestions()
+    [HttpGet("{questionId}/answer")]
+    public async Task<IActionResult> GetCorrectAnswer(int questionId)
     {
-      var questions = await _questionsService.GetQuestionsAsync();
+      try
+      {
+        var answer = await _questionsService.GetCorrectAnswerAsync(questionId);
+        if (answer == null)
+          return NotFound(new { message = "Answer not found." });
 
-      if (questions == null || questions.Count == 0)
-        return NotFound("No questions found.");
-
-      return Ok(questions);
+        return Ok(answer);
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+      }
     }
   }
 }
