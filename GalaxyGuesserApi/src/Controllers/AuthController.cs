@@ -1,22 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using System.Text.Json.Serialization;
-using System.Text;
 using System.Text.Json;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
 using GalaxyGuesserApi.Configuration;
 
-namespace GalaxyGuesserApi.src.Controllers
+namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -24,7 +15,7 @@ namespace GalaxyGuesserApi.src.Controllers
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly HttpClient _httpClient;  // Change field type from IHttpClientFactory to HttpClient
+        private readonly HttpClient _httpClient;  
 
         private readonly GoogleAuthSettings _googleAuth;
 
@@ -159,7 +150,6 @@ namespace GalaxyGuesserApi.src.Controllers
             if (string.IsNullOrWhiteSpace(guid) || string.IsNullOrWhiteSpace(userName))
                 return BadRequest("Missing required claims.");
 
-                // Check if user exists in DB
                 var player = await _playerRepository.GetUserByGoogleIdAsync(guid);
 
                 if (player == null)

@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
-using System.Security.Claims; // Add this line
+using System.Security.Claims;
 using GalaxyGuesserApi.Services;
-using Microsoft.AspNetCore.Authentication; // Add this line
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -12,9 +11,9 @@ namespace GalaxyGuesserApi.Controllers
     [Authorize] 
     public class PlayersController : ControllerBase
     {
-        private readonly PlayerService _playerService;
+        private readonly IPlayerService _playerService;
 
-        public PlayersController(PlayerService playerService)
+        public PlayersController(IPlayerService playerService)
         {
             _playerService = playerService;
         }
@@ -116,7 +115,7 @@ namespace GalaxyGuesserApi.Controllers
 
             if (player != null)
             {
-                return Ok(player); // Already exists
+                return Ok(player); 
             }
 
             if (string.IsNullOrWhiteSpace(displayName))

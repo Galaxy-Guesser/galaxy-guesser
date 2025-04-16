@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
-using GalaxyGuesserApi.Services;
+using GalaxyGuesserApi.Services.Interfaces;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -10,9 +10,9 @@ namespace GalaxyGuesserApi.Controllers
     [Route("api/change")]
     public class SessionViewController : ControllerBase
     {
-        private readonly SessionViewService _sessionViewService;
+        private readonly ISessionViewService _sessionViewService;
 
-        public SessionViewController(SessionViewService sessionViewService)
+        public SessionViewController(ISessionViewService sessionViewService)
         {
             _sessionViewService = sessionViewService;
         }

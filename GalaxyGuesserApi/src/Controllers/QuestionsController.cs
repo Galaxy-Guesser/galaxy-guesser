@@ -1,24 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using GalaxyGuesserApi.Models;
-using System.Security.Claims;
-using GalaxyGuesserApi.Services;
-using Microsoft.AspNetCore.Authentication;
-using System.Threading.Tasks;
-using GalaxyGuesserApi.Models;
-using System.Collections.Generic;
-using System;
+using GalaxyGuesserApi.Services.Interfaces;
 
 namespace GalaxyGuesserApi.Controllers
 {
   [ApiController]
   [Route("api/[controller]")]
-  //[Authorize]
   public class QuestionsController : ControllerBase
   {
-    private readonly QuestionService _questionsService;
+    private readonly IQuestionService _questionsService;
 
-    public QuestionsController(QuestionService questionsService)
+    public QuestionsController(IQuestionService questionsService)
     {
       _questionsService = questionsService;
     }

@@ -1,22 +1,22 @@
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Repositories.Interfaces;
+using GalaxyGuesserApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GalaxyGuesserApi.Services
 {
-    public class SessionViewService
+    public class SessionViewService: ISessionViewService
     {
-        private readonly ISessionViewRepository _sessionViewRepository;
+        private readonly ISessionViewService _sessionViewService;
 
-        public SessionViewService(ISessionViewRepository sessionViewRepository)
+        public SessionViewService(ISessionViewService sessionViewService)
         {
-            _sessionViewRepository = sessionViewRepository;
+            _sessionViewService = sessionViewService;
         }
 
         public async Task<List<SessionView>> GetAllActiveSessions()
         {
-            return await _sessionViewRepository.GetAllActiveSessions();
+            return await _sessionViewService.GetAllActiveSessions();
         }
-
     }
 }

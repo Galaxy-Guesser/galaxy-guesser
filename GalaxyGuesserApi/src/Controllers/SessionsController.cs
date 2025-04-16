@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
-using  GalaxyGuesserApi.Services;
-using System.Security.Claims; // Add this line
+using System.Security.Claims;
+using GalaxyGuesserApi.Services.Interfaces; 
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -12,9 +12,9 @@ namespace GalaxyGuesserApi.Controllers
 
     public class SessionsController : ControllerBase
     {
-        private readonly SessionService _sessionService;
+        private readonly ISessionService _sessionService;
 
-        public SessionsController(SessionService sessionService)
+        public SessionsController(ISessionService sessionService)
         {
             _sessionService = sessionService;
         }
