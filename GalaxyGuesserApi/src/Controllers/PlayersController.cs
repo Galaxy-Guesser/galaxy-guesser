@@ -38,7 +38,7 @@ namespace GalaxyGuesserApi.Controllers
             try
             {
                 var Player = await _playerService.GetPlayerByIdAsync(playerId);
-                if (Player == null)
+                if (string.IsNullOrEmpty(Player.ToString()))
                 {
                     return NotFound();
                 }

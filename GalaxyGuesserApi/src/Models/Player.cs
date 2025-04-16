@@ -1,11 +1,11 @@
 
 namespace GalaxyGuesserApi.Models
 {
-    public class Player
+    public readonly struct Player
     {
-        public int playerId { get; set; }
-        public required string userName { get; set; }
-        public required string guid { get; set; }
+        public int playerId { get; init; }
+        public required string userName { get; init; }
+        public required string guid { get; init; }
     }
 }
 

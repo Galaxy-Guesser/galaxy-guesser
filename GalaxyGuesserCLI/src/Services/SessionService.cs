@@ -36,14 +36,14 @@ namespace ConsoleApp1.Services
         {
             string sessionCode = GenerateSessionCode();
             int sessionId = sessions.Count > 0 ? sessions.Max(s => s.Id) + 1 : 1;
-            
+
             Session session = new Session(sessionId, sessionCode, categoryId, questionDuration, questionCount);
             sessions.Add(session);
             
             AddQuestionsToSession(session.Id, categoryId, questionCount);
             
             AddPlayerToSession(player.playerId, session.Id);
-            
+
             return session;
         }
 
@@ -111,8 +111,9 @@ namespace ConsoleApp1.Services
             return sessionScores
                 .Where(s => s.SessionId == sessionId)
                 .OrderByDescending(s => s.Score + s.TimeRemaining)
-                .Select(s => new { 
-                    Name = players.First(p => p.playerId == s.PlayerId).userName, 
+                .Select(s => new
+                {
+                    Name = players.First(p => p.playerId == s.PlayerId).userName,
                     Score = s.Score,
                     TimeBonus = s.TimeRemaining,
                     Total = s.Score + s.TimeRemaining
@@ -154,22 +155,22 @@ namespace ConsoleApp1.Services
         }
 
 
-         private static readonly HttpClient _httpClient = new HttpClient();
+        private static readonly HttpClient _httpClient = new HttpClient();
 
-        public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string startDate, int questionDuration)
+        public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string startDate, decimal sessionDuration)
         {
             try
             {
                 string jwt = Helper.GetStoredToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-                var url = $"http://localhost:5010/api/sessions/session";
+                var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions/session";
 
-                var request = new CreateSessionRequest
+                    var request = new CreateSessionRequest
                 {
                     category = category,
                     questionsCount = questionsCount,
                     startDate = startDate,
-                    questionDuration = questionDuration
+                    sessionDuration = sessionDuration
                 };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -194,43 +195,57 @@ namespace ConsoleApp1.Services
             }
         }
 
-
-        public static async Task JoinSessionAsync(string sessionCode)
+          public static async Task JoinSessionAsync(string sessionCode)
+        {
+            try
             {
-                try
+                string jwt = Helper.GetStoredToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(jwt);
+
+                var playerGuid = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
+                              ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                var requestBody = new
                 {
-                    string jwt = Helper.GetStoredToken();
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+                    sessionCode = sessionCode,
+                };
 
-                    var handler = new JwtSecurityTokenHandler();
-                    var token = handler.ReadJwtToken(jwt);
-                    
-                    var playerGuid = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value 
-                                ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                
-                    var requestBody = new
-                    {
-                        sessionCode = sessionCode,
-                    };
+                var json = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    var json = JsonSerializer.Serialize(requestBody);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    var url = "http://localhost:5010/api/sessions"; 
-                    HttpResponseMessage response = await _httpClient.PostAsync(url, content);
-                    response.EnsureSuccessStatusCode();
 
-                    string responseContent = await response.Content.ReadAsStringAsync();
+        var url = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions"; 
+        HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"✅ Successfully joined session: {sessionCode}");
-                    Console.ResetColor();
+                    var questions = await SessionQuestionViewService.GetAllSessionQuestions(sessionCode);
+                    await UIService.DisplaySessionQuestionsAsync(questions);
                 }
-                catch (Exception ex)
+                else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"❌ Error joining session: {ex.Message}");
-                    Console.ResetColor();
+                    Console.WriteLine($"🔍 Error : {responseContent}");
                 }
             }
-    }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"❌ Unexpected error: {ex.Message}");
+            }
+            finally
+            {
+                Console.ResetColor();
+            }
+        
+        }
+        }
+
 }

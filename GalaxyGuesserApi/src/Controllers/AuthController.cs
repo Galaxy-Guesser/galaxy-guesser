@@ -15,7 +15,7 @@ namespace GalaxyGuesserApi.Controllers
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly HttpClient _httpClient;  
+        private readonly HttpClient _httpClient;
 
         private readonly GoogleAuthSettings _googleAuth;
 
@@ -153,7 +153,7 @@ namespace GalaxyGuesserApi.Controllers
 
                 var player = await _playerRepository.GetUserByGoogleIdAsync(guid);
 
-                if (player == null)
+                if (string.IsNullOrEmpty(player.ToString()))
                 {
                     player = await _playerRepository.CreatePlayerAsync(guid, userName);
                 }

@@ -9,10 +9,10 @@ namespace GalaxyGuesserApi.Services
     public interface IPlayerService
     {
         Task<List<Player>> GetAllPlayersAsync();
-        Task<Player> GetPlayerByIdAsync(int playerId);
-        Task<Player> CreatePlayerAsync(string guid, string userName);
-        Task<bool> UpdatePlayerAsync(int playerId, string userName);
-        Task<Player> GetPlayerByGuidAsync(string guid);
-        Task<bool> DeletePlayerAsync(int playerId);
+        Task<Player> GetPlayerByIdAsync(int player_id);
+        Task<Player> CreatePlayerAsync(string guid, string username);
+        Task<bool> UpdatePlayerAsync(int player_id, string username);
+        Task<Player?> GetPlayerByGuidAsync(string guid);
+        Task<bool> DeletePlayerAsync(int player_id);
     }
 }

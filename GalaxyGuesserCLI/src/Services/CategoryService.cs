@@ -20,7 +20,7 @@ namespace ConsoleApp1.Services
                 string jwt = Helper.GetStoredToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
                 
-                var url = "http://localhost:5010/api/categories";
+                var url = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/categories";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 

@@ -10,7 +10,6 @@ namespace GalaxyGuesserApi.Models
         public string category { get; set; } = null!;
         public List<string> playerUserNames { get; set; } = new();
         public int playerCount{ get; set; }
-        public string duration { get; set; } = null!;
         public int questionCount{ get; set; }
         public int? highestScore { get; set; }
         public string? endsIn{ get; set; }

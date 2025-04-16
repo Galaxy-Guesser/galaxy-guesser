@@ -61,13 +61,8 @@ namespace ConsoleApp1.Services
        
 public static void PrintGalaxyHeader()
 {
-    // Clear console and set up
     Console.Clear();
-    
-    // Animated stars effect
-    AnimateStars(50, 3000);
-    
-    // Main title with gradient effect
+
     string[] galaxyTitle = new string[]
     {
         @"   ___________________________________________________________",
@@ -134,51 +129,6 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
     Console.ForegroundColor = originalFg;
 }
 
-// Creates animated stars effect
-private static void AnimateStars(int numStars, int duration)
-{
-    Random rand = new Random();
-    int consoleWidth = Console.WindowWidth;
-    int consoleHeight = Console.WindowHeight;
-    
-    // Generate random star positions
-    (int x, int y, char symbol)[] stars = new (int, int, char)[numStars];
-    for (int i = 0; i < numStars; i++)
-    {
-        stars[i] = (
-            rand.Next(consoleWidth), 
-            rand.Next(consoleHeight), 
-            rand.Next(2) == 0 ? '*' : '.'
-        );
-    }
-    
-    // Animate stars twinkling
-    int frames = 5;
-    for (int frame = 0; frame < frames; frame++)
-    {
-        Console.Clear();
-        
-        // Draw stars
-        foreach (var star in stars)
-        {
-            try
-            {
-                Console.SetCursorPosition(star.x, star.y);
-                Console.ForegroundColor = frame % 2 == 0 ? ConsoleColor.White : ConsoleColor.Gray;
-                Console.Write(star.symbol);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                // Skip if position is outside console
-            }
-        }
-        
-        // Pause between frames
-        System.Threading.Thread.Sleep(duration / frames);
-    }
-    
-    Console.Clear();
-}
         public static void ShowHelp(Dictionary<string,string> COMMANDS)
         {
             Console.Clear();
@@ -256,7 +206,7 @@ private static void AnimateStars(int numStars, int duration)
          internal static void ShowFinalResults(Player player, Session session)
         {
             Console.Clear();
-            UIService.PrintGalaxyHeader();
+            PrintGalaxyHeader();
 
             SessionScore playerScore = SessionService.GetPlayerScore(player.playerId, session.Id);
             int score = playerScore != null ? playerScore.Score : 0;
@@ -397,5 +347,70 @@ private static void AnimateStars(int numStars, int duration)
             
             Continue();
         }
+
+public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
+{
+    if (questions.Count == 0)
+    {
+        AnsiConsole.MarkupLine("[grey]No questions found for this session.[/]");
+        return;
+    }
+
+    foreach (var question in questions)
+    {
+        AnsiConsole.Clear();
+
+        // Display question + options in card
+        var questionPanel = new Panel(BuildQuestionMarkup(question))
+        {
+            Border = BoxBorder.Rounded,
+            Padding = new Padding(1, 0, 1, 0),
+            Header = new PanelHeader($"[bold green]Question {question.questionId}[/]", Justify.Center)
+        };
+
+        AnsiConsole.Write(questionPanel);
+
+        var prompt = new SelectionPrompt<string>()
+            .Title("\n[bold]Select your answer:[/]")
+            .HighlightStyle("cyan");
+
+        var optionMap = new Dictionary<string, Option>();
+
+        for (int i = 0; i < question.options.Count; i++)
+        {
+            var label = $"{i + 1}. {question.options[i].optionText}";
+            prompt.AddChoice(label);
+            optionMap[label] = question.options[i];
+        }
+
+        var selectedLabel = AnsiConsole.Prompt(prompt);
+        var selectedOption = optionMap[selectedLabel];
+
+        bool isCorrect = selectedOption.answerId == question.correctAnswerId;
+        var resultColor = isCorrect ? "green" : "red";
+        var resultText = isCorrect ? "✔ Correct!" : "✘ Incorrect.";
+
+        AnsiConsole.MarkupLine($"\n[{resultColor}]{resultText}[/]");
+        await Task.Delay(2000);
+    }
+
+    AnsiConsole.Clear();
+    AnsiConsole.MarkupLine("[bold green]✅ All questions completed.[/]");
+}
+
+
+
+private static string BuildQuestionMarkup(SessionQuestionView question)
+{
+    var markup = $"[bold underline]{question.questionText}[/]\n\n";
+
+    for (int i = 0; i < question.options.Count; i++)
+    {
+        markup += $"[blue]{i + 1}.[/] {question.options[i].optionText}\n";
+    }
+
+    return markup;
+}
+
     }
 }

@@ -4,5 +4,5 @@ public class CreateSessionRequest
     public int questionsCount { get; set; }
     public string userGuid { get; set; }
     public string startDate { get; set; }
-    public int questionDuration { get; set; }
+   public decimal sessionDuration { get; set; }
 }

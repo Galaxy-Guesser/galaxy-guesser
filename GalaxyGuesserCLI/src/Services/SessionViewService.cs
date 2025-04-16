@@ -8,7 +8,7 @@ namespace ConsoleApp1.Services
     {
         private static readonly HttpClient _httpClient = new HttpClient();
 
-        private const string ActiveSessionsApiUrl = "http://localhost:5010/api/change"; 
+        private const string ActiveSessionsApiUrl = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/change"; 
         public static async Task<List<SessionView>> GetActiveSessions()
         {
             try

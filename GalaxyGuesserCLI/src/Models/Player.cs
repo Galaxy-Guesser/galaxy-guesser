@@ -1,10 +1,10 @@
  namespace ConsoleApp1.Models
 {
-    class Player
+    public readonly struct Player
     {
-        public int playerId { get; set; }
-        public string guid { get; set; }
-        public string userName { get; set; }
+        public int playerId { get; init; }
+        public string guid { get; init; }
+        public string userName { get; init; }
 
     }
 }

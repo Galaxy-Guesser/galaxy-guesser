@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using GalaxyGuesserApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GalaxyGuesserApi.Controllers
 {
   [ApiController]
   [Route("api/[controller]")]
+  [Authorize]
   public class QuestionsController : ControllerBase
   {
     private readonly IQuestionService _questionsService;

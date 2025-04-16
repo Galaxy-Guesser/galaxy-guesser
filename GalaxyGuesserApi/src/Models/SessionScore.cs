@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GalaxyGuesserApi.Models
 {
@@ -12,36 +9,34 @@ namespace GalaxyGuesserApi.Models
         public int score { get; set; }
 
         public record ScoreUpdateRequest(
-        int PlayerId,
-        int SessionId,
-        int QuestionId,
-        int AnswerId,
-        double SecondsRemaining);
+            int PlayerId,
+            int SessionId,
+            int Points
+        );
 
         public record ScoreUpdateResponse(
             bool Success,
-            bool IsCorrect = false,
-            int BasePoints = 0,
-            double TimeBonus = 0,
-            int TotalPointsAdded = 0,
-            int? NewTotalScore = null,
-            double SecondsRemaining = 0,
-            string? Message = null);
+            int NewTotalScore,
+            string Message
+        );
 
         public record FinalScoreResponse(
             bool Success,
             int PlayerId,
             int SessionId,
             int TotalScore,
-            string? Message = null);
+            string? Message = null
+        );
 
         public record QuestionResult(
             int QuestionId,
             bool IsCorrect,
             double TimeTaken,
-            int PointsEarned);
+            int PointsEarned
+        );
 
         public record SessionStats(
-            int TotalScore);
+            int TotalScore
+        );
     }
 }

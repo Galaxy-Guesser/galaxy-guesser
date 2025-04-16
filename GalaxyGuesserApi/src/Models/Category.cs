@@ -1,10 +1,10 @@
 
 namespace GalaxyGuesserApi.Models
 {
-    public class Category
+    public readonly struct Category
     {
-        public int categoryId { get; set; }
-        public string category { get; set; }
+        public int categoryId { get; init; }
+        public string category { get; init; }
     }
 }
 

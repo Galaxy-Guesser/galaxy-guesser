@@ -68,7 +68,7 @@ namespace ConsoleApp1.Services
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
-            var response = await httpClient.PostAsync("http://localhost:5010/api/players/auth", new StringContent("null", Encoding.UTF8, "application/json"));
+            var response = await httpClient.PostAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/auth", new StringContent("null", Encoding.UTF8, "application/json"));
             Console.WriteLine(await response.Content.ReadAsStringAsync());
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -79,7 +79,7 @@ namespace ConsoleApp1.Services
                 Console.CursorVisible = false;
 
                 var nameJson = JsonSerializer.Serialize(displayName);
-                response = await httpClient.PostAsync("http://localhost:5010/api/players/auth", new StringContent(nameJson, Encoding.UTF8, "application/json"));
+                response = await httpClient.PostAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/auth", new StringContent(nameJson, Encoding.UTF8, "application/json"));
                 Console.WriteLine(await response.Content.ReadAsStringAsync());
                 
             }
@@ -99,7 +99,7 @@ namespace ConsoleApp1.Services
             
             var authorizationEndpoint = 
                 "https://accounts.google.com/o/oauth2/v2/auth" +
-                "?client_id="+ _configuration["Google:client_id"] +
+                "?client_id="+ "2880504077-78ejpg7rqn6cqr35mjolapla9e232g1b.apps.googleusercontent.com" +
                 "&response_type=code" +
                 "&scope=openid%20email%20profile" +
                 "&redirect_uri=http://localhost:5000/" +
@@ -134,7 +134,7 @@ namespace ConsoleApp1.Services
             
             using var httpClient = new HttpClient();
             var tokenResponse = await httpClient.PostAsync(
-            "http://localhost:5010/api/auth/token",
+            "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/auth/token",
             new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["Code"] = code,

@@ -17,9 +17,25 @@ namespace GalaxyGuesserApi.Services
             return await _playerRepository.GetAllPlayersAsync();
         }
 
-        public async Task<Player> GetPlayerByIdAsync(int player_id)
+        public async Task<Player> GetPlayerByIdAsync(int playerId)
         {
-            return await _playerRepository.GetPlayerByIdAsync(player_id);
+            return await _playerRepository.GetPlayerByIdAsync(playerId);
+        }
+
+        public async Task<Player> CreatePlayerAsync(string guid, string userName)
+        {
+           return await _playerRepository.CreatePlayerAsync(guid, userName);
+        }
+
+        public async Task<bool> UpdatePlayerAsync(int playerId, string userName)
+        {
+            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(playerId);
+            if (string.IsNullOrEmpty(existingPlayer.ToString()))
+            {
+                return false;
+            }
+
+            return await _playerRepository.UpdatePlayerAsync(playerId, userName);
         }
 
         public async Task<Player?> GetPlayerByGuidAsync(string guid)
@@ -27,33 +43,15 @@ namespace GalaxyGuesserApi.Services
             return await _playerRepository.GetPlayerByGuidAsync(guid);
         }
 
-        public async Task<Player> CreatePlayerAsync(string guid, string username)
+        public async Task<bool> DeletePlayerAsync(int playerId)
         {
-           return await _playerRepository.CreatePlayerAsync(guid, username);
-        }
-
-        public async Task<bool> UpdatePlayerAsync(int player_id, string username)
-        {
-            var existingPlayer = await _playerRepository.GetPlayerByIdAsync(player_id);
-            if (existingPlayer == null)
+           var existingPlayer = await _playerRepository.GetPlayerByIdAsync(playerId);
+            if (string.IsNullOrEmpty(existingPlayer.ToString()))
             {
                 return false;
             }
 
-            return await _playerRepository.UpdatePlayerAsync(player_id, username);
+            return await _playerRepository.DeletePlayerAsync(playerId);
         }
-
-        public async Task<bool> DeletePlayerAsync(int player_id)
-        {
-           var existingPlayer = await _playerRepository.GetPlayerByIdAsync(player_id);
-            if (existingPlayer == null)
-            {
-                return false;
-            }
-
-            return await _playerRepository.DeletePlayerAsync(player_id);
-        }
-
-
     }
 }

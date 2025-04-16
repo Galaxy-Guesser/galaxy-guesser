@@ -199,7 +199,7 @@ public class AuthControllerTests
             };
             var mockHttpClient = CreateMockHttpClient(mockResponse);
             _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(mockHttpClient);
-            _mockPlayerRepository.Setup(repo => repo.GetUserByGoogleIdAsync(guid)).ReturnsAsync((Player)null);
+            _mockPlayerRepository.Setup(repo => repo.GetUserByGoogleIdAsync(guid)).ReturnsAsync(default(Player));
             _mockPlayerRepository.Setup(repo => repo.CreatePlayerAsync(guid, userName)).ReturnsAsync(new Player { playerId = playerId, guid = guid, userName = userName });
 
             var result = await _controller.Callback(code);
