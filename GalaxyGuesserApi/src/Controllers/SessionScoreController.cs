@@ -21,18 +21,13 @@ namespace GalaxyGuesserApi.Controllers
         }
 
 
-        [HttpPut("update")]
+        [HttpPut]
         public async Task<IActionResult> UpdateScore([FromBody] ScoreUpdateRequest request)
         {
             var response = await _sessionScoreService.UpdateScoreAsync(request);
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpGet("finalScore/{sessionId}/{playerId}")]
-        public async Task<IActionResult> GetFinalScore(int sessionId, int playerId)
-        {
-            var response = await _sessionScoreService.GetFinalScoreAsync(playerId, sessionId);
-            return response.Success ? Ok(response) : BadRequest(response);
-        }
+       
     }
 }

@@ -17,38 +17,7 @@ namespace GalaxyGuesserApi.Services
         }
         public async Task<ScoreUpdateResponse> UpdateScoreAsync(ScoreUpdateRequest request)
         {
-            if (!await _sessionScoreRepository.IsPlayerInSessionAsync(request.PlayerId, request.SessionId))
-            {
-                return new ScoreUpdateResponse(false, Message: "Player is not in this session");
-            }
-
-            if (!await _sessionScoreRepository.IsQuestionInSessionAsync(request.QuestionId, request.SessionId))
-            {
-                return new ScoreUpdateResponse(false, Message: "Question not in this session");
-            }
-
-            var correctAnswerId = await _sessionScoreRepository.GetCorrectAnswerIdAsync(request.QuestionId);
-            if (request.AnswerId != correctAnswerId)
-            {
-                return new ScoreUpdateResponse(
-                    Success: false,
-                    IsCorrect: false,
-                    Message: "Incorrect answer");
-            }
-
-            int basePoints = 1;
-            double timeBonus = Math.Round((request.SecondsRemaining / 30.0) * 5, 2);
-            int totalPoints = basePoints + (int)timeBonus;
-
-            var currentScore = await _sessionScoreRepository.GetPlayerScoreAsync(request.PlayerId, request.SessionId);
-            if (currentScore.HasValue)
-            {
-                await _sessionScoreRepository.UpdatePlayerScoreAsync(request.PlayerId, request.SessionId, totalPoints);
-            }
-            else
-            {
-                await _sessionScoreRepository.AddPlayerScoreAsync(request.PlayerId, request.SessionId, totalPoints);
-            }
+            await _sessionScoreRepository.UpdatePlayerScoreAsync(request.PlayerId, request.SessionId, request.Points);
 
             var updatedScore = await _sessionScoreRepository.GetPlayerScoreAsync(request.PlayerId, request.SessionId);
 
@@ -60,7 +29,7 @@ namespace GalaxyGuesserApi.Services
                 totalPoints,
                 updatedScore,
                 request.SecondsRemaining,
-                "Answer correct! Points added.");
+                "Answer correct!");
         }
 
         public async Task<FinalScoreResponse> GetFinalScoreAsync(int playerId, int sessionId)
