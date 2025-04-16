@@ -261,6 +261,7 @@ jobs:
           DB_CONNECTION_STRING: "Host=${{ needs.terraform.outputs.rds_endpoint }};Database=guesserDB;Username=iamuser;Password=${{ secrets.DB_PASSWORD }}"
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          CALLBACK_URL: ${{ secrets.CALLBACK_URL }}
         run: |
           ssh -v -o StrictHostKeyChecking=no -i deploy-key.pem ec2-user@${{ needs.terraform.outputs.ec2 }} << EOF
             if ! command -v docker >/dev/null 2>&1; then
@@ -310,5 +311,6 @@ jobs:
               -e "ConnectionStrings__DefaultConnection=$DB_CONNECTION" \
               -e "Google__ClientId=$GOOGLE_CLIENT_ID" \
               -e "Google__ClientSecret=$GOOGLE_CLIENT_SECRET" \
+              -e "Google__CallbackUrl=$CALLBACK_URL" \
               $IMAGE
           EOF

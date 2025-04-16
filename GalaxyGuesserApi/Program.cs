@@ -9,6 +9,20 @@ using GalaxyGuesserApi.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowCli", policy =>
+//     {
+//         policy.WithOrigins(
+//             "http://localhost:5000"           
+//         )
+//         .AllowAnyMethod()         
+//         .AllowAnyHeader()       
+//         .AllowCredentials();
+//     });
+// });
+
 var googleAuthSettings = new GoogleAuthSettings();
 builder.Configuration.GetSection("Google").Bind(googleAuthSettings);
 
@@ -85,6 +99,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+// app.UseCors("AllowCli");
 // app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
