@@ -28,7 +28,7 @@ namespace ConsoleApp1.Services
         private static List<SessionQuestion> sessionQuestions = new List<SessionQuestion>();
         private static List<SessionScore> sessionScores = new List<SessionScore>();
 
-
+        
 
         public static string GenerateSessionCode()
         {
@@ -50,16 +50,16 @@ namespace ConsoleApp1.Services
         {
             string sessionCode = GenerateSessionCode();
             int sessionId = sessions.Count > 0 ? sessions.Max(s => s.Id) + 1 : 1;
-
+            
             Session session = new Session(sessionId, sessionCode, categoryId, questionDuration, questionCount);
             sessions.Add(session);
-
+            
             // Add questions to session
             AddQuestionsToSession(session.Id, categoryId, questionCount);
-
+            
             // Add player to session
             AddPlayerToSession(player.playerId, session.Id);
-
+            
             return session;
         }
 
@@ -130,9 +130,8 @@ namespace ConsoleApp1.Services
             return sessionScores
                 .Where(s => s.SessionId == sessionId)
                 .OrderByDescending(s => s.Score + s.TimeRemaining)
-                .Select(s => new
-                {
-                    Name = players.First(p => p.playerId == s.PlayerId).userName,
+                .Select(s => new { 
+                    Name = players.First(p => p.playerId == s.PlayerId).userName, 
                     Score = s.Score,
                     TimeBonus = s.TimeRemaining,
                     Total = s.Score + s.TimeRemaining
@@ -168,7 +167,7 @@ namespace ConsoleApp1.Services
             }
         }
 
-
+        
 
         public static int GetSessionQuestionsCount(int sessionId)
         {
@@ -176,9 +175,9 @@ namespace ConsoleApp1.Services
         }
 
 
-        private static readonly HttpClient _httpClient = new HttpClient();
+         private static readonly HttpClient _httpClient = new HttpClient();
 
-  public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string startDate, decimal sessionDuration)
+  public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string startDate, int questionDuration)
 {
     try
     {
@@ -186,57 +185,58 @@ namespace ConsoleApp1.Services
          _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
         var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions/session";
 
-                var request = new CreateSessionRequest
-                {
-                    category = category,
-                    questionsCount = questionsCount,
-                    startDate = startDate,
-                    sessionDuration = sessionDuration
-                };
-                var json = JsonSerializer.Serialize(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(url, content);
-                response.EnsureSuccessStatusCode();
-
-                string sessionCode = await response.Content.ReadAsStringAsync();
-
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"✅ Session created: {sessionCode}");
-                Console.ResetColor();
-
-                return sessionCode;
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"❌ Error creating session: {ex.Message}");
-                Console.ResetColor();
-                return null;
-            }
-        }
-
-
-        public static async Task JoinSessionAsync(string sessionCode)
+        var request = new CreateSessionRequest
         {
-            try
-            {
-                string jwt = Helper.GetStoredToken();
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+            category = category,
+            questionsCount = questionsCount,
+            startDate = startDate,
+            questionDuration = questionDuration
+        };
+        var json = JsonSerializer.Serialize(request);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var handler = new JwtSecurityTokenHandler();
-                var token = handler.ReadJwtToken(jwt);
+        var response = await _httpClient.PostAsync(url, content);
+        response.EnsureSuccessStatusCode();
 
-                var playerGuid = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
-                              ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        string sessionCode = await response.Content.ReadAsStringAsync();
 
-                var requestBody = new
-                {
-                    sessionCode = sessionCode,
-                };
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"✅ Session created: {sessionCode}");
+        Console.ResetColor();
 
-                var json = JsonSerializer.Serialize(requestBody);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+        return sessionCode;
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"❌ Error creating session: {ex.Message}");
+        Console.ResetColor();
+        return null;
+    }
+}
+
+
+    public static async Task JoinSessionAsync(string sessionCode)
+{
+    try
+    {
+        string jwt = Helper.GetStoredToken();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(jwt);
+        
+        // Try to get sub  or nameidentifier
+        var playerGuid = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value 
+                    ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+      
+        var requestBody = new
+        {
+            sessionCode = sessionCode,
+        };
+
+        var json = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
        
 
@@ -244,29 +244,17 @@ namespace ConsoleApp1.Services
         HttpResponseMessage response = await _httpClient.PostAsync(url, content);
         response.EnsureSuccessStatusCode();
 
-                string responseContent = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"✅ Successfully joined session: {sessionCode}");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"🔍 Error : {responseContent}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"❌ Unexpected error: {ex.Message}");
-            }
-            finally
-            {
-                Console.ResetColor();
-            }
-        }
-
+        string responseContent = await response.Content.ReadAsStringAsync();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"✅ Successfully joined session: {sessionCode}");
+        Console.ResetColor();
+    }
+    catch (Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"❌ Error joining session: {ex.Message}");
+        Console.ResetColor();
+    }
+}
     }
 }
