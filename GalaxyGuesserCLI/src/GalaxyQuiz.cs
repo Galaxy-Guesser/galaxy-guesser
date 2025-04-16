@@ -52,10 +52,10 @@ namespace ConsoleApp1
     var menuActions = new Dictionary<string, Func<Task>>
     {
         ["Create new quiz session"] = async () => {
-            var (category, questionCount, startTime, questionDuration) = await SessionUIService.PromptSessionDetails();
+            var (category, questionCount, startTime,sessionDuration) = await SessionUIService.PromptSessionDetails();
             AnsiConsole.MarkupLine($"Category: [cyan]{category}[/], Question Count: [cyan]{questionCount}[/], Start Time: [cyan]{startTime}[/]");
             
-            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount, startTime, questionDuration);
+            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount,startTime, sessionDuration);
             
             if (!string.IsNullOrEmpty(sessionCode))
                 AnsiConsole.MarkupLine($"✅ Session created! Code: [bold yellow]{sessionCode}[/]");
