@@ -1,14 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
 using ConsoleApp1.Models;
 using ConsoleApp1.Services;
-using ConsoleApp1.Data;
-using ConsoleApp1.Helpers;
-
 using ConsoleApp1.Utilities;
 using Spectre.Console;
 using GalaxyGuesserCLI.Services;
@@ -51,183 +42,91 @@ namespace ConsoleApp1
 
             bool exitRequested = false;
 
-            while (!exitRequested)
-            {
-                UIService.PrintGalaxyHeader();
-                Console.WriteLine(await CategoryService.GetCategoriesAsync());
-                Console.WriteLine($"\n👋 Welcome, {player.userName}!");
-                Console.WriteLine("\nMAIN MENU");
-                Console.WriteLine("1. Create new quiz session");
-                Console.WriteLine("2. Join existing session");
-                Console.WriteLine("3. View active sessions");
-                Console.WriteLine("4. View categories");
-                Console.WriteLine("5. View leaderboard");
-                Console.WriteLine("6. My profile");
-                Console.WriteLine("7. How to play");
-                Console.WriteLine("8. Exit");
-                Console.WriteLine("\nType a command (e.g., '/help') or select an option (1-7):");
-
-                Console.Write("\n👉 ");
-                Console.CursorVisible = true;
-                string input = Console.ReadLine().Trim();
-                Console.CursorVisible = false;
-
-                // Check if input is a command
-                if (CommandService.IsCommand(input))
-                {
-                    string cmd = CommandService.ExtractCommandName(input);
-                    CommandService.ProcessCommand(cmd, player);
-                    UIService.Continue();
-                }
-                else if (int.TryParse(input, out int option))
-                {
-                    switch (option)
-                    {
-                        case 1:
-                            var (category, questionCount, startTime,questionDuration) = await SessionUIService.PromptSessionDetails();
-                            Console.WriteLine($"Category: {category}, Question Count: {questionCount}, Start Time: {startTime}");
-
-                            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount,startTime, questionDuration);
-
-                            if (!string.IsNullOrEmpty(sessionCode))
-                            {
-                                UIService.ShowFeedback($"✅ Session created! Code: [bold yellow]{sessionCode}[/]", ConsoleColor.Green);
-                            }
-                            else
-                            {
-                                UIService.ShowFeedback("❌ Failed to create session.", ConsoleColor.Red);
-                            }
-
-                            UIService.Continue();
-                            break;
-                        case 2:
-                            var activeSessions = await SessionViewService.GetActiveSessions();
-
-                            if (activeSessions.Count == 0)
-                            {
-                                AnsiConsole.MarkupLine("[red]No active sessions available.[/]");
-                                break;
-                            }
-
-                            var selected = AnsiConsole.Prompt(
-                                new SelectionPrompt<string>()
-                                    .Title("Select a session to join")
-                                    .PageSize(10)
-                                    .AddChoices(activeSessions.Select(s =>
-                                        $"{s.sessionCode} - {s.category}")));
-
-                            sessionCode = selected.Split(" - ")[0];
-                            await SessionService.JoinSessionAsync(sessionCode);
-
-                            UIService.Continue();
-                            break;
-
-
-                        case 3:
-                            var sessions = await SessionViewService.GetActiveSessions();
-                            UIService.DisplayActiveSessionsAsync(sessions);
-                            UIService.Continue();
-                            break;
-
-                        case 4:
-                            CommandService.ProcessCommand("leaderboard", player);
-                            UIService.Continue();
-                            break;
-                        case 5:
-                            CommandService.ProcessCommand("myprofile", player);
-                            UIService.Continue();
-                            break;
-                        case 6:
-                            UIService.ShowHowToPlay();
-                            UIService.Continue();
-                            break;
-                        case 7:
-                            exitRequested = true;
-                            Console.WriteLine("\n👋 Thanks for playing Galaxy Quiz! See you among the stars!");
-                            Thread.Sleep(2000);
-                            break;
-                        default:
-                            Console.WriteLine("Invalid option. Please try again.");
-                            UIService.Continue();
-                            break;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a number or command.");
-                    UIService.Continue();
-                }
-            }
-        }
-
-        static Session CreateSession(Player player)
-        {
-            Console.WriteLine("\nAvailable categories:");
-            for (int i = 0; i < SampleData.Categories.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}. {SampleData.Categories[i].category}");
-            }
-
-            Console.Write("\n👉 Select category (1-" + SampleData.Categories.Count + "): ");
-            Console.CursorVisible = true;
-            int catChoice;
-            while (!int.TryParse(Console.ReadLine(), out catChoice) || catChoice < 1 || catChoice > SampleData.Categories.Count)
-            {
-                Console.Write("Invalid choice. Please select again: ");
-            }
-
-            Console.Write("\n👉 How many questions do you want (1-10)? ");
-            int questionCount;
-            while (!int.TryParse(Console.ReadLine(), out questionCount) || questionCount < 1 || questionCount > 10)
-            {
-                Console.Write("Please enter a number between 1 and 10: ");
-            }
-
-            Console.Write("\n👉 Time per question in seconds (10-60): ");
-            int questionDuration;
-            while (!int.TryParse(Console.ReadLine(), out questionDuration) || questionDuration < 10 || questionDuration > 60)
-            {
-                Console.Write("Please enter a number between 10 and 60: ");
-            }
-            Console.CursorVisible = false;
-
-            Session session = SessionService.CreateSession(
-                player,
-                SampleData.Categories[catChoice - 1].categoryId,
-                questionCount,
-                questionDuration
-            );
-
-            Console.WriteLine($"\n🎮 Session created! Code: {session.Code}");
-            Thread.Sleep(2000);
-
-            return session;
-        }
-
-        static Session JoinSession(Player player)
-        {
-            Console.Write("\n👉 Enter session code: ");
-            Console.CursorVisible = true;
-            string sessionCode = Console.ReadLine().ToUpper();
-            Console.CursorVisible = false;
-
-            Session session = SessionService.JoinSession(player, sessionCode);
-
-            if (session != null)
-            {
-                Console.WriteLine("\n🚀 Joining session...");
-                Thread.Sleep(1500);
-                return session;
-            }
+           while (!exitRequested)
+{
+    AnsiConsole.Clear();
+    
+    UIService.PrintGalaxyHeader();
+    AnsiConsole.MarkupLine($"\n👋 Welcome, [bold]{player.userName}[/]!\n");
+    
+    var menuActions = new Dictionary<string, Func<Task>>
+    {
+        ["Create new quiz session"] = async () => {
+            var (category, questionCount, startTime, questionDuration) = await SessionUIService.PromptSessionDetails();
+            AnsiConsole.MarkupLine($"Category: [cyan]{category}[/], Question Count: [cyan]{questionCount}[/], Start Time: [cyan]{startTime}[/]");
+            
+            string sessionCode = await SessionService.CreateSessionAsync(category, questionCount, startTime, questionDuration);
+            
+            if (!string.IsNullOrEmpty(sessionCode))
+                AnsiConsole.MarkupLine($"✅ Session created! Code: [bold yellow]{sessionCode}[/]");
             else
+                AnsiConsole.MarkupLine("[red]❌ Failed to create session.[/]");
+        },
+        
+        ["Join existing session"] = async () => {
+            var activeSessions = await SessionViewService.GetActiveSessions();
+            
+            if (activeSessions.Count == 0)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("❌ Session not found. Please check the code and try again.");
-                Console.ResetColor();
-                return null;
+                AnsiConsole.MarkupLine("[red]No active sessions available.[/]");
+                return;
             }
+            
+            var selectedSession = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Select a session to join")
+                    .PageSize(10)
+                    .AddChoices(activeSessions.Select(s => $"{s.sessionCode} - {s.category}")));
+            
+            string sessionCode = selectedSession.Split(" - ")[0];
+            await SessionService.JoinSessionAsync(sessionCode);
+        },
+        
+        ["View active sessions"] = async () => {
+            var sessions = await SessionViewService.GetActiveSessions();
+            await UIService.DisplayActiveSessionsAsync(sessions);
+        },
+        
+        ["View leaderboard"] = () => {
+            CommandService.ProcessCommand("leaderboard", player);
+            return Task.CompletedTask;
+        },
+        
+        ["My profile"] = () => {
+            CommandService.ProcessCommand("myprofile", player);
+            return Task.CompletedTask;
+        },
+        
+        ["How to play"] = () => {
+            UIService.ShowHowToPlay();
+            return Task.CompletedTask;
+        },
+        
+        ["Exit"] = () => {
+            if (AnsiConsole.Confirm("Are you sure you want to exit?"))
+            {
+                exitRequested = true;
+                AnsiConsole.MarkupLine("\n[green]👋 Thanks for playing Galaxy Quiz! See you among the stars![/]");
+                Thread.Sleep(2000);
+            }
+            return Task.CompletedTask;
         }
-
+    };
+    
+    // Create menu from the dictionary keys
+    var selection = AnsiConsole.Prompt(
+        new SelectionPrompt<string>()
+            .Title("MAIN MENU")
+            .PageSize(10)
+            .AddChoices(menuActions.Keys));
+    
+    // Execute the selected action
+    await menuActions[selection]();
+    
+    // Continue prompt after each action (unless exiting)
+    if (!exitRequested)
+        UIService.Continue();
+}
         static void PlayQuizSession(Player player, Session session)
         {
             List<Question> sessionQuestions = SessionService.GetSessionQuestions(session.Id);
@@ -307,6 +206,7 @@ namespace ConsoleApp1
             // Save score
             SessionService.SaveScore(player.playerId, session.Id, score, totalTimeRemaining);
         }
+
         static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
         {
             Console.Clear();
@@ -346,4 +246,5 @@ namespace ConsoleApp1
             Console.ResetColor();
         }
     }
+}
 }
