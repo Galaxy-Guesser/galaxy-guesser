@@ -162,7 +162,7 @@ namespace GalaxyGuesserApi.src.Controllers
                 // Check if user exists in DB
                 var player = await _playerRepository.GetUserByGoogleIdAsync(guid);
 
-                if (player == null)
+                if (string.IsNullOrEmpty(player.ToString()))
                 {
                     player = await _playerRepository.CreatePlayerAsync(guid, userName);
                 }

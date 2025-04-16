@@ -35,7 +35,7 @@ namespace GalaxyGuesserApi.Services
         public async Task<bool> UpdatePlayerAsync(int player_id, string username)
         {
             var existingPlayer = await _PlayerRepository.GetPlayerByIdAsync(player_id);
-            if (existingPlayer == null)
+            if (string.IsNullOrEmpty(existingPlayer.ToString()))
             {
                 return false; // Player not found
             }
@@ -46,7 +46,7 @@ namespace GalaxyGuesserApi.Services
         public async Task<bool> DeletePlayerAsync(int player_id)
         {
            var existingPlayer = await _PlayerRepository.GetPlayerByIdAsync(player_id);
-            if (existingPlayer == null)
+            if (string.IsNullOrEmpty(existingPlayer.ToString()))
             {
                 return false; // Player not found
             }

@@ -65,7 +65,7 @@ namespace GalaxyGuesserApi.Repositories
             return result.FirstOrDefault()!;
         }
 
-        public async Task<Player?> GetUserByGoogleIdAsync(string guid)
+        public async Task<Player> GetUserByGoogleIdAsync(string guid)
         {
             const string query = @"
                 SELECT player_id, user_name, guid
