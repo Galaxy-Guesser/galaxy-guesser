@@ -2,11 +2,8 @@ using GalaxyGuesserApi.Models;
 
 public class Option
 {
-  public int Id { get; set; }
-  public string Text { get; set; }
+  public int optionId { get; set; }
+  public string optionText { get; set; }
+  public int answerId { get; set; }
 
-  public int QuestionId { get; set; }
-  public Question Question { get; set; }
-
-  public bool IsCorrect { get; set; }
 }
