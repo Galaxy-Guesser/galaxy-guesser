@@ -18,7 +18,7 @@ namespace GalaxyGuesserApi.Repositories
 
         public async Task<List<SessionQuestionView>> GetAllSessionQuestions(string sessionCode)
         {
-            const string sql = "SELECT * FROM session_questions_view WHERE session_id = @SessionCode";
+            const string sql = "SELECT * FROM session_questions_view WHERE session_code = @SessionCode";
             var parameters = new Dictionary<string, object>
             {
                 { "@SessionCode", sessionCode },
