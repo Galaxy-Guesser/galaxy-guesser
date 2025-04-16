@@ -261,6 +261,7 @@ jobs:
           DB_CONNECTION_STRING: "Host=${{ needs.terraform.outputs.rds_endpoint }};Database=guesserDB;Username=iamuser;Password=${{ secrets.DB_PASSWORD }}"
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          CALLBACK_URL: ${{ secrets.CALLBACK_URL }}
         run: |
           ssh -v -o StrictHostKeyChecking=no -i deploy-key.pem ec2-user@${{ needs.terraform.outputs.ec2 }} << EOF
             if ! command -v docker >/dev/null 2>&1; then
@@ -294,10 +295,10 @@ jobs:
               echo "Fallback Image: \$IMAGE"
             fi
             
-            DB_CONNECTION="${DB_CONNECTION_STRING}"
+            DB_CONNECTION_STRING="${DB_CONNECTION_STRING}"
             if [ -z "\$DB_CONNECTION" ]; then
               echo "Error: DB_CONNECTION_STRING variable is empty, using hardcoded value"
-              DB_CONNECTION="Host=${{ needs.terraform.outputs.rds_endpoint }};Database=guesserDB;Username=iamuser;${{ secrets.DB_PASSWORD }}"
+              DB_CONNECTION_STRING="Host=${{ needs.terraform.outputs.rds_endpoint }};Database=guesserDB;Username=iamuser;${{ secrets.DB_PASSWORD }}"
             fi
             
             aws ecr get-login-password --region af-south-1 | docker login --username AWS --password-stdin \${IMAGE%/*}
@@ -307,8 +308,9 @@ jobs:
             docker run -d \
               --name galaxy-guesser-api \
               -p 80:8080 \
-              -e "ConnectionStrings__DefaultConnection=$DB_CONNECTION" \
+              -e "ConnectionStrings__DefaultConnection=$DB_CONNECTION_STRING" \
               -e "Google__ClientId=$GOOGLE_CLIENT_ID" \
               -e "Google__ClientSecret=$GOOGLE_CLIENT_SECRET" \
+              -e "Google__CallbackUrl=$CALLBACK_URL" \
               $IMAGE
           EOF
