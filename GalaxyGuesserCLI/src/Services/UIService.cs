@@ -347,5 +347,43 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             
             Continue();
         }
+
+       public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
+        {
+            AnsiConsole.MarkupLine("\n📚 [bold underline]Session Questions[/]");
+
+            if (questions.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[grey]No questions found for this session.[/]");
+                return;
+            }
+
+            foreach (var question in questions)
+            {
+                var questionPanel = new Panel(BuildQuestionMarkup(question))
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 0, 1, 0),
+                    Header = new PanelHeader($"[bold green]Question {question.QuestionId}[/]", Justify.Center)
+                };
+
+                AnsiConsole.Write(questionPanel);
+                await Task.Delay(150);
+            }
+        }
+
+        private static string BuildQuestionMarkup(SessionQuestionView question)
+        {
+            var markup = $"[bold underline]{question.QuestionText}[/]\n\n";
+
+            foreach (var option in question.Options)
+            {
+                var isCorrect = option.OptionId == question.CorrectAnswerId;
+                var color = isCorrect ? "green" : "default";
+                markup += $"[blue]•[/] [{color}]{option.Text}[/]\n";
+            }
+
+            return markup;
+        }
     }
 }

@@ -16,12 +16,12 @@ namespace GalaxyGuesserApi.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<SessionQuestionView>> GetAllSessionQuestions(int sessionId)
+        public async Task<List<SessionQuestionView>> GetAllSessionQuestions(string sessionCode)
         {
-            const string sql = "SELECT * FROM session_questions_view WHERE session_id = @SessionId";
+            const string sql = "SELECT * FROM session_questions_view WHERE session_id = @SessionCode";
             var parameters = new Dictionary<string, object>
             {
-                { "@SessionId", sessionId },
+                { "@SessionCode", sessionCode },
             };
 
             return await _dbContext.QueryAsync(sql, reader => new SessionQuestionView

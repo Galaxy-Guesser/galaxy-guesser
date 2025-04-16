@@ -13,9 +13,9 @@ namespace GalaxyGuesserApi.Services
             _sessionQuestionViewRepository = sessionQuestionViewRepository;
         }
 
-        public async Task<List<SessionQuestionView>> GetAllSessionQuestions(int SessionId)
+        public async Task<List<SessionQuestionView>> GetAllSessionQuestions(string sessionCode)
         {
-            return await _sessionQuestionViewRepository.GetAllSessionQuestions(SessionId);
+            return await _sessionQuestionViewRepository.GetAllSessionQuestions(sessionCode);
         }
 
     }

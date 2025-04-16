@@ -7,8 +7,10 @@ public class SessionQuestionView
     public int SessionId { get; set; }
 
     public int QuestionId { get; set; }
+    
 
     public string QuestionText { get; set; }
+    public string SessionCode { get; set; }
 
     public int CategoryId { get; set; }
 

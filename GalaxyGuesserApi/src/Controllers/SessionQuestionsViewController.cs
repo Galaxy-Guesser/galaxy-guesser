@@ -18,11 +18,11 @@ namespace GalaxyGuesserApi.Controllers
         }
 
        [HttpGet]
-        public async Task<ActionResult<IEnumerable<SessionQuestionView>>> GetAllSessionQuestions([FromQuery] int sessionId)
+        public async Task<ActionResult<IEnumerable<SessionQuestionView>>> GetAllSessionQuestions([FromQuery] string sessionCode)
         {
             try
             {
-                var sessionQuestions = await _sessionQuestionViewService.GetAllSessionQuestions(sessionId);
+                var sessionQuestions = await _sessionQuestionViewService.GetAllSessionQuestions(sessionCode);
                 return Ok(sessionQuestions);
             }
             catch (Exception ex)

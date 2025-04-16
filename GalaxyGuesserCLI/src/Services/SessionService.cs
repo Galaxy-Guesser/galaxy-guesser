@@ -241,14 +241,14 @@ namespace ConsoleApp1.Services
 
         var url = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions"; 
         HttpResponseMessage response = await _httpClient.PostAsync(url, content);
-        response.EnsureSuccessStatusCode();
-
                 string responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"✅ Successfully joined session: {sessionCode}");
+                    var questions = await SessionQuestionViewService.GetAllSessionQuestions(sessionCode);
+                    await UIService.DisplaySessionQuestionsAsync(questions);
                 }
                 else
                 {
