@@ -61,13 +61,8 @@ namespace ConsoleApp1.Services
        
 public static void PrintGalaxyHeader()
 {
-    // Clear console and set up
     Console.Clear();
-    
-    // Animated stars effect
-    AnimateStars(50, 3000);
-    
-    // Main title with gradient effect
+
     string[] galaxyTitle = new string[]
     {
         @"   ___________________________________________________________",
@@ -134,51 +129,6 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
     Console.ForegroundColor = originalFg;
 }
 
-// Creates animated stars effect
-private static void AnimateStars(int numStars, int duration)
-{
-    Random rand = new Random();
-    int consoleWidth = Console.WindowWidth;
-    int consoleHeight = Console.WindowHeight;
-    
-    // Generate random star positions
-    (int x, int y, char symbol)[] stars = new (int, int, char)[numStars];
-    for (int i = 0; i < numStars; i++)
-    {
-        stars[i] = (
-            rand.Next(consoleWidth), 
-            rand.Next(consoleHeight), 
-            rand.Next(2) == 0 ? '*' : '.'
-        );
-    }
-    
-    // Animate stars twinkling
-    int frames = 5;
-    for (int frame = 0; frame < frames; frame++)
-    {
-        Console.Clear();
-        
-        // Draw stars
-        foreach (var star in stars)
-        {
-            try
-            {
-                Console.SetCursorPosition(star.x, star.y);
-                Console.ForegroundColor = frame % 2 == 0 ? ConsoleColor.White : ConsoleColor.Gray;
-                Console.Write(star.symbol);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                // Skip if position is outside console
-            }
-        }
-        
-        // Pause between frames
-        System.Threading.Thread.Sleep(duration / frames);
-    }
-    
-    Console.Clear();
-}
         public static void ShowHelp(Dictionary<string,string> COMMANDS)
         {
             Console.Clear();
