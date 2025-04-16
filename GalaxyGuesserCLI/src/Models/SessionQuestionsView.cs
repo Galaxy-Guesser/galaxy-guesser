@@ -7,6 +7,7 @@ namespace ConsoleApp1.Models
     public class SessionQuestionView
     {
         public int SessionId { get; set; }
+        public string SessionCode { get; set; }
 
         public int QuestionId { get; set; }
 

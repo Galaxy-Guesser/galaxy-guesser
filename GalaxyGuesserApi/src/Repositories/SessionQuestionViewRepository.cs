@@ -27,13 +27,14 @@ namespace GalaxyGuesserApi.Repositories
             return await _dbContext.QueryAsync(sql, reader => new SessionQuestionView
             {
                 SessionId = reader.GetInt32(0),                
-                QuestionId = reader.GetInt32(1),            
-                QuestionText = reader.GetString(2),                   
-                CategoryId = reader.GetInt32(3),               
-                CategoryName = reader.GetString(4),               
-                CorrectAnswerId = reader.GetInt32(5),         
+                SessionCode=  reader.GetString(1),                
+                QuestionId = reader.GetInt32(2),            
+                QuestionText = reader.GetString(3),                   
+                CategoryId = reader.GetInt32(4),               
+                CategoryName = reader.GetString(5),               
+                CorrectAnswerId = reader.GetInt32(6),         
                 Options = JsonConvert.DeserializeObject<List<Option>>(
-                    reader.GetString(6))                     
+                    reader.GetString(7))                     
             }, parameters);
         }
     }
