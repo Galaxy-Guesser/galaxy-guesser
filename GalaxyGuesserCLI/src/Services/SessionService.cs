@@ -9,7 +9,6 @@ using System.Text;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using ConsoleApp1.Models;
-using ConsoleApp1.Data;
 using ConsoleApp1.Helpers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
@@ -28,54 +27,6 @@ namespace ConsoleApp1.Services
         private static List<SessionQuestion> sessionQuestions = new List<SessionQuestion>();
         private static List<SessionScore> sessionScores = new List<SessionScore>();
 
-        
-
-        public static string GenerateSessionCode()
-        {
-            // Generate a unique 6-character code
-            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-            Random random = new Random();
-            string code;
-
-            do
-            {
-                code = new string(Enumerable.Repeat(chars, 6)
-                    .Select(s => s[random.Next(s.Length)]).ToArray());
-            } while (sessions.Any(s => s.Code == code));
-
-            return code;
-        }
-
-        internal static Session CreateSession(Player player, int categoryId, int questionCount, int questionDuration)
-        {
-            string sessionCode = GenerateSessionCode();
-            int sessionId = sessions.Count > 0 ? sessions.Max(s => s.Id) + 1 : 1;
-            
-            Session session = new Session(sessionId, sessionCode, categoryId, questionDuration, questionCount);
-            sessions.Add(session);
-            
-            // Add questions to session
-            AddQuestionsToSession(session.Id, categoryId, questionCount);
-            
-            // Add player to session
-            AddPlayerToSession(player.playerId, session.Id);
-            
-            return session;
-        }
-
-        internal static Session JoinSession(Player player, string sessionCode)
-        {
-            Session session = sessions.FirstOrDefault(s => s.Code == sessionCode.ToUpper());
-
-            if (session != null)
-            {
-                // Add player to session
-                AddPlayerToSession(player.playerId, session.Id);
-                return session;
-            }
-
-            return null; // Session not found
-        }
 
         public static void AddPlayerToSession(int playerId, int sessionId)
         {
@@ -86,34 +37,34 @@ namespace ConsoleApp1.Services
             }
         }
 
-        public static void AddQuestionsToSession(int sessionId, int categoryId, int questionCount)
-        {
-            // Get questions for this category and randomize them
-            var categoryQuestions = SampleData.Questions
-                .Where(q => q.CategoryId == categoryId)
-                .OrderBy(q => Guid.NewGuid()) // Random order
-                .Take(questionCount)  // Only take requested number of questions
-                .ToList();
+        // public static void AddQuestionsToSession(int sessionId, int categoryId, int questionCount)
+        // {
+        //     // Get questions for this category and randomize them
+        //     var categoryQuestions = SampleData.Questions
+        //         .Where(q => q.CategoryId == categoryId)
+        //         .OrderBy(q => Guid.NewGuid()) // Random order
+        //         .Take(questionCount)  // Only take requested number of questions
+        //         .ToList();
 
-            int id = sessionQuestions.Count > 0 ? sessionQuestions.Max(sq => sq.Id) + 1 : 1;
-            foreach (var question in categoryQuestions)
-            {
-                sessionQuestions.Add(new SessionQuestion(id++, sessionId, question.Id));
-            }
-        }
+        //     int id = sessionQuestions.Count > 0 ? sessionQuestions.Max(sq => sq.Id) + 1 : 1;
+        //     foreach (var question in categoryQuestions)
+        //     {
+        //         sessionQuestions.Add(new SessionQuestion(id++, sessionId, question.Id));
+        //     }
+        // }
 
-        internal static List<Question> GetSessionQuestions(int sessionId)
-        {
-            return sessionQuestions
-                .Where(sq => sq.SessionId == sessionId)
-                .Join(
-                    SampleData.Questions,
-                    sq => sq.QuestionId,
-                    q => q.Id,
-                    (sq, q) => q
-                )
-                .ToList();
-        }
+        // internal static List<Question> GetSessionQuestions(int sessionId)
+        // {
+        //     return sessionQuestions
+        //         .Where(sq => sq.SessionId == sessionId)
+        //         .Join(
+        //             SampleData.Questions,
+        //             sq => sq.QuestionId,
+        //             q => q.Id,
+        //             (sq, q) => q
+        //         )
+        //         .ToList();
+        // }
 
         public static void SaveScore(int playerId, int sessionId, int score, int timeRemaining = 0)
         {

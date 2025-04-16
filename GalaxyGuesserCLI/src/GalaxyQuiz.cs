@@ -87,15 +87,15 @@ namespace ConsoleApp1
             await UIService.DisplayActiveSessionsAsync(sessions);
         },
         
-        ["View leaderboard"] = () => {
-            CommandService.ProcessCommand("leaderboard", player);
-            return Task.CompletedTask;
-        },
+        // ["View leaderboard"] = () => {
+        //     CommandService.ProcessCommand("leaderboard", player);
+        //     return Task.CompletedTask;
+        // },
         
-        ["My profile"] = () => {
-            CommandService.ProcessCommand("myprofile", player);
-            return Task.CompletedTask;
-        },
+        // ["My profile"] = () => {
+        //     CommandService.ProcessCommand("myprofile", player);
+        //     return Task.CompletedTask;
+        // },
         
         ["How to play"] = () => {
             UIService.ShowHowToPlay();
@@ -127,85 +127,85 @@ namespace ConsoleApp1
     if (!exitRequested)
         UIService.Continue();
 }
-        static void PlayQuizSession(Player player, Session session)
-        {
-            List<Question> sessionQuestions = SessionService.GetSessionQuestions(session.Id);
-            int score = 0;
-            int totalTimeRemaining = 0;
+        // static void PlayQuizSession(Player player, Session session)
+        // {
+        //     List<Question> sessionQuestions = SessionService.GetSessionQuestions(session.Id);
+        //     int score = 0;
+        //     int totalTimeRemaining = 0;
 
-            for (int i = 0; i < sessionQuestions.Count; i++)
-            {
-                bool answered = false;
-                int selectedOption = -1;
-                int timeRemaining = session.QuestionDuration;
+        //     for (int i = 0; i < sessionQuestions.Count; i++)
+        //     {
+        //         bool answered = false;
+        //         int selectedOption = -1;
+        //         int timeRemaining = session.QuestionDuration;
 
-                // First render the full question and options (once only)
-                DisplayFullQuestion(sessionQuestions[i], i + 1, sessionQuestions.Count, timeRemaining);
+        //         // First render the full question and options (once only)
+        //         DisplayFullQuestion(sessionQuestions[i], i + 1, sessionQuestions.Count, timeRemaining);
 
-                // Display timer
-                int timerRow = Console.CursorTop - sessionQuestions[i].Options.Length - 4;
+        //         // Display timer
+        //         int timerRow = Console.CursorTop - sessionQuestions[i].Options.Length - 4;
 
-                // Start timer display thread
-                CancellationTokenSource cts = new CancellationTokenSource();
-                Task timerTask = Task.Run(() =>
-                {
-                    try
-                    {
-                        while (timeRemaining > 0 && !cts.Token.IsCancellationRequested)
-                        {
-                            UIService.UpdateTimerOnly(timerRow, timeRemaining, session.QuestionDuration);
-                            Thread.Sleep(1000);
-                            timeRemaining--;
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        // Task was canceled, do nothing
-                    }
-                }, cts.Token);
+        //         // Start timer display thread
+        //         CancellationTokenSource cts = new CancellationTokenSource();
+        //         Task timerTask = Task.Run(() =>
+        //         {
+        //             try
+        //             {
+        //                 while (timeRemaining > 0 && !cts.Token.IsCancellationRequested)
+        //                 {
+        //                     UIService.UpdateTimerOnly(timerRow, timeRemaining, session.QuestionDuration);
+        //                     Thread.Sleep(1000);
+        //                     timeRemaining--;
+        //                 }
+        //             }
+        //             catch (OperationCanceledException)
+        //             {
+        //                 // Task was canceled, do nothing
+        //             }
+        //         }, cts.Token);
 
-                Task<(bool answered, int selectedOption)> answerTask = SessionService.WaitForAnswerWithTimeout(
-                    sessionQuestions[i], session.QuestionDuration);
-                answerTask.Wait();
+        //         Task<(bool answered, int selectedOption)> answerTask = SessionService.WaitForAnswerWithTimeout(
+        //             sessionQuestions[i], session.QuestionDuration);
+        //         answerTask.Wait();
 
-                cts.Cancel();
+        //         cts.Cancel();
 
-                answered = answerTask.Result.answered;
-                selectedOption = answerTask.Result.selectedOption;
+        //         answered = answerTask.Result.answered;
+        //         selectedOption = answerTask.Result.selectedOption;
 
-                int inputRow = Console.CursorTop;
-                Console.SetCursorPosition(0, inputRow);
-                Console.Write(new string(' ', Console.WindowWidth));
-                Console.SetCursorPosition(0, inputRow);
+        //         int inputRow = Console.CursorTop;
+        //         Console.SetCursorPosition(0, inputRow);
+        //         Console.Write(new string(' ', Console.WindowWidth));
+        //         Console.SetCursorPosition(0, inputRow);
 
-                if (answered)
-                {
-                    Console.Write($"👉 Your answer: {(char)('A' + selectedOption)}");
+        //         if (answered)
+        //         {
+        //             Console.Write($"👉 Your answer: {(char)('A' + selectedOption)}");
 
-                    if (selectedOption == sessionQuestions[i].CorrectAnswerIndex)
-                    {
-                        score++;
-                        totalTimeRemaining += timeRemaining; // Award bonus points for quick answers
-                        UIService.ShowFeedback($"✅ Correct! +{timeRemaining} time bonus!", ConsoleColor.Green);
-                    }
-                    else
-                    {
-                        UIService.ShowFeedback($"❌ Wrong! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}",
-                                   ConsoleColor.Red);
-                    }
-                }
-                else
-                {
-                    UIService.ShowFeedback($"⏰ Time's up! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}",
-                               ConsoleColor.Yellow);
-                }
+        //             if (selectedOption == sessionQuestions[i].CorrectAnswerIndex)
+        //             {
+        //                 score++;
+        //                 totalTimeRemaining += timeRemaining; // Award bonus points for quick answers
+        //                 UIService.ShowFeedback($"✅ Correct! +{timeRemaining} time bonus!", ConsoleColor.Green);
+        //             }
+        //             else
+        //             {
+        //                 UIService.ShowFeedback($"❌ Wrong! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}",
+        //                            ConsoleColor.Red);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             UIService.ShowFeedback($"⏰ Time's up! Correct was {(char)('A' + sessionQuestions[i].CorrectAnswerIndex)}",
+        //                        ConsoleColor.Yellow);
+        //         }
 
-                Thread.Sleep(1500);
-            }
+        //         Thread.Sleep(1500);
+        //     }
 
-            // Save score
-            SessionService.SaveScore(player.playerId, session.Id, score, totalTimeRemaining);
-        }
+        //     // Save score
+        //     SessionService.SaveScore(player.playerId, session.Id, score, totalTimeRemaining);
+        // }
 
         static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
         {

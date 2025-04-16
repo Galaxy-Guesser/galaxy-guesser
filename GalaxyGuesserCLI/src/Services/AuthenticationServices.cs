@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using ConsoleApp1.Models;
 using ConsoleApp1.Helpers;
-using ConsoleApp1.Data;
 using System.Net;
 using System.Web;
 using System.Security;
@@ -22,7 +21,6 @@ namespace ConsoleApp1.Services
     {
         // In-memory data storage (could be moved to a repository pattern in future)
         private static List<Player> players = new List<Player>();
-        private static Dictionary<string, string> userCredentials = SampleData.UserCredentials;
         private readonly IConfiguration _configuration;
 
         public AuthenticationService()
@@ -38,30 +36,6 @@ namespace ConsoleApp1.Services
             return players;
         }
 
-        public static string ReadPassword()
-        {
-            StringBuilder password = new StringBuilder();
-            ConsoleKeyInfo key;
-
-            do
-            {
-                key = Console.ReadKey(true);
-
-                if (key.Key != ConsoleKey.Enter && key.Key != ConsoleKey.Backspace)
-                {
-                    password.Append(key.KeyChar);
-                    Console.Write("*");
-                }
-                else if (key.Key == ConsoleKey.Backspace && password.Length > 0)
-                {
-                    password.Remove(password.Length - 1, 1);
-                    Console.Write("\b \b");
-                }
-            } while (key.Key != ConsoleKey.Enter);
-
-            Console.WriteLine();
-            return password.ToString();
-        }
 
         internal async Task<Player> AuthOrRegisterWithBackend()
         {
@@ -106,7 +80,6 @@ namespace ConsoleApp1.Services
                 "&redirect_uri=http://localhost:5000/" +
                 "&state=" + state;
             
-            // Open the URL in the default browser
             Process.Start(new ProcessStartInfo
             {
                 FileName = authorizationEndpoint,
@@ -115,10 +88,8 @@ namespace ConsoleApp1.Services
             
             Console.WriteLine("A browser window has been opened. Please login with your Google account.");
             
-            // Wait for the callback
             var context = await listener.GetContextAsync();
             
-            // Parse the authorization code from the callback URL
             var query = HttpUtility.ParseQueryString(context.Request.Url.Query);
             var returnedState = query["state"];
             var code = query["code"];
@@ -128,7 +99,6 @@ namespace ConsoleApp1.Services
                 throw new SecurityException("Invalid state parameter");
             }
             
-            // Send a response to the browser
             var response = context.Response;
             var responseString = "<html><body><h1>Authentication successful!</h1><p>You can close this window now.</p></body></html>";
             var buffer = Encoding.UTF8.GetBytes(responseString);

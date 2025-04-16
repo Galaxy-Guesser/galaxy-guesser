@@ -75,10 +75,8 @@ public static void PrintGalaxyHeader()
         @"  \___________________________________________________________/",
     };
 
-    // Display main title with color gradient
     DisplayColorGradient(galaxyTitle, ConsoleColor.DarkMagenta, ConsoleColor.Cyan);
     
-    // Subtitle with pulsing effect
     string[] subtitle = new string[]
     {
         @"     ☄️  EXPLORE THE UNIVERSE - DISCOVER NEW WORLDS  ☄️"
@@ -91,20 +89,16 @@ public static void PrintGalaxyHeader()
         Console.WriteLine(line);
     }
     
-    // Elegant separator
     Console.ForegroundColor = ConsoleColor.DarkCyan;
     Console.WriteLine("\n⭐ ════════════════════════════════════════════════════ ⭐");
     Console.ResetColor();
     Console.WriteLine();
 }
 
-// Displays text with a color gradient effect
 private static void DisplayColorGradient(string[] text, ConsoleColor startColor, ConsoleColor endColor)
 {
-    // Preserve original colors
     ConsoleColor originalFg = Console.ForegroundColor;
     
-    // Define colors for gradient (can be expanded)
     ConsoleColor[] gradientColors = new ConsoleColor[]
     {
         startColor,
@@ -114,10 +108,8 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
         endColor
     };
     
-    // Display each line with appropriate color
     for (int i = 0; i < text.Length; i++)
     {
-        // Calculate which color to use based on position
         int colorIndex = (int)Math.Floor((double)i / text.Length * gradientColors.Length);
         if (colorIndex >= gradientColors.Length) colorIndex = gradientColors.Length - 1;
         
@@ -128,28 +120,6 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
     // Reset color
     Console.ForegroundColor = originalFg;
 }
-
-        public static void ShowHelp(Dictionary<string,string> COMMANDS)
-        {
-            Console.Clear();
-            PrintGalaxyHeader();
-            
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n📖 AVAILABLE COMMANDS");
-            Console.ResetColor();
-            
-            Console.WriteLine($"\nUse {CMD_PREFIX}[command] to execute any of these commands:");
-            
-            foreach (var cmd in COMMANDS)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write($"{CMD_PREFIX}{cmd.Key,-15}");
-                Console.ResetColor();
-                Console.WriteLine($" - {cmd.Value}");
-            }
-            
-            Console.WriteLine("\nYou can use commands at any input prompt in the application.");
-        }
 
         public static void ShowFeedback(string message, ConsoleColor color)
         {
@@ -167,9 +137,8 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
      static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
         {
             Console.Clear();
-            UIService.PrintGalaxyHeader();
+            PrintGalaxyHeader();
             
-            // Placeholder for timer bar - will be updated separately
             Console.WriteLine($"⏱ Time: {secondsRemaining}s [" + new string(' ', Console.WindowWidth - 20) + "]");
             
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -180,8 +149,7 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"\n{q.Text}\n");
             Console.ResetColor();
-            Console.WriteLine(); // Extra spacing
-            // Display answer options with clear formatting
+            Console.WriteLine(); 
             Console.WriteLine("Answer options:");
             for (int i = 0; i < q.Options.Length; i++)
             {
@@ -196,7 +164,6 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             Console.Write("\n👉 Press A, B, C or D to select your answer: ");
             Console.ResetColor();
             
-            // Make answer input area very visible
             Console.BackgroundColor = ConsoleColor.DarkGray;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("     ");
@@ -206,7 +173,7 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
          internal static void ShowFinalResults(Player player, Session session)
         {
             Console.Clear();
-            UIService.PrintGalaxyHeader();
+            PrintGalaxyHeader();
 
             SessionScore playerScore = SessionService.GetPlayerScore(player.playerId, session.Id);
             int score = playerScore != null ? playerScore.Score : 0;
@@ -219,7 +186,6 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             Console.WriteLine($"⏱ Time Bonus: {timeBonus} points");
             Console.WriteLine($"🏆 Total Score: {score + timeBonus} points\n");
 
-            // Get leaderboard
             Console.WriteLine("🏆 Leaderboard:");
             var leaderboard = SessionService.GetSessionLeaderboard(session.Id, AuthenticationService.GetAllPlayers());
             
@@ -237,14 +203,11 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             int originalRow = Console.CursorTop;
             int originalCol = Console.CursorLeft;
             
-            // Move to timer position
             Console.SetCursorPosition(0, row);
             
-            // Calculate bar width
             int barWidth = Console.WindowWidth - 20;
             int filledWidth = (int)((double)secondsRemaining / totalSeconds * barWidth);
             
-            // Update timer with appropriate color
             Console.ForegroundColor = secondsRemaining > 10 ? ConsoleColor.Green : 
                                     secondsRemaining > 5 ? ConsoleColor.Yellow : ConsoleColor.Red;
             Console.Write($"⏱ Time: {secondsRemaining}s [");
@@ -253,7 +216,6 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             Console.Write("]");
             Console.ResetColor();
             
-            // Move cursor back to original position
             Console.SetCursorPosition(originalCol, originalRow);
         }
 
