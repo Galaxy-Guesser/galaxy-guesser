@@ -5,6 +5,6 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
     public interface ISessionQuestionViewRepository
     {
    
-        Task<List<SessionQuestionView>> GetAllSessionQuestions(int sessionId);
+        Task<List<SessionQuestionView>> GetAllSessionQuestions(string sessionCode);
     }
 }
