@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using GalaxyGuesserApi.Configuration;
 using GalaxyGuesserApi.Controllers;
 using GalaxyGuesserApi.Models;
@@ -14,7 +7,6 @@ using GalaxyGuesserApi.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Moq.Protected;
-using Newtonsoft.Json.Linq;
 using Xunit;
 using static GalaxyGuesserApi.Controllers.AuthController;
 
@@ -64,13 +56,10 @@ public class AuthControllerTests
         [Fact]
         public async Task ExchangeToken_NullRequest_ReturnsBadRequest()
         {
-            // Arrange
             TokenRequest request = null;
 
-            // Act
             var result = await _controller.ExchangeToken(request);
 
-            // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
             Assert.Equal("Invalid request", badRequestResult.Value);
@@ -79,13 +68,10 @@ public class AuthControllerTests
         [Fact]
         public async Task ExchangeToken_EmptyCode_ReturnsBadRequest()
         {
-            // Arrange
             var request = new TokenRequest { Code = "", RedirectUri = "testUri" };
 
-            // Act
             var result = await _controller.ExchangeToken(request);
 
-            // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
             Assert.Equal("Invalid request", badRequestResult.Value);
@@ -94,8 +80,7 @@ public class AuthControllerTests
         [Fact]
         public async Task ExchangeToken_FailedExchange_ReturnsBadRequest()
         {
-            // Arrange
-            var request = new TokenRequest { Code = "testCode", RedirectUri = _googleAuthSettings.redirectUri }; // Use configured redirect URI
+            var request = new TokenRequest { Code = "testCode", RedirectUri = _googleAuthSettings.redirectUri };
             var mockResponse = new HttpResponseMessage(HttpStatusCode.BadRequest)
             {
                 Content = new StringContent("{\"error\": \"invalid_grant\"}")
@@ -103,10 +88,8 @@ public class AuthControllerTests
             var mockHttpClient = CreateMockHttpClient(mockResponse);
             _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(mockHttpClient);
 
-            // Act
             var result = await _controller.ExchangeToken(request);
 
-            // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
             Assert.StartsWith("Failed to exchange code for token", badRequestResult.Value.ToString());
@@ -120,7 +103,6 @@ public class AuthControllerTests
         [Fact]
         public void Login_ReturnsRedirectResultWithCorrectUrl()
         {
-            // Arrange
             var expectedAuthUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
                                   $"client_id={_googleAuthSettings.clientId}" +
                                   $"&redirect_uri={_googleAuthSettings.redirectUri}" +
@@ -129,10 +111,8 @@ public class AuthControllerTests
                                   $"&access_type=offline" +
                                   $"&prompt=consent";
 
-            // Act
             var result = _controller.Login();
 
-            // Assert
             Assert.IsType<RedirectResult>(result);
             var redirectResult = result as RedirectResult;
             Assert.Equal(expectedAuthUrl, redirectResult.Url);
@@ -145,7 +125,6 @@ public class AuthControllerTests
         [Fact]
         public async Task Callback_InvalidCode_ReturnsBadRequest()
         {
-            // Arrange
             var code = "invalidCode";
             var mockResponse = new HttpResponseMessage(HttpStatusCode.BadRequest)
             {
@@ -154,10 +133,8 @@ public class AuthControllerTests
             var mockHttpClient = CreateMockHttpClient(mockResponse);
             _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(mockHttpClient);
 
-            // Act
             var result = await _controller.Callback(code);
 
-            // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
             Assert.StartsWith("Error retrieving token", badRequestResult.Value.ToString());
@@ -166,7 +143,6 @@ public class AuthControllerTests
         [Fact]
         public async Task Callback_NoIdToken_ReturnsBadRequest()
         {
-            // Arrange
             var code = "validCode";
             var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
             {
@@ -175,10 +151,8 @@ public class AuthControllerTests
             var mockHttpClient = CreateMockHttpClient(mockResponse);
             _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(mockHttpClient);
 
-            // Act
             var result = await _controller.Callback(code);
 
-            // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
             Assert.Equal("No ID token received.", badRequestResult.Value);
@@ -187,7 +161,6 @@ public class AuthControllerTests
         [Fact]
         public async Task Callback_MissingClaims_ReturnsBadRequest()
         {
-            // Arrange
             var code = "validCode";
             var idToken = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(claims: new[]
             {
@@ -200,10 +173,8 @@ public class AuthControllerTests
             var mockHttpClient = CreateMockHttpClient(mockResponse);
             _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(mockHttpClient);
 
-            // Act
             var result = await _controller.Callback(code);
 
-            // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
             Assert.Equal("Missing required claims.", badRequestResult.Value);
@@ -212,7 +183,6 @@ public class AuthControllerTests
         [Fact]
         public async Task Callback_ExistingUser_ReturnsOkWithMessageAndPlayerInfo()
         {
-            // Arrange
             var code = "validCode";
             var guid = "existingGuid";
             var userName = "Existing User";
@@ -230,10 +200,8 @@ public class AuthControllerTests
             _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(mockHttpClient);
             _mockPlayerRepository.Setup(repo => repo.GetUserByGoogleIdAsync(guid)).ReturnsAsync(new Player { playerId = playerId, guid = guid, userName = userName });
 
-            // Act
             var result = await _controller.Callback(code);
 
-            // Assert
             Assert.IsType<OkObjectResult>(result);
             var okResult = result as OkObjectResult;
             Assert.NotNull(okResult.Value);

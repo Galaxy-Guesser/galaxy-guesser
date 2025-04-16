@@ -1,11 +1,8 @@
 using Xunit;
 using Moq;
 using Microsoft.AspNetCore.Mvc;
-using GalaxyGuesserApi.Controllers;
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GalaxyGuesserApi.Repositories.Interfaces;
 
 namespace GalaxyGuesserApi.Controllers

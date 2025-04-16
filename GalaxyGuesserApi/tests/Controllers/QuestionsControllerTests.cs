@@ -3,7 +3,6 @@ using Moq;
 using Xunit;
 using GalaxyGuesserApi.Controllers;
 using GalaxyGuesserApi.Models;
-using GalaxyGuesserApi.Services;
 using GalaxyGuesserApi.Services.Interfaces;
 
 namespace GalaxyGuesserApi.Tests
