@@ -31,7 +31,7 @@ BEGIN
         FROM SessionPlayers
         WHERE session_id = v_session_id AND player_id = v_player_id
     ) THEN
-        RAISE EXCEPTION 'You have alredy joined this session and cannot join again';
+        RAISE EXCEPTION 'Player already joined this session';
     END IF;
 
     INSERT INTO SessionPlayers (session_id, player_id)

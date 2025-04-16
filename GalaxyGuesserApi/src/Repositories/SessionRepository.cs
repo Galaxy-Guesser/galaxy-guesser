@@ -43,14 +43,14 @@ namespace GalaxyGuesserApi.Repositories
         }
         public async Task CreateSessionAsync(CreateSessionRequestDTO requestBody,string loggedInUserGuid)
         {
-            const string sql = "CALL create_session (@category,@userGuid,@startDate,@sessionDuration,@questionCount)";
+            const string sql = "CALL create_session (@category,@userGuid,@startDate,@questionCount,@questionDuration)";
             var parameters = new Dictionary<string, object>
              {
                 { "@category", requestBody.category },
                 { "@questionCount", requestBody.questionsCount },
                 { "@userGuid", loggedInUserGuid},
                 {"@startDate" , requestBody.startDate },
-                {"@sessionDuration",requestBody.sessionDuration},
+                {"@questionDuration",requestBody.questionDuration},
             };
 
             await _dbContext.ExecuteNonQueryAsync(sql, parameters);
