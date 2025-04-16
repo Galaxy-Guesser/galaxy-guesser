@@ -7,7 +7,10 @@ CREATE OR REPLACE PROCEDURE create_session(
 )
 LANGUAGE plpgsql
 AS $$
-	@@ -14,12 +15,7 @@ DECLARE
+DECLARE
+    v_session_code VARCHAR(6);
+    v_session_id INTEGER;
+    v_category_id INTEGER;
     v_created_by INTEGER;
     v_chars TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     v_end_time TIMESTAMP;
@@ -20,7 +23,24 @@ BEGIN
     SELECT category_id INTO v_category_id
     FROM Categories
     WHERE category = p_category_name;
-	@@ -50,23 +46,10 @@ BEGIN
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Category not found: %', p_category_name;
+    END IF;
+    SELECT player_id INTO v_created_by
+    FROM Players
+    WHERE guid = p_player_guid;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Player with GUID % not found', p_player_guid;
+    END IF;
+    LOOP
+        SELECT string_agg(
+            substr(v_chars, (random() * length(v_chars))::integer + 1, 1), 
+            ''
+        ) INTO v_session_code
+        FROM generate_series(1, 6);
+        v_session_code := upper(v_session_code);
+        EXIT WHEN NOT EXISTS (
+            SELECT 1 FROM Sessions WHERE session_code = v_session_code
         );
     END LOOP;
 
