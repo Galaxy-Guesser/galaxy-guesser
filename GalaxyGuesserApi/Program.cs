@@ -9,6 +9,7 @@ using GalaxyGuesserApi.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // builder.Services.AddCors(options =>
 // {
 //     options.AddPolicy("AllowCli", policy =>
@@ -80,12 +81,16 @@ builder.Services.AddScoped<ISessionRepository,SessionRepository>();
 builder.Services.AddScoped<ISessionViewRepository, SessionViewRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<ISessionScoreRepository, SessionScoreRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
 
 builder.Services.AddScoped<SessionScoreService>();
 builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<SessionViewService>();
 builder.Services.AddScoped<QuestionService>();
+builder.Services.AddScoped<CategoryService>();
+
 
 var app = builder.Build();
 

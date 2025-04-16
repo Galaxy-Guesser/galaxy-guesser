@@ -11,6 +11,7 @@ using ConsoleApp1.Helpers;
 
 using ConsoleApp1.Utilities;
 using Spectre.Console;
+using GalaxyGuesserCLI.Services;
 
 namespace ConsoleApp1
 {
@@ -24,13 +25,18 @@ namespace ConsoleApp1
 
            try
             {
+                var httpClient = new HttpClient();
+                var nasaService = new NasaService(httpClient);
+                
                 UIService.PrintGalaxyHeader();
-
                 var authService = new AuthenticationService();
                 var jwt = await authService.AuthenticateWithGoogle();
                 
-
                 var player = await authService.AuthOrRegisterWithBackend();
+
+                var fact = await nasaService.GetSpaceFactAsync();
+                
+                UIService.DisplaySpaceFact(fact);
 
                 await MainMenuLoop(player);
             }
@@ -48,6 +54,7 @@ namespace ConsoleApp1
             while (!exitRequested)
             {
                 UIService.PrintGalaxyHeader();
+                Console.WriteLine(await CategoryService.GetCategoriesAsync());
                 Console.WriteLine($"\n👋 Welcome, {player.userName}!");
                 Console.WriteLine("\nMAIN MENU");
                 Console.WriteLine("1. Create new quiz session");
@@ -77,7 +84,7 @@ namespace ConsoleApp1
                     switch (option)
                     {
                         case 1:
-                            var (category, questionCount, startTime,questionDuration) = SessionUIService.PromptSessionDetails();
+                            var (category, questionCount, startTime,questionDuration) = await SessionUIService.PromptSessionDetails();
                             Console.WriteLine($"Category: {category}, Question Count: {questionCount}, Start Time: {startTime}");
 
                             string sessionCode = await SessionService.CreateSessionAsync(category, questionCount,startTime, questionDuration);
@@ -158,7 +165,7 @@ namespace ConsoleApp1
             Console.WriteLine("\nAvailable categories:");
             for (int i = 0; i < SampleData.Categories.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {SampleData.Categories[i].Name}");
+                Console.WriteLine($"{i + 1}. {SampleData.Categories[i].category}");
             }
 
             Console.Write("\n👉 Select category (1-" + SampleData.Categories.Count + "): ");
@@ -186,7 +193,7 @@ namespace ConsoleApp1
 
             Session session = SessionService.CreateSession(
                 player,
-                SampleData.Categories[catChoice - 1].Id,
+                SampleData.Categories[catChoice - 1].categoryId,
                 questionCount,
                 questionDuration
             );
