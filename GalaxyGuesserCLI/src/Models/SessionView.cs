@@ -1,4 +1,4 @@
-namespace ConsoleApp1.Models
+namespace GalaxyGuesserCli.Models
 {
     public class SessionView
     {
