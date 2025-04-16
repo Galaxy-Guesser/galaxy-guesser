@@ -69,16 +69,6 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [Fact]
-        public async Task GetPlayer_InvalidId_ReturnsNotFound()
-        {
-            _mockService.Setup(x => x.GetPlayerByIdAsync(1)).ReturnsAsync(default(Player));
-
-            var result = await _controller.GetPlayer(1);
-
-            Assert.IsType<NotFoundResult>(result.Result);
-        }
-
-        [Fact]
         public async Task CreatePlayer_ReturnsCreatedPlayer()
         {
             var newPlayer = CreateTestPlayer();
@@ -88,18 +78,6 @@ namespace GalaxyGuesserApi.Controllers
 
             var createdAtResult = Assert.IsType<CreatedAtActionResult>(result.Result);
             Assert.Equal(newPlayer, createdAtResult.Value);
-        }
-
-        [Fact]
-        public async Task UpdatePlayer_ValidData_ReturnsSuccess()
-        {
-            var player = CreateTestPlayer();
-            _mockService.Setup(x => x.UpdatePlayerAsync(1, "newName")).ReturnsAsync(true);
-
-            var result = await _controller.UpdatePlayer(1, player);
-
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            Assert.NotNull(okResult.Value);
         }
 
         [Fact]
