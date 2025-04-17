@@ -2,25 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using ConsoleApp1.Models;
-using ConsoleApp1.Data;
 
 namespace ConsoleApp1.Services
 {
     public class CommandService
     {
         public static readonly string CMD_PREFIX = "/";
-        private static readonly Dictionary<string, string> COMMANDS = UIData.COMMANDS;
 
         internal static void ProcessCommand(string command, Player player)
         {
             switch (command)
             {
-                case "help":
-                    UIService.ShowHelp(COMMANDS);
-                    break;
-                case "categories":
-                    ViewCategories();
-                    break;
+              
                 case "sessions":
                     ViewSessions();
                     break;
@@ -53,14 +46,7 @@ namespace ConsoleApp1.Services
             }
         }
 
-        private static void ViewCategories()
-        {
-            Console.WriteLine("\nCategories:");
-            foreach (var category in SampleData.Categories)
-            {
-                Console.WriteLine($"- {category.category}");
-            }
-        }
+       
 
         private static void ViewSessions()
         {
