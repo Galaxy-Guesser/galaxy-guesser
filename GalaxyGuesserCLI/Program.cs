@@ -5,11 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
-using GalaxyGuesserCli.Models;
-using GalaxyGuesserCli.Services;
-using GalaxyGuesserCli.Data;
+using ConsoleApp1.Models;
+using ConsoleApp1.Services;
 
-namespace GalaxyGuesserCli
+namespace ConsoleApp1
 {
     class Program
     {

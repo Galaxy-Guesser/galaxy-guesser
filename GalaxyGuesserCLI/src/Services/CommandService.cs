@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GalaxyGuesserCli.Models;
-using GalaxyGuesserCli.Data;
+using ConsoleApp1.Models;
 
-namespace GalaxyGuesserCli.Services
+namespace ConsoleApp1.Services
 {
     public class CommandService
     {

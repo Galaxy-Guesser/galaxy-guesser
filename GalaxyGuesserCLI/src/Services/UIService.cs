@@ -1,11 +1,10 @@
 using Spectre.Console;
-using System.Diagnostics;
 using System;
 using System.Collections.Generic;
-using GalaxyGuesserCli.Models;
+using ConsoleApp1.Models;
 using System.Text;
 
-namespace GalaxyGuesserCli.Services
+namespace ConsoleApp1.Services
 {
     public static class UIService
     {
@@ -360,6 +359,8 @@ public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> 
     foreach (var question in questions)
     {
         AnsiConsole.Clear();
+
+        // Display question + options in card
         var questionPanel = new Panel(BuildQuestionMarkup(question))
         {
             Border = BoxBorder.Rounded,
@@ -369,43 +370,34 @@ public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> 
 
         AnsiConsole.Write(questionPanel);
 
-        // Start tracking time
-        var stopwatch = Stopwatch.StartNew();
+        var prompt = new SelectionPrompt<string>()
+            .Title("\n[bold]Select your answer:[/]")
+            .HighlightStyle("cyan");
 
-        var promptCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        try
+        var optionMap = new Dictionary<string, Option>();
+
+        for (int i = 0; i < question.options.Count; i++)
         {
-            var prompt = new SelectionPrompt<string>()
-                .Title("\n[bold]Select your answer:[/]")
-                .HighlightStyle("cyan");
-
-            foreach (var (option, index) in question.options.Select((o, i) => (o, i)))
-            {
-                prompt.AddChoice($"{index + 1}. {option.optionText}");
-            }
-
-            var selectedLabel = await AnsiConsole.PromptAsync(prompt, promptCts.Token);
-            stopwatch.Stop();
-
-            var selectedOption = question.options[int.Parse(selectedLabel.Split('.')[0]) - 1];
-            bool isCorrect = selectedOption.answerId == question.correctAnswerId;
-
-            AnsiConsole.MarkupLine($"\n[{(isCorrect ? "green" : "red")}]{(isCorrect ? "✔ Correct!" : "✘ Incorrect.")}[/]");
-            AnsiConsole.MarkupLine($"[blue]Time taken: {stopwatch.Elapsed.TotalSeconds:F2} seconds[/]");
-            await SessionScores.UpdatePlayerScores(question.sessionId,9);
-        }
-        catch (TaskCanceledException)
-        {
-            stopwatch.Stop(); 
-            AnsiConsole.MarkupLine("\n[red]Time's up! Moving to next question...[/]");
-            AnsiConsole.MarkupLine($"[blue]Time taken: {stopwatch.Elapsed.TotalSeconds:F2} seconds[/]");
+            var label = $"{i + 1}. {question.options[i].optionText}";
+            prompt.AddChoice(label);
+            optionMap[label] = question.options[i];
         }
 
+        var selectedLabel = AnsiConsole.Prompt(prompt);
+        var selectedOption = optionMap[selectedLabel];
+
+        bool isCorrect = selectedOption.answerId == question.correctAnswerId;
+        var resultColor = isCorrect ? "green" : "red";
+        var resultText = isCorrect ? "✔ Correct!" : "✘ Incorrect.";
+
+        AnsiConsole.MarkupLine($"\n[{resultColor}]{resultText}[/]");
         await Task.Delay(2000);
     }
 
-    AnsiConsole.MarkupLine("[bold green]✅ All questions completed[/]");
+    AnsiConsole.Clear();
+    AnsiConsole.MarkupLine("[bold green]✅ All questions completed.[/]");
 }
+
 
 
 private static string BuildQuestionMarkup(SessionQuestionView question)
