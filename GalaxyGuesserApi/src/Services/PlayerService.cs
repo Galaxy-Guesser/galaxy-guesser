@@ -3,7 +3,7 @@ using GalaxyGuesserApi.Repositories.Interfaces;
 
 namespace GalaxyGuesserApi.Services
 {
-    public class PlayerService
+    public class PlayerService : IPlayerService
     {
         private readonly IPlayerRepository _playerRepository;
 
@@ -38,7 +38,7 @@ namespace GalaxyGuesserApi.Services
             return await _playerRepository.UpdatePlayerAsync(playerId, userName);
         }
 
-        public async Task<Player> GetPlayerByGuidAsync(string guid)
+        public async Task<Player?> GetPlayerByGuidAsync(string guid)
         {
             return await _playerRepository.GetPlayerByGuidAsync(guid);
         }

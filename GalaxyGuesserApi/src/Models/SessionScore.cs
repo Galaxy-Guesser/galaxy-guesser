@@ -9,6 +9,7 @@ namespace GalaxyGuesserApi.Models
         public int score { get; set; }
 
         public record ScoreUpdateRequest(
+            int PlayerId,
             int SessionId,
             int Points
         );

@@ -2,13 +2,12 @@ using Spectre.Console;
 using System.Text;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using GalaxyGuesserCli.Models;
-using GalaxyGuesserCli.Data;
-using GalaxyGuesserCli.Helpers;
+using ConsoleApp1.Models;
+using ConsoleApp1.Helpers;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace GalaxyGuesserCli.Services
+namespace ConsoleApp1.Services
 {
     public class SessionService
     {

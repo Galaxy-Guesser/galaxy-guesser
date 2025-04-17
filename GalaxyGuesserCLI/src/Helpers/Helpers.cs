@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace GalaxyGuesserCli.Helpers
+namespace ConsoleApp1.Helpers
 {
     public static class Helper
     {
