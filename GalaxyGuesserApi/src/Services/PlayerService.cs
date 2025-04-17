@@ -53,5 +53,11 @@ namespace GalaxyGuesserApi.Services
 
             return await _playerRepository.DeletePlayerAsync(playerId);
         }
+
+          public async Task<Player> GetPlayerByGuid(string guid)
+        {
+           return await _playerRepository.GetPlayerByGuidAsync(guid);
+        }
+
     }
 }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GalaxyGuesserApi.Models;
 
 namespace GalaxyGuesserApi.Services.Interfaces
@@ -10,6 +6,7 @@ namespace GalaxyGuesserApi.Services.Interfaces
     {
         Task<QuestionResponse> GetNextQuestionForSessionAsync(int sessionId);
         Task<List<OptionResponse>> GetOptionsByQuestionIdAsync(int questionId);
+        Task<int> GetQuestionCountForCategory(int categoryId);
         Task<AnswerResponse> GetCorrectAnswerAsync(int questionId);
     }
 }
