@@ -75,7 +75,6 @@ builder.Services.AddScoped<ISessionQuestionViewRepository, SessionQuestionViewRe
 
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<SessionScoreService>();
-builder.Services.AddScoped<IPlayerService,PlayerService>();
 builder.Services.AddScoped<ISessionViewService,SessionViewService>();
 builder.Services.AddScoped<SessionQuestionsViewService>();
 builder.Services.AddScoped<IQuestionService,QuestionService>();

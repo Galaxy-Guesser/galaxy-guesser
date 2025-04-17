@@ -1,10 +1,10 @@
-using ConsoleApp1.Models;
-using ConsoleApp1.Services;
-using ConsoleApp1.Utilities;
+using GalaxyGuesserCli.Models;
+using GalaxyGuesserCli.Services;
+using GalaxyGuesserCli.Utilities;
 using Spectre.Console;
 using GalaxyGuesserCLI.Services;
 
-namespace ConsoleApp1
+namespace GalaxyGuesserCli
 {
     class GalaxyQuiz
     {
