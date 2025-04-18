@@ -17,6 +17,8 @@ namespace GalaxyGuesserApi.Controllers
             _sessionViewService = sessionViewService;
         }
 
+
+        //TODO: MOVE TO SESSIONS CONTROLLER
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SessionView>>> GetAllActiveSessions()
         {

@@ -3,164 +3,246 @@ using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
 using System.Security.Claims;
 using GalaxyGuesserApi.Services;
+using System.ComponentModel.DataAnnotations;
+using GalaxyGuesserApi.Models.DTO;
 
 namespace GalaxyGuesserApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] 
+    [Produces("application/json")]
     public class PlayersController : ControllerBase
     {
         private readonly IPlayerService _playerService;
 
         public PlayersController(IPlayerService playerService)
         {
-            _playerService = playerService;
+            _playerService = playerService ?? throw new ArgumentNullException(nameof(playerService));
+        }
+
+        /// <summary>
+        /// Gets the Google ID from the current user's claims
+        /// </summary>
+        /// <returns>The Google ID if found, null otherwise</returns>
+        private string? GetGoogleIdFromClaims()
+        {
+            return User.FindFirst("sub")?.Value 
+                ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        /// <summary>
+        /// Validates that the current user is authenticated with a valid Google ID
+        /// </summary>
+        /// <returns>An unauthorized result if not authenticated, null if authenticated</returns>
+        private ActionResult<ApiResponse<T>>? ValidateAuthentication<T>()
+        {
+            var googleId = GetGoogleIdFromClaims();
+            if (string.IsNullOrEmpty(googleId))
+            {
+                return Unauthorized(ApiResponse<T>.ErrorResponse("User not authenticated"));
+            }
+            return null;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Player>>> GetPlayers()
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<Player>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse<IEnumerable<Player>>>> GetPlayers()
         {
             try
             {
-                var Players = await _playerService.GetAllPlayersAsync();
-                return Ok(Players);
+                var players = await _playerService.GetAllPlayersAsync();
+                return Ok(ApiResponse<IEnumerable<Player>>.SuccessResponse(players, "Players retrieved successfully"));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    ApiResponse<IEnumerable<Player>>.ErrorResponse("An error occurred while retrieving players", new List<string> { ex.Message }));
             }
         }
 
         [HttpGet("{playerId}")]
-        public async Task<ActionResult<Player>> GetPlayer(int playerId)
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse<Player>>> GetPlayer([Required] int playerId)
         {
             try
             {
-                var Player = await _playerService.GetPlayerByIdAsync(playerId);
-                if (string.IsNullOrEmpty(Player.ToString()))
+                var unauthorizedResult = ValidateAuthentication<Player>();
+                if (unauthorizedResult != null) return unauthorizedResult;
+
+                var googleId = GetGoogleIdFromClaims();
+                var player = await _playerService.GetPlayerByGuidAsync(googleId);
+                
+                if (player == null)
                 {
-                    return NotFound();
+                    return NotFound(ApiResponse<Player>.ErrorResponse($"Player with ID {playerId} not found"));
                 }
-                else{
-                    return Ok(Player);
-                }
+                
+                return Ok(ApiResponse<Player?>.SuccessResponse(player, "Player retrieved successfully"));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    ApiResponse<Player>.ErrorResponse("An error occurred while retrieving the player", new List<string> { ex.Message }));
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<Player>> CreatePlayer(string guid, string userName)
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse<Player>>> CreatePlayer([FromBody] CreatePlayerRequest request)
         {
             try
             {
-                var player = await _playerService.CreatePlayerAsync(guid, userName);
-                return CreatedAtAction(nameof(GetPlayer), new { id = player.playerId }, player);
+                var unauthorizedResult = ValidateAuthentication<Player>();
+                if (unauthorizedResult != null) return unauthorizedResult;
+
+                var googleId = GetGoogleIdFromClaims();
+            
+                if (string.IsNullOrWhiteSpace(request.UserName))
+                {
+                    return BadRequest(ApiResponse<Player>.ErrorResponse("Username is required"));
+                }
+
+                var player = await _playerService.CreatePlayerAsync(googleId, request.UserName);
+                
+                return CreatedAtAction(nameof(GetPlayer), new { player.playerId }, 
+                    ApiResponse<Player>.SuccessResponse(player, "Player created successfully"));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    ApiResponse<Player>.ErrorResponse("An error occurred while creating the player", new List<string> { ex.Message }));
             }
         }
 
         [HttpPut("{playerId}")]
-        public async Task<IActionResult> UpdatePlayer(int playerId, [FromBody] Player player)
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse<Player>>> UpdatePlayer([Required] int playerId, [FromBody] UpdatePlayerRequest request)
         {
-            
-           if (playerId != player.playerId)
+            try
             {
-                return BadRequest("Player ID in the URL does not match the ID in the request body.");
-            }
-            else
-            {
-                try
-                {
-                    var updated = await _playerService.UpdatePlayerAsync(playerId, player.userName);
+                var unauthorizedResult = ValidateAuthentication<Player>();
+                if (unauthorizedResult != null) return unauthorizedResult;
 
-                    if (!updated)
-                    {
-                        return NotFound($"Player with ID {playerId} not found.");
-                    }
-                    else
-                    {
-                        return Ok(new
-                        {
-                            message = "Player updated successfully",
-                            playerId,
-                            updated_username = player.userName
-                        });
-                    }
-                }
-                catch (Exception ex)
+                if (string.IsNullOrWhiteSpace(request.UserName))
                 {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
+                    return BadRequest(ApiResponse<Player>.ErrorResponse("Username is required"));
                 }
+
+                var googleId = GetGoogleIdFromClaims();
+                var existingPlayer = await _playerService.GetPlayerByGuidAsync(googleId);
+
+                if (existingPlayer == null)
+                {
+                    return NotFound(ApiResponse<Player>.ErrorResponse($"Player with ID {playerId} not found"));
+                }
+
+                if (existingPlayer?.guid != googleId)
+                {
+                    return Forbid();
+                }
+
+                var updated = await _playerService.UpdatePlayerAsync(playerId, request.UserName);
+
+                if (!updated)
+                {
+                    return NotFound(ApiResponse<Player>.ErrorResponse($"Player with ID {playerId} not found"));
+                }
+
+                return Ok(ApiResponse<Player?>.SuccessResponse(existingPlayer, "Player updated successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    ApiResponse<Player>.ErrorResponse("An error occurred while updating the player", new List<string> { ex.Message }));
             }
         }
 
-        [Authorize] 
-        [HttpPost("auth")]
-        public async Task<ActionResult<Player>> AuthenticateOrRegister([FromBody] string? displayName = null)
+        [HttpDelete("{playerId}")]
+        [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse<Player>>> DeletePlayer([Required] int playerId)
         {
-            var googleId = User.FindFirst("sub")?.Value 
-                        ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var email = User.FindFirst("email")?.Value;
+            try
+            {
+                var unauthorizedResult = ValidateAuthentication<Player>();
+                if (unauthorizedResult != null) return unauthorizedResult;
 
-            if (string.IsNullOrEmpty(googleId))
-            {
-                return Unauthorized(new {
-                    Message = "Google ID (sub claim) missing",
-                    AllClaims = User.Claims.Select(c => new { c.Type, c.Value })
-                });
+                var googleId = GetGoogleIdFromClaims();
+                var existingPlayer = await _playerService.GetPlayerByGuidAsync(googleId);
+
+                if (existingPlayer == null)
+                {
+                    return NotFound(ApiResponse<Player>.ErrorResponse($"Player with ID {playerId} not found"));
+                }
+
+                if (existingPlayer?.guid != googleId)
+                {
+                    return Forbid();
+                }
+
+                var deleted = await _playerService.DeletePlayerAsync(playerId);
+
+                if (!deleted)
+                {
+                    return NotFound(ApiResponse<Player>.ErrorResponse($"Player with ID {playerId} not found"));
+                }
+
+                return Ok(ApiResponse<Player?>.SuccessResponse(existingPlayer, "Player deleted successfully"));
             }
-            else
+            catch (Exception ex)
             {
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    ApiResponse<Player>.ErrorResponse("An error occurred while deleting the player", new List<string> { ex.Message }));
+            }
+        }
+
+        [Authorize]
+        [HttpPost("auth")]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse<Player>>> AuthenticateOrRegister([FromBody] string displayName)
+        {
+            try
+            {
+                var unauthorizedResult = ValidateAuthentication<Player>();
+                if (unauthorizedResult != null) return unauthorizedResult;
+
+                var googleId = GetGoogleIdFromClaims();
                 var player = await _playerService.GetPlayerByGuidAsync(googleId);
 
-                if (player != null)
-                {
-                    return Ok(player); 
-                }
-                else
+                if (player == null)
                 {
                     if (string.IsNullOrWhiteSpace(displayName))
                     {
-                        return BadRequest("Display name required for new users.");
+                        return BadRequest(ApiResponse<Player>.ErrorResponse("Display name is required for new player registration"));
                     }
-                    else
-                    {
-                        player = await _playerService.CreatePlayerAsync(googleId, displayName);
-                        return player;
-                    }
+
+                    player = await _playerService.CreatePlayerAsync(googleId, displayName);
+                    return Ok(ApiResponse<Player?>.SuccessResponse(player, "Player registered successfully"));
                 }
+
+                return Ok(ApiResponse<Player?>.SuccessResponse(player, "Player authenticated successfully"));
             }
-        }
-
-
-        [HttpDelete("{playerId}")]
-        public async Task<IActionResult> DeletePlayer(int playerId)
-        {
-            try
-                {
-                    var deleted = await _playerService.DeletePlayerAsync(playerId);
-
-                    if (!deleted)
-                    {
-                        return NotFound($"Player with ID {playerId} not found.");
-                    }
-                    else
-                    {
-                         return Ok(new { message = "User deleted successfully" });
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    ApiResponse<Player>.ErrorResponse("An error occurred while authenticating or registering the player", new List<string> { ex.Message }));
+            }
         }
     }
 }

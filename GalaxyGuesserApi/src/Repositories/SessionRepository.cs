@@ -1,5 +1,6 @@
 using GalaxyGuesserApi.Data;
 using GalaxyGuesserApi.Models;
+using GalaxyGuesserApi.Models.DTO;
 using GalaxyGuesserApi.Repositories.Interfaces;
 
 namespace GalaxyGuesserApi.Repositories
