@@ -1,4 +1,4 @@
-using GalaxyGuesserApi.Models;
+using GalaxyGuesserApi.Models.DTO;
 
 namespace GalaxyGuesserApi.Repositories.Interfaces
 {

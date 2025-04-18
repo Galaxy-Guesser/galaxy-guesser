@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
 using System.Security.Claims;
-using GalaxyGuesserApi.Services.Interfaces; 
+using GalaxyGuesserApi.Services.Interfaces;
+using GalaxyGuesserApi.Models.DTO;
 
 namespace GalaxyGuesserApi.Controllers
 {

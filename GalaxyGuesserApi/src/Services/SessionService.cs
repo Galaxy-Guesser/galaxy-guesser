@@ -1,4 +1,4 @@
-using GalaxyGuesserApi.Models;
+using GalaxyGuesserApi.Models.DTO;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using GalaxyGuesserApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
