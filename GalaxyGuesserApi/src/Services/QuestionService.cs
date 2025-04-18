@@ -25,13 +25,9 @@ namespace GalaxyGuesserApi.Services
           return await _questionRepository.GetOptionsByQuestionIdAsync(questionId);
         }
 
-    public async Task<AnswerResponse> GetCorrectAnswerAsync(int questionId)
-    {
-      return await _questionRepository.GetCorrectAnswerAsync(questionId);
+        public async Task<AnswerResponse> GetCorrectAnswerAsync(int questionId)
+        {
+          return await _questionRepository.GetCorrectAnswerAsync(questionId);
+        }
     }
-     public async Task<int> GetQuestionCountForCategory(int categoryId)
-    {
-      return await _questionRepository.GetQuestionCountForCategory(categoryId);
-    }
-  }
 }

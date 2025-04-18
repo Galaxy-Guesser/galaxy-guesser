@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using GalaxyGuesserCli.Models;
-using GalaxyGuesserCli.Helpers;
-using GalaxyGuesserCli.Data;
+using ConsoleApp1.Models;
+using ConsoleApp1.Helpers;
 using System.Net;
 using System.Web;
 using System.Security;
@@ -16,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 
 
 
-namespace GalaxyGuesserCli.Services
+namespace ConsoleApp1.Services
 {
     public class AuthenticationService
     {
