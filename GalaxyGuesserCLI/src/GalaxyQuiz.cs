@@ -1,11 +1,9 @@
+using System.Text;
 using ConsoleApp1.Models;
 using ConsoleApp1.Services;
 using ConsoleApp1.Utilities;
 using Spectre.Console;
-using GalaxyGuesserCLI.Services;
-using SixLabors.ImageSharp;
-using System.Text;
-
+ 
 namespace ConsoleApp1
 {
     class GalaxyQuiz
