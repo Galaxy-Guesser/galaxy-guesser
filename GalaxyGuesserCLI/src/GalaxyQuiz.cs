@@ -94,9 +94,8 @@ namespace ConsoleApp1
                         await UIService.DisplayActiveSessionsAsync(sessions);
                     },
 
-                    ["View leaderboard"] = () => {
-                        CommandService.ProcessCommand("leaderboard", player);
-                        return Task.CompletedTask;
+                    ["Leaderboards"] = async () => {
+                        await ShowLeaderboardMenu(player);
                     },
 
                     ["My profile"] = async () => {
@@ -170,6 +169,43 @@ namespace ConsoleApp1
                     .AddChoices(profileOptions.Keys));
 
                 await profileOptions[profileSelection]();
+
+                if (!backToMainMenu)
+                    UIService.Continue();
+            }
+        }
+
+        private static async Task ShowLeaderboardMenu(Player player)
+        {
+            bool backToMainMenu = false;
+
+            while (!backToMainMenu)
+            {
+                AnsiConsole.Clear();
+                UIService.PrintGalaxyHeader();
+                AnsiConsole.MarkupLine("\n[bold cyan]LEADERBOARDS[/]\n");
+
+                var leaderboardOptions = new Dictionary<string, Func<Task>>
+                {
+                    ["Global Leaderboard"] = async () => {
+                        await UIService.DisplayGlobalLeaderboard();
+                    },
+                    ["Session Leaderboard"] = async () => {
+                      await UIService.DisplaySessionLeaderboard();
+                    },
+                    ["↩️ Back to Main Menu"] = () => {
+                        backToMainMenu = true;
+                        return Task.CompletedTask;
+                    }
+                };
+
+                var selection = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                    .Title("Select leaderboard type")
+                    .PageSize(10)
+                    .AddChoices(leaderboardOptions.Keys));
+
+                await leaderboardOptions[selection]();
 
                 if (!backToMainMenu)
                     UIService.Continue();

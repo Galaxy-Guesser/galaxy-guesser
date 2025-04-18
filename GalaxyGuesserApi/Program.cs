@@ -80,6 +80,8 @@ builder.Services.AddScoped<ISessionViewService,SessionViewService>();
 builder.Services.AddScoped<SessionQuestionsViewService>();
 builder.Services.AddScoped<IQuestionService,QuestionService>();
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ILeaderboardRepository, LeaderboardRepository>();
+builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 
 
 var app = builder.Build();
