@@ -160,28 +160,25 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
 
         public static void Continue()
     {
-        Console.WriteLine("\nPress any key to continue...");
+        Console.WriteLine("\nReturn to main menu...");
         Console.ReadKey(true);
     }
 
      static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
         {
             Console.Clear();
-            UIService.PrintGalaxyHeader();
+            PrintGalaxyHeader();
             
-            // Placeholder for timer bar - will be updated separately
             Console.WriteLine($"⏱ Time: {secondsRemaining}s [" + new string(' ', Console.WindowWidth - 20) + "]");
             
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"\nQuestion {current}/{total}:");
             Console.ResetColor();
             
-            // Make the question text much more visible with highlighting
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"\n{q.Text}\n");
             Console.ResetColor();
             Console.WriteLine(); // Extra spacing
-            // Display answer options with clear formatting
             Console.WriteLine("Answer options:");
             for (int i = 0; i < q.Options.Length; i++)
             {
@@ -410,6 +407,103 @@ private static string BuildQuestionMarkup(SessionQuestionView question)
     }
 
     return markup;
+}
+
+/// <summary>
+/// Displays a loading indicator with the specified message
+/// </summary>
+/// <param name="message">Message to display while loading</param>
+public static void ShowLoader(string message)
+{
+    int originalTop = Console.CursorTop;
+    int originalLeft = Console.CursorLeft;
+    
+    // Save current console colors
+    ConsoleColor originalFg = Console.ForegroundColor;
+    ConsoleColor originalBg = Console.BackgroundColor;
+    
+    // Create loading indicator line
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write($"\r🔄 {message}");
+    
+    // Store the position info in static variables so HideLoader can access them
+    loaderActive = true;
+    loaderPosition = (Console.CursorLeft, Console.CursorTop);
+    loaderMessage = message;
+    
+    // Reset colors
+    Console.ForegroundColor = originalFg;
+    Console.BackgroundColor = originalBg;
+    
+    // Start animation task if not already running
+    if (loaderTask == null || loaderTask.IsCompleted)
+    {
+        loaderTask = StartLoaderAnimationAsync();
+    }
+}
+
+/// <summary>
+/// Hides the active loading indicator
+/// </summary>
+public static void HideLoader()
+{
+    // Stop the animation
+    loaderActive = false;
+    
+    // Clear the loader line if it was displayed
+    if (loaderPosition.HasValue)
+    {
+        int currentTop = Console.CursorTop;
+        int currentLeft = Console.CursorLeft;
+        
+        Console.SetCursorPosition(0, loaderPosition.Value.Top);
+        Console.Write(new string(' ', loaderMessage.Length + 10)); // Clear the line with spaces
+        
+        // Reset cursor position
+        Console.SetCursorPosition(currentLeft, currentTop);
+        
+        // Reset loader state
+        loaderPosition = null;
+        loaderMessage = string.Empty;
+    }
+}
+
+// Add these fields to the UIService class
+private static bool loaderActive = false;
+private static (int Left, int Top)? loaderPosition = null;
+private static string loaderMessage = string.Empty;
+private static Task loaderTask = null;
+
+/// <summary>
+/// Handles the loader animation
+/// </summary>
+private static async Task StartLoaderAnimationAsync()
+{
+    string[] animationFrames = new[] { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
+    int frameIndex = 0;
+    
+    while (loaderActive)
+    {
+        if (loaderPosition.HasValue)
+        {
+            int currentTop = Console.CursorTop;
+            int currentLeft = Console.CursorLeft;
+            
+            Console.SetCursorPosition(0, loaderPosition.Value.Top);
+            
+            ConsoleColor originalFg = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            
+            Console.Write($"\r{animationFrames[frameIndex]} {loaderMessage}");
+            
+            Console.ForegroundColor = originalFg;
+            Console.SetCursorPosition(currentLeft, currentTop);
+            
+            frameIndex = (frameIndex + 1) % animationFrames.Length;
+        }
+        
+        await Task.Delay(100); // Update animation every 100ms
+    }
 }
 
     }
