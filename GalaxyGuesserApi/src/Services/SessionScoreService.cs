@@ -13,11 +13,13 @@ namespace GalaxyGuesserApi.Services
             _sessionScoreRepository = sessionScoreRepository;
         }
 
-        public async Task<ScoreUpdateResponse> UpdateScoreAsync(ScoreUpdateRequest request,int playerId)
+        public async Task<ScoreUpdateResponse> UpdateScoreAsync(ScoreUpdateRequest request)
         {
-            await _sessionScoreRepository.UpdatePlayerScoreAsync(playerId, request.SessionId, request.Points);
+            // Update the player's score (append points)
+            await _sessionScoreRepository.UpdatePlayerScoreAsync(request.PlayerId, request.SessionId, request.Points);
 
-            var updatedScore = await _sessionScoreRepository.GetPlayerScoreAsync(playerId, request.SessionId);
+            // Retrieve the updated score
+            var updatedScore = await _sessionScoreRepository.GetPlayerScoreAsync(request.PlayerId, request.SessionId);
 
             return new ScoreUpdateResponse(
                 Success: true,

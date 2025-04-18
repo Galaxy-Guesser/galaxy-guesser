@@ -1,6 +1,6 @@
 using System;
 
-namespace GalaxyGuesserCli.Utilities
+namespace ConsoleApp1.Utilities
 {
     public static class ErrorHandler
     {

@@ -48,6 +48,17 @@ namespace GalaxyGuesserApi.Tests.Services
     }
 
     [Fact]
+    public async Task GetPlayerByGuidAsync_ReturnsPlayer()
+    {
+      var player = new Player { playerId = 3, userName = "Charlie", guid = "abc123" };
+      _playerRepoMock.Setup(r => r.GetPlayerByGuidAsync("abc123")).ReturnsAsync(player);
+
+      var result = await _playerService.GetPlayerByGuidAsync("abc123");
+
+      Assert.Equal("Charlie", result?.userName);
+    }
+
+    [Fact]
     public async Task CreatePlayerAsync_CreatesAndReturnsPlayer()
     {
       var player = new Player { playerId = 4, userName = "NewPlayer", guid = "newguid" };

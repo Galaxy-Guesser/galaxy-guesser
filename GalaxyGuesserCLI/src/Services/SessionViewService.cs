@@ -1,9 +1,8 @@
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using GalaxyGuesserCli.Helpers;
-using GalaxyGuesserCli.Models;
+using ConsoleApp1.Helpers;
+using ConsoleApp1.Models;
 
-namespace GalaxyGuesserCli.Services
+namespace ConsoleApp1.Services
 {
     public class SessionViewService
     {
