@@ -376,7 +376,7 @@ namespace ConsoleApp1.Services
       Continue();
     }
 
-    public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
+    public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions, string sessionCode)
     {
       if (questions.Count == 0)
       {
@@ -511,7 +511,22 @@ namespace ConsoleApp1.Services
         await Task.Delay(2000);
       }
 
-      AnsiConsole.MarkupLine("[bold green]✅ All questions completed[/]");
+        AnsiConsole.MarkupLine("[bold green]✅ All questions completed[/]");
+        await DisplaySessionLeaderboard(sessionCode);
+
+        var panel = new Panel(
+            Align.Center(
+                new FigletText("GAME OVER")
+                    .Color(Color.Gold1)
+            )
+        );
+
+        panel.Border = BoxBorder.Double;
+        panel.BorderStyle = new Style(Color.Green);
+        panel.Padding = new Padding(2, 1, 2, 1);
+
+        AnsiConsole.Write(panel);
+        AnsiConsole.WriteLine();
     }
 
     private static void DisplayTotalScorePanel(int totalScore)

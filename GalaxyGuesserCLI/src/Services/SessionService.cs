@@ -206,7 +206,7 @@ namespace ConsoleApp1.Services
           Console.ForegroundColor = ConsoleColor.Green;
           Console.WriteLine($"✅ Successfully joined session: {sessionCode}");
           var questions = await SessionQuestionViewService.GetAllSessionQuestions(sessionCode);
-          await UIService.DisplaySessionQuestionsAsync(questions);
+          await UIService.DisplaySessionQuestionsAsync(questions, sessionCode);
         }
         else
         {
