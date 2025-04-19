@@ -240,11 +240,10 @@ namespace ConsoleApp1.Services
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/2";
+        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/{playerId}";
         HttpResponseMessage response = await _httpClient.PutAsync(url, content);
         string responseContent = await response.Content.ReadAsStringAsync();
-
-        //response.EnsureSuccessStatusCode();
+        response.EnsureSuccessStatusCode();
 
         if (!response.IsSuccessStatusCode)
         {
@@ -266,7 +265,7 @@ namespace ConsoleApp1.Services
     {
       try
       {
-        var url = $"http://localhost:5010/api/players/{playerId}/stats";
+        var url = $"http://localhost:5010/api/players/2/stats";
         HttpResponseMessage response = await _httpClient.GetAsync(url);
         string responseContent = await response.Content.ReadAsStringAsync();
         //response.EnsureSuccessStatusCode();
@@ -284,11 +283,6 @@ namespace ConsoleApp1.Services
 
         var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<PlayerStatsDTO>>>(responseContent, options);
         var data = apiResponse?.Data ?? new List<PlayerStatsDTO>();
-
-        //var data = JsonSerializer.Deserialize<List<PlayerStatsDTO>>(responseContent);
-
-        if (data == null)
-          return new List<PlayerStatsDTO>();
 
         foreach (var stat in data)
         {
@@ -308,5 +302,4 @@ namespace ConsoleApp1.Services
       }
     }
   }
-
 }

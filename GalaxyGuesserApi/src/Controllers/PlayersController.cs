@@ -97,13 +97,10 @@ namespace GalaxyGuesserApi.Controllers
     [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<PlayerStatsDTO>>> GetPlayersStats(int playerId)
+    public async Task<ActionResult<ApiResponse<IEnumerable<PlayerStatsDTO>>>> GetPlayersStats(int playerId)
     {
       try
       {
-        var profileSessions = await _playerService.GetPlayersStats(playerId);
-        return Ok(profileSessions);
-
         var unauthorizedResult = ValidateAuthentication<IEnumerable<PlayerStatsDTO>>();
         if (unauthorizedResult != null) return unauthorizedResult;
 

@@ -307,9 +307,9 @@ namespace ConsoleApp1.Services
         var color = minutes < 5 ? "red" : "green";
 
         return new Panel(new Markup(
-                  $"[bold]{session.category}[/]\n" +
-                  $"[blue]Code:[/] {session.sessionCode}\n" +
-                  $"[blue]Ends In:[/] [{color}]{minutes}m[/]"))
+            $"[bold]{session.category}[/]\n" +
+            $"[blue]Code:[/] {session.sessionCode}\n" +
+            $"[blue]Ends In:[/] [{color}]{minutes}m[/]"))
         {
           Border = BoxBorder.Double,
           Padding = new Padding(1, 0, 1, 0)
@@ -599,6 +599,7 @@ namespace ConsoleApp1.Services
         AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
       }
     }
+
     public static async Task DisplayGlobalLeaderboard()
     {
       try
