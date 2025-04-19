@@ -18,7 +18,7 @@ namespace GalaxyGuesserCLI.Models
             public int TotalScore { get; set; }
             public int SessionsPlayed { get; set; }
             public int Rank { get; set; }
-            public List<string> Sessions { get; set; } = new List<string>();
+            public List<string> Sessions { get; set; } = new();
         }
 
         public class SessionLeaderboardResponse
@@ -32,7 +32,7 @@ namespace GalaxyGuesserCLI.Models
         public class GlobalLeaderboardResponse
         {
             public bool Success { get; set; }
-            public List<GlobalLeaderboardEntry> Leaderboard { get; set; } = new List<GlobalLeaderboardEntry>();
+            public List<GlobalLeaderboardEntry> Leaderboard { get; set; } = new();
             public string Message { get; set; } = string.Empty;
         }
     }
