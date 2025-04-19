@@ -376,7 +376,7 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             Continue();
         }
 
-        public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
+        public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions, string sessionCode)
         {
             if (questions.Count == 0)
             {
@@ -510,8 +510,22 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
 
                 await Task.Delay(2000);
             }
-
+            await DisplaySessionLeaderboard(sessionCode);
             AnsiConsole.MarkupLine("[bold green]✅ All questions completed[/]");
+            var panel = new Panel(
+                Align.Center(
+                    new FigletText("GAME OVER")
+                        .Color(Color.Gold1)
+                )
+            );
+            
+            panel.Border = BoxBorder.Double;
+            panel.BorderStyle = new Style(Color.Green);
+            panel.Padding = new Padding(2, 1, 2, 1);
+            
+            AnsiConsole.Write(panel);
+            AnsiConsole.WriteLine();
+            
         }
 
         private static void DisplayTotalScorePanel(int totalScore)
@@ -603,11 +617,18 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
             }
         }
 
-        public static async Task DisplaySessionLeaderboard()
+        public static async Task DisplaySessionLeaderboard(string? session)
         {
             try
             {
-                var sessionCode = AnsiConsole.Ask<string>("Enter session code:");
+                string sessionCode;
+
+                if (string.IsNullOrWhiteSpace(session))
+                {
+                    sessionCode = AnsiConsole.Ask<string>("Enter session code:");
+                } else {
+                    sessionCode = session;
+                }
      
                 AnsiConsole.Status()
                     .Start("Loading session leaderboard...", ctx => 
@@ -627,7 +648,7 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
                 }
 
                 AnsiConsole.Clear();
-                UIService.PrintGalaxyHeader();
+                PrintGalaxyHeader();
                 AnsiConsole.MarkupLine($"\n[bold yellow]🚀 SESSION LEADERBOARD: {sessionCode}[/]\n");
 
                 var table = new Table()
