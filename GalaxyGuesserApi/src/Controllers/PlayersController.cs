@@ -243,7 +243,7 @@ namespace GalaxyGuesserApi.Controllers
     [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<Player>), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<ApiResponse<Player>>> AuthenticateOrRegister([FromBody] string displayName)
+    public async Task<ActionResult<ApiResponse<Player>>> AuthenticateOrRegister([FromBody] string? displayName)
     {
       try
       {
@@ -255,12 +255,8 @@ namespace GalaxyGuesserApi.Controllers
 
         if (player == null)
         {
-          if (string.IsNullOrWhiteSpace(displayName))
-          {
-            return BadRequest(ApiResponse<Player>.ErrorResponse("Display name is required for new player registration"));
-          }
-
-          player = await _playerService.CreatePlayerAsync(googleId, displayName);
+       
+          player = await _playerService.CreatePlayerAsync(googleId, " ");
           return Ok(ApiResponse<Player?>.SuccessResponse(player, "Player registered successfully"));
         }
 

@@ -1,6 +1,6 @@
-using ConsoleApp1.Models;
+using GalaxyGuesserCLI.Models;
 
-namespace ConsoleApp1.Services
+namespace GalaxyGuesserCLI.Services
 {
     public class NasaService
     {

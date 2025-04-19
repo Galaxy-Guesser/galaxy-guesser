@@ -2,15 +2,15 @@ using Spectre.Console;
 using System.Text;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using ConsoleApp1.Models;
-using ConsoleApp1.Helpers;
-using ConsoleApp1.Services;
+using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.Helpers;
+using GalaxyGuesserCLI.Services;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text.Json.Serialization;
 
-namespace ConsoleApp1.Services
+namespace GalaxyGuesserCLI.Services
 {
   public class SessionService
   {
@@ -142,7 +142,7 @@ namespace ConsoleApp1.Services
       {
         string jwt = Helper.GetStoredToken();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-        var url = $"http://localhost:5010/api/sessions/session";
+        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions/session";
 
         var request = new CreateSessionRequest
         {
@@ -265,7 +265,7 @@ namespace ConsoleApp1.Services
     {
       try
       {
-        var url = $"http://localhost:5010/api/players/{playerId}/stats";
+        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/{playerId}/stats";
         HttpResponseMessage response = await _httpClient.GetAsync(url);
         string responseContent = await response.Content.ReadAsStringAsync();
         //response.EnsureSuccessStatusCode();

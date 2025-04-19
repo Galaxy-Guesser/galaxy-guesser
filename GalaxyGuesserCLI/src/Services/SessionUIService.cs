@@ -1,4 +1,4 @@
-using ConsoleApp1.Services;
+using GalaxyGuesserCLI.Services;
 
 using Spectre.Console;
 

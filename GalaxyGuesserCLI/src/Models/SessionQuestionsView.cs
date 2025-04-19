@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace ConsoleApp1.Models
+namespace GalaxyGuesserCLI.Models
 {
     public class SessionQuestionView
     {
