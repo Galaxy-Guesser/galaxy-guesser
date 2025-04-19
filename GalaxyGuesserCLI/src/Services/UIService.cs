@@ -598,6 +598,5 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
         AnsiConsole.MarkupLine("[red]Error loading session leaderboard:[/]");
         AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
       }
-}
-    }
+    }}
 }
