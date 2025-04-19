@@ -549,24 +549,16 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
              try
             {
                 AnsiConsole.Status()
-                    .Start("Loading global leaderboard...", ctx => 
-                    {
-                        ctx.Spinner(Spinner.Known.Star);
-                        ctx.SpinnerStyle(Style.Parse("green"));
-                    });
+                    .Start("Loading...", ctx => ctx.Spinner(Spinner.Known.Star));
 
                 var leaderboard = await LeaderboardService.GetGlobalLeaderboardAsync();
-
-                AnsiConsole.Clear();
-                UIService.PrintGalaxyHeader();
-                AnsiConsole.MarkupLine("\n[bold yellow]🌌 GLOBAL LEADERBOARD[/]\n");
-
+                               
                 var table = new Table()
                     .Border(TableBorder.Rounded)
                     .BorderColor(Color.Purple)
                     .AddColumn(new TableColumn("[bold]Rank[/]").Centered())
                     .AddColumn(new TableColumn("[bold]Player[/]").Centered())
-                    .AddColumn(new TableColumn("[bold]Total Score[/]").Centered())
+                    .AddColumn(new TableColumn("[bold]Score[/]").Centered())
                     .AddColumn(new TableColumn("[bold]Sessions[/]").Centered());
 
                 if (leaderboard.Count == 0)
@@ -575,8 +567,9 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
                 }
                 else
                 {
-                    foreach (var entry in leaderboard)
+                    for (int i = 0; i < leaderboard.Count; i++)
                     {
+                        var entry = leaderboard[i];
                         var sessionsList = entry.Sessions?.Any() == true 
                             ? string.Join("\n", entry.Sessions.Take(3)) 
                             : "None";
@@ -592,14 +585,20 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
                             entry.TotalScore.ToString(),
                             sessionsList
                         );
-                    }
+
+                        if (i < leaderboard.Count - 1)
+                        {
+                            table.AddEmptyRow();
+                        }
                 }
+            }
 
                 AnsiConsole.Write(table);
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine("[red]Error loading leaderboard:[/] " + ex.Message);
+                AnsiConsole.WriteException(ex, 
+                    ExceptionFormats.ShortenPaths | ExceptionFormats.ShortenTypes);
             }
         }
 
