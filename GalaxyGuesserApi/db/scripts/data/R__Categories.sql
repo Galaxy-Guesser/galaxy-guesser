@@ -6,5 +6,5 @@ VALUES
   ('Galaxy Types'),
   ('Stars and Planets'),
   ('The Moon'),
-  ('Basic Astronomy')
+  ('Astronomy')
 ON CONFLICT (category) DO NOTHING;
