@@ -16,6 +16,8 @@ namespace ConsoleApp1.Services
         private static List<SessionQuestion> sessionQuestions = new List<SessionQuestion>();
         private static List<SessionScore> sessionScores = new List<SessionScore>();
 
+
+
         public static string GenerateSessionCode()
         {
             const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -69,7 +71,7 @@ namespace ConsoleApp1.Services
         }
 
 
-    
+
         public static void SaveScore(int playerId, int sessionId, int score, int timeRemaining = 0)
         {
             sessionScores.Add(new SessionScore(playerId, sessionId, score, timeRemaining));
@@ -139,7 +141,7 @@ namespace ConsoleApp1.Services
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
                 var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions/session";
 
-                    var request = new CreateSessionRequest
+                var request = new CreateSessionRequest
                 {
                     category = category,
                     questionsCount = questionsCount,
@@ -169,7 +171,7 @@ namespace ConsoleApp1.Services
             }
         }
 
-          public static async Task JoinSessionAsync(string sessionCode)
+        public static async Task JoinSessionAsync(string sessionCode)
         {
             try
             {
@@ -192,8 +194,8 @@ namespace ConsoleApp1.Services
 
 
 
-        var url = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions"; 
-        HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+                var url = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions";
+                HttpResponseMessage response = await _httpClient.PostAsync(url, content);
                 string responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -218,8 +220,8 @@ namespace ConsoleApp1.Services
             {
                 Console.ResetColor();
             }
-        
+
         }
-        }
+    }
 
 }
