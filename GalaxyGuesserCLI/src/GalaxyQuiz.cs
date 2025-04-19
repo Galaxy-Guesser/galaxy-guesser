@@ -189,7 +189,7 @@ namespace ConsoleApp1
                         await UIService.DisplayGlobalLeaderboard();
                     },
                     ["Session Leaderboard"] = async () => {
-                      await UIService.DisplaySessionLeaderboard();
+                      await UIService.DisplaySessionLeaderboard(null);
                     },
                     ["↩️ Back to Main Menu"] = () => {
                         backToMainMenu = true;

@@ -265,7 +265,7 @@ namespace ConsoleApp1.Services
     {
       try
       {
-        var url = $"http://localhost:5010/api/players/2/stats";
+        var url = $"http://localhost:5010/api/players/{playerId}/stats";
         HttpResponseMessage response = await _httpClient.GetAsync(url);
         string responseContent = await response.Content.ReadAsStringAsync();
         //response.EnsureSuccessStatusCode();

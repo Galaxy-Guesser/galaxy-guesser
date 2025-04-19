@@ -650,7 +650,7 @@ namespace ConsoleApp1.Services
             );
           }
         }
-
+        
         AnsiConsole.Write(table);
       }
       catch (Exception ex)
