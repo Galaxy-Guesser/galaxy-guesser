@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using ConsoleApp1.Helpers;
-using ConsoleApp1.Models;
+using GalaxyGuesserCLI.Helpers;
+using GalaxyGuesserCLI.Models;
 
-namespace ConsoleApp1.Services
+namespace GalaxyGuesserCLI.Services
 {
     public class SessionQuestionViewService
     {

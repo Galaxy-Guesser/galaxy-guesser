@@ -1,10 +1,10 @@
- namespace ConsoleApp1.Models
+ namespace GalaxyGuesserCLI.Models
 {
-    public readonly struct Player
+    public class Player
     {
-        public int playerId { get; init; }
-        public string guid { get; init; }
-        public string userName { get; init; }
+        public int playerId { get; set; }
+        public string guid { get; set; }
+        public string userName { get; set; }
 
     }
 }

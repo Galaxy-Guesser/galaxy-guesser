@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ConsoleApp1.Models;
-using ConsoleApp1.Helpers;
+using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.Helpers;
 using System.Net;
 using System.Web;
 using System.Security;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 
 
 
-namespace ConsoleApp1.Services
+namespace GalaxyGuesserCLI.Services
 {
     public class AuthenticationService
     {
@@ -65,22 +65,31 @@ namespace ConsoleApp1.Services
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
-            var response = await httpClient.PostAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/auth", new StringContent("null", Encoding.UTF8, "application/json"));
-
-            if (response.StatusCode == HttpStatusCode.BadRequest)
+           var response = await httpClient.PostAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/auth", new StringContent("null", Encoding.UTF8, "application/json"));
+            var result = await Result<Player>.FromApiResponseAsync(response);
+             Player player = new Player ();
+            result.OnSuccess(playerResponse =>
             {
+                if(playerResponse.userName == " ")
+                {
                 Console.Write("\n🌟 Enter your display name: ");
                 Console.CursorVisible = true;
                 var displayName = Console.ReadLine();
                 Console.CursorVisible = false;
-
-                var nameJson = JsonSerializer.Serialize(displayName);
-                response = await httpClient.PostAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/auth", new StringContent(nameJson, Encoding.UTF8, "application/json"));
+                }
+                player.userName = playerResponse.userName;
+                player.guid=playerResponse.guid;
+                player.playerId=playerResponse.playerId;
                 
-            }
-            var playerJson = await response.Content.ReadAsStringAsync();
-            var player = JsonSerializer.Deserialize<Player>(playerJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
+            })
+            .OnFailure(errors =>
+            {
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Authentication failed: {error}");
+                }
+            });
+            Console.WriteLine(player);
             return player!;
         }
 
