@@ -572,7 +572,7 @@ private static void DisplayColorGradient(string[] text, ConsoleColor startColor,
                     .BorderColor(Color.Purple)
                     .AddColumn(new TableColumn("[bold]Rank[/]").Centered())
                     .AddColumn(new TableColumn("[bold]Player[/]").Centered())
-                    .AddColumn(new TableColumn("[bold]Score[/]").Centered())
+                    .AddColumn(new TableColumn("[bold]Total Score[/]").Centered())
                     .AddColumn(new TableColumn("[bold]Sessions[/]").Centered());
 
                 if (leaderboard.Count == 0)
