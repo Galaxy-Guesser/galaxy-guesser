@@ -659,11 +659,16 @@ namespace ConsoleApp1.Services
       }
     }
 
-    public static async Task DisplaySessionLeaderboard()
+    public static async Task DisplaySessionLeaderboard(string? session)
     {
       try
       {
-        var sessionCode = AnsiConsole.Ask<string>("Enter session code:");
+        string sessionCode;
+        if (string.IsNullOrWhiteSpace(session)) {
+            sessionCode = AnsiConsole.Ask<string>("Enter session code:");
+        } else {
+            sessionCode = session;
+        }
 
         AnsiConsole.Status()
             .Start("Loading session leaderboard...", ctx =>
