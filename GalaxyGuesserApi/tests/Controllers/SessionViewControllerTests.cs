@@ -1,10 +1,11 @@
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Services.Interfaces;
+using GalaxyGuesserApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace GalaxyGuesserApi.Controllers
+namespace GalaxyGuesserApi.Tests.Controllers
 {
     public class SessionViewControllerTests
     {

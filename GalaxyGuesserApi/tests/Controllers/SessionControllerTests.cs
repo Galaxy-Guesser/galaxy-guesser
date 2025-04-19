@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace GalaxyGuesserApi.tests.Controllers
+namespace GalaxyGuesserApi.Tests.Controllers
 {
     public class SessionControllerTests
     {
