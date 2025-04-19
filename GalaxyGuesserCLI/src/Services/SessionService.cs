@@ -12,12 +12,14 @@ using System.Text.Json.Serialization;
 
 namespace ConsoleApp1.Services
 {
-  public class SessionService
-  {
-    private static List<Session> sessions = new List<Session>();
-    private static List<SessionPlayer> sessionPlayers = new List<SessionPlayer>();
-    private static List<SessionQuestion> sessionQuestions = new List<SessionQuestion>();
-    private static List<SessionScore> sessionScores = new List<SessionScore>();
+    public class SessionService
+    {
+        private static List<Session> sessions = new List<Session>();
+        private static List<SessionPlayer> sessionPlayers = new List<SessionPlayer>();
+        private static List<SessionQuestion> sessionQuestions = new List<SessionQuestion>();
+        private static List<SessionScore> sessionScores = new List<SessionScore>();
+
+
 
     public static string GenerateSessionCode()
     {
@@ -73,10 +75,10 @@ namespace ConsoleApp1.Services
 
 
 
-    public static void SaveScore(int playerId, int sessionId, int score, int timeRemaining = 0)
-    {
-      sessionScores.Add(new SessionScore(playerId, sessionId, score, timeRemaining));
-    }
+        public static void SaveScore(int playerId, int sessionId, int score, int timeRemaining = 0)
+        {
+            sessionScores.Add(new SessionScore(playerId, sessionId, score, timeRemaining));
+        }
 
     public static SessionScore GetPlayerScore(int playerId, int sessionId)
     {
@@ -142,15 +144,15 @@ namespace ConsoleApp1.Services
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
         var url = $"http://localhost:5010/api/sessions/session";
 
-        var request = new CreateSessionRequest
-        {
-          category = category,
-          questionsCount = questionsCount,
-          startDate = startDate,
-          sessionDuration = sessionDuration
-        };
-        var json = JsonSerializer.Serialize(request);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var request = new CreateSessionRequest
+                {
+                    category = category,
+                    questionsCount = questionsCount,
+                    startDate = startDate,
+                    sessionDuration = sessionDuration
+                };
+                var json = JsonSerializer.Serialize(request);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await _httpClient.PostAsync(url, content);
         response.EnsureSuccessStatusCode();
@@ -172,12 +174,12 @@ namespace ConsoleApp1.Services
       }
     }
 
-    public static async Task JoinSessionAsync(string sessionCode)
-    {
-      try
-      {
-        string jwt = Helper.GetStoredToken();
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        public static async Task JoinSessionAsync(string sessionCode)
+        {
+            try
+            {
+                string jwt = Helper.GetStoredToken();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         var handler = new JwtSecurityTokenHandler();
         var token = handler.ReadJwtToken(jwt);
@@ -195,9 +197,9 @@ namespace ConsoleApp1.Services
 
 
 
-        var url = "http://localhost:5010/api/sessions";
-        HttpResponseMessage response = await _httpClient.PostAsync(url, content);
-        string responseContent = await response.Content.ReadAsStringAsync();
+                var url = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions";
+                HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+                string responseContent = await response.Content.ReadAsStringAsync();
 
         if (response.IsSuccessStatusCode)
         {

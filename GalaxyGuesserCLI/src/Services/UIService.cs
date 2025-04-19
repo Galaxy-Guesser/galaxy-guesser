@@ -1,8 +1,10 @@
 using Spectre.Console;
+using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using ConsoleApp1.Models;
 using System.Text;
+using ConsoleApp1.Services;
 
 namespace ConsoleApp1.Services
 {
@@ -18,62 +20,102 @@ namespace ConsoleApp1.Services
             ("quit", "Exit the application")
         };
 
-    public static void ShowHowToPlay()
+        public static void ShowHowToPlay()
+{
+    AnsiConsole.Clear();
+    PrintGalaxyHeader();
+
+    AnsiConsole.Write(
+        new FigletText("HOW TO PLAY")
+         
+            .Color(Color.Cyan1));
+    
+    AnsiConsole.Write(
+        new FigletText("GALAXY QUIZ")
+         
+            .Color(Color.MediumPurple2));
+
+    // Create a grid layout for the instructions
+    var grid = new Grid()
+        .AddColumn(new GridColumn().PadRight(1))
+        .AddColumn(new GridColumn().PadLeft(1))
+        .AddRow();
+
+    // Left column - instruction steps
+    var leftPanel = new Panel(
+        new Rows(
+            new Markup("[bold cyan]1️⃣ CREATE OR JOIN A SESSION[/]"),
+            new Text("• Create a new quiz session by selecting a category,"),
+            new Text("  question count, and time limit"),
+            new Text("• Join existing sessions with a session code"),
+            new Markup("\n[bold cyan]2️⃣ ANSWER THE QUESTIONS[/]"),
+            new Text("• Multiple-choice answers (A, B, C, D)"),
+            new Text("• Select answers quickly for bonus points"),
+            new Text("• Correct answers earn base points"),
+            new Markup("\n[bold cyan]3️⃣ SCORING SYSTEM[/]"),
+            new Text("• 1 point for each correct answer"),
+            new Text("• 1 bonus point per second remaining"),
+            new Text("• Final score = correct + time bonus")
+        ))
     {
-      Console.Clear();
-      PrintGalaxyHeader();
+        Border = BoxBorder.Rounded,
+        BorderStyle = new Style(Color.Cyan1),
+        Padding = new Padding(1, 1, 1, 1)
+    };
 
-      Console.ForegroundColor = ConsoleColor.Cyan;
-      Console.WriteLine("\n🚀 HOW TO PLAY GALAXY QUIZ");
-      Console.ResetColor();
-
-      Console.WriteLine("\n1️⃣ CREATE OR JOIN A SESSION");
-      Console.WriteLine("   • Create a new quiz session by selecting a category, question count, and time limit");
-      Console.WriteLine("   • Or join an existing session by entering the session code provided by another player");
-
-      Console.WriteLine("\n2️⃣ ANSWER THE QUESTIONS");
-      Console.WriteLine("   • Each question has multiple-choice answers (A, B, C, D)");
-      Console.WriteLine("   • Press the letter key corresponding to your answer");
-      Console.WriteLine("   • Answer correctly to earn points");
-      Console.WriteLine("   • Answer quickly to earn time bonus points (quicker = more bonus points)");
-
-      Console.WriteLine("\n3️⃣ SCORING SYSTEM");
-      Console.WriteLine("   • 1 point for each correct answer");
-      Console.WriteLine("   • Bonus points for remaining time (1 point per second)");
-      Console.WriteLine("   • Final score = correct answers + time bonus");
-
-      Console.WriteLine("\n4️⃣ LEADERBOARDS");
-      Console.WriteLine("   • Compare your scores with other players");
-      Console.WriteLine("   • View your statistics and session history");
-
-      Console.WriteLine("\n5️⃣ COMMANDS");
-      Console.WriteLine("   • Use commands like '/help', '/categories', '/sessions' anytime");
-      Console.WriteLine("   • Type the command starting with '/' at any input prompt");
-
-      Console.ForegroundColor = ConsoleColor.Yellow;
-      Console.WriteLine("\n🌟 TIPS 🌟");
-      Console.ResetColor();
-      Console.WriteLine("• The faster you answer correctly, the more points you earn");
-      Console.WriteLine("• Study the different categories to improve your knowledge");
-      Console.WriteLine("• Create sessions with friends and compete for high scores");
-    }
-
-
-    public static void PrintGalaxyHeader()
+    // Right column - more instructions
+    var rightPanel = new Panel(
+        new Rows(
+            new Markup("[bold cyan]4️⃣ LEADERBOARDS[/]"),
+            new Text("• Compare scores with other players"),
+            new Text("• View your statistics and history"),
+            new Markup("\n[bold cyan]5️⃣ COMMANDS[/]"),
+            new Text("• /help - Show available commands"),
+            new Text("• /categories - List categories"),
+            new Text("• /sessions - Active sessions"),
+            new Markup("\n[bold yellow]🌟 TIPS 🌟[/]"),
+            new Text("• Faster answers = more points"),
+            new Text("• Study categories to improve"),
+            new Text("• Compete with friends")
+        ))
     {
-      Console.Clear();
+        Border = BoxBorder.Rounded,
+        BorderStyle = new Style(Color.MediumPurple2),
+        Padding = new Padding(1, 1, 1, 1)
+    };
 
-      string[] galaxyTitle = new string[]
-      {
-        @"   ___________________________________________________________",
-        @"  /    _____       _             _   _        _               \",
-        @" |    / ____|     | |           | | (_)      | |               |",
-        @" |   | |  __  __ _| | __ ___  __| |_ _  ___  | |__             |",
-        @" |   | | |_ |/ _` | |/ _` \ \/ /| __| |/ __| | '_ \            |",
-        @" |   | |__| | (_| | | (_| |>  < | |_| | (__  | | | |           |",
-        @" |    \_____|\__,_|_|\__,_/_/\_\ \__|_|\___| |_| |_|           |",
-        @"  \___________________________________________________________/",
-      };
+    // Add panels to grid
+    grid.AddRow(leftPanel, rightPanel);
+
+    // Render the grid
+    AnsiConsole.Write(grid);
+
+    // Footer with decorative elements
+    AnsiConsole.WriteLine();
+    AnsiConsole.Write(new Rule("[yellow]Press any key to continue...[/]")
+        .RuleStyle("grey dim"));
+}
+
+       
+public static void PrintGalaxyHeader()
+{
+    Console.Clear();
+
+    
+    string[] galaxyTitle = new string[]
+    {
+        @"   ╔═══════════════════════════════════════════════════════════╗",
+        @"   ║                                                           ║",
+        @"   ║   ██████╗  █████╗ ██╗  ██╗ ██████╗  ██████╗ ████████╗    ║",
+        @"   ║  ██╔════╝ ██╔══██╗██║  ██║██╔═══██╗██╔═══██╗╚══██╔══╝    ║",
+        @"   ║  ██║  ███╗███████║███████║██║   ██║██║   ██║   ██║       ║",
+        @"   ║  ██║   ██║██╔══██║██╔══██║██║   ██║██║   ██║   ██║       ║",
+        @"   ║  ╚██████╔╝██║  ██║██║  ██║╚██████╔╝╚██████╔╝   ██║       ║",
+        @"   ║   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝       ║",
+        @"   ║                                                           ║",
+        @"   ╚═══════════════════════════════════════════════════════════╝",
+    };
+
 
       // Display main title with color gradient
       DisplayColorGradient(galaxyTitle, ConsoleColor.DarkMagenta, ConsoleColor.Cyan);
@@ -98,36 +140,30 @@ namespace ConsoleApp1.Services
       Console.WriteLine();
     }
 
-    // Displays text with a color gradient effect
-    private static void DisplayColorGradient(string[] text, ConsoleColor startColor, ConsoleColor endColor)
+private static void DisplayColorGradient(string[] text, ConsoleColor startColor, ConsoleColor endColor)
+{
+    ConsoleColor originalFg = Console.ForegroundColor;
+    
+    ConsoleColor[] gradientColors = new ConsoleColor[]
     {
-      // Preserve original colors
-      ConsoleColor originalFg = Console.ForegroundColor;
-
-      // Define colors for gradient (can be expanded)
-      ConsoleColor[] gradientColors = new ConsoleColor[]
-      {
         startColor,
         ConsoleColor.Magenta,
         ConsoleColor.Blue,
         ConsoleColor.Cyan,
         endColor
-      };
-
-      // Display each line with appropriate color
-      for (int i = 0; i < text.Length; i++)
-      {
-        // Calculate which color to use based on position
+    };
+    
+    for (int i = 0; i < text.Length; i++)
+    {
         int colorIndex = (int)Math.Floor((double)i / text.Length * gradientColors.Length);
         if (colorIndex >= gradientColors.Length) colorIndex = gradientColors.Length - 1;
 
         Console.ForegroundColor = gradientColors[colorIndex];
         Console.WriteLine(text[i]);
-      }
-
-      // Reset color
-      Console.ForegroundColor = originalFg;
     }
+    
+    Console.ForegroundColor = originalFg;
+}
 
     public static void ShowHelp(Dictionary<string, string> COMMANDS)
     {
@@ -216,43 +252,38 @@ namespace ConsoleApp1.Services
       Console.WriteLine($"⏱ Time Bonus: {timeBonus} points");
       Console.WriteLine($"🏆 Total Score: {score + timeBonus} points\n");
 
-      // Get leaderboard
-      Console.WriteLine("🏆 Leaderboard:");
-      var leaderboard = SessionService.GetSessionLeaderboard(session.Id, AuthenticationService.GetAllPlayers());
-
-      for (int i = 0; i < leaderboard.Count; i++)
-      {
-        var entry = leaderboard[i];
-        Console.WriteLine($"{i + 1}. {entry.Name}: {entry.Score} correct + {entry.TimeBonus} time bonus = {entry.Total} points");
-      }
+            Console.WriteLine("🏆 Leaderboard:");
+            var leaderboard = SessionService.GetSessionLeaderboard(session.Id, AuthenticationService.GetAllPlayers());
+            
+            for (int i = 0; i < leaderboard.Count; i++)
+            {
+                var entry = leaderboard[i];
+                Console.WriteLine($"{i+1}. {entry.Name}: {entry.Score} correct + {entry.TimeBonus} time bonus = {entry.Total} points");
+            }
 
       Console.ResetColor();
     }
 
-    internal static void UpdateTimerOnly(int row, int secondsRemaining, int totalSeconds)
-    {
-      int originalRow = Console.CursorTop;
-      int originalCol = Console.CursorLeft;
-
-      // Move to timer position
-      Console.SetCursorPosition(0, row);
-
-      // Calculate bar width
-      int barWidth = Console.WindowWidth - 20;
-      int filledWidth = (int)((double)secondsRemaining / totalSeconds * barWidth);
-
-      // Update timer with appropriate color
-      Console.ForegroundColor = secondsRemaining > 10 ? ConsoleColor.Green :
-                              secondsRemaining > 5 ? ConsoleColor.Yellow : ConsoleColor.Red;
-      Console.Write($"⏱ Time: {secondsRemaining}s [");
-      Console.Write(new string('■', filledWidth));
-      Console.Write(new string('□', barWidth - filledWidth));
-      Console.Write("]");
-      Console.ResetColor();
-
-      // Move cursor back to original position
-      Console.SetCursorPosition(originalCol, originalRow);
-    }
+        internal static void UpdateTimerOnly(int row, int secondsRemaining, int totalSeconds)
+        {
+            int originalRow = Console.CursorTop;
+            int originalCol = Console.CursorLeft;
+            
+            Console.SetCursorPosition(0, row);
+            
+            int barWidth = Console.WindowWidth - 20;
+            int filledWidth = (int)((double)secondsRemaining / totalSeconds * barWidth);
+            
+            Console.ForegroundColor = secondsRemaining > 10 ? ConsoleColor.Green : 
+                                    secondsRemaining > 5 ? ConsoleColor.Yellow : ConsoleColor.Red;
+            Console.Write($"⏱ Time: {secondsRemaining}s [");
+            Console.Write(new string('■', filledWidth));
+            Console.Write(new string('□', barWidth - filledWidth));
+            Console.Write("]");
+            Console.ResetColor();
+            
+            Console.SetCursorPosition(originalCol, originalRow);
+        }
 
     public static async Task DisplayActiveSessionsAsync(List<SessionView> sessions)
     {
@@ -345,57 +376,175 @@ namespace ConsoleApp1.Services
       Continue();
     }
 
-    public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
-    {
-      if (questions.Count == 0)
-      {
-        AnsiConsole.MarkupLine("[grey]No questions found for this session.[/]");
-        return;
-      }
-
-      foreach (var question in questions)
-      {
-        AnsiConsole.Clear();
-
-        // Display question + options in card
-        var questionPanel = new Panel(BuildQuestionMarkup(question))
+        public static async Task DisplaySessionQuestionsAsync(List<SessionQuestionView> questions)
         {
-          Border = BoxBorder.Rounded,
-          Padding = new Padding(1, 0, 1, 0),
-          Header = new PanelHeader($"[bold green]Question {question.questionId}[/]", Justify.Center)
-        };
+            if (questions.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[grey]No questions found for this session.[/]");
+                return;
+            }
 
-        AnsiConsole.Write(questionPanel);
+            // Track the total score throughout the session
+            int currentTotalScore = 0;
 
-        var prompt = new SelectionPrompt<string>()
-            .Title("\n[bold]Select your answer:[/]")
-            .HighlightStyle("cyan");
+            foreach (var question in questions)
+            {
+                AnsiConsole.Clear();
+                var questionPanel = new Panel(BuildQuestionMarkup(question))
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 0, 1, 0),
+                    Header = new PanelHeader($"[bold green]Question {question.questionId}[/]", Justify.Center)
+                };
 
-        var optionMap = new Dictionary<string, Option>();
+                AnsiConsole.Write(questionPanel);
+                
+                DisplayTotalScorePanel(currentTotalScore);
 
-        for (int i = 0; i < question.options.Count; i++)
-        {
-          var label = $"{i + 1}. {question.options[i].optionText}";
-          prompt.AddChoice(label);
-          optionMap[label] = question.options[i];
+                var stopwatch = Stopwatch.StartNew();
+                var timeLimit = 30; 
+                var promptCts = new CancellationTokenSource();
+                
+                var timeRemaining = timeLimit;
+                
+                var timerTask = Task.Run(async () => 
+                {
+                    try 
+                    {
+                        int timerLeft = 25; 
+                        int timerTop = Console.CursorTop;
+                        
+                        while (timeRemaining > 0 && !promptCts.Token.IsCancellationRequested)
+                        {
+                            int currentLeft = Console.CursorLeft;
+                            int currentTop = Console.CursorTop;
+                            
+                            Console.SetCursorPosition(timerLeft, timerTop);
+                            Console.ForegroundColor = timeRemaining <= 5 ? ConsoleColor.Red : ConsoleColor.Yellow;
+                            Console.Write($"[{timeRemaining.ToString().PadLeft(2, '0')} seconds]");
+                            Console.ResetColor();
+                            
+                            Console.SetCursorPosition(currentLeft, currentTop);
+                            
+                            await Task.Delay(1000, promptCts.Token);
+                            timeRemaining--;
+                        }
+                        
+                        if (timeRemaining <= 0 && !promptCts.Token.IsCancellationRequested)
+                        {
+                            promptCts.Cancel();
+                        }
+                    }
+                    catch (OperationCanceledException) 
+                    {
+                        // Task was canceled, simply exit
+                    }
+                });
+
+                try
+                {
+                    await Task.Delay(200);
+                    
+                    var prompt = new SelectionPrompt<string>()
+                        .Title("\n\n[bold]Select your answer:[/]") 
+                        .HighlightStyle("cyan");
+
+                    foreach (var (option, index) in question.options.Select((o, i) => (o, i)))
+                    {
+                        prompt.AddChoice($"{index + 1}. {option.optionText}");
+                    }
+
+                    var selectedLabel = await AnsiConsole.PromptAsync(prompt, promptCts.Token);
+                    stopwatch.Stop();
+                    
+                    promptCts.Cancel();
+                    
+                    try
+                    {
+                        await Task.WhenAll(timerTask);
+                    }
+                    catch { }
+
+                    var selectedOption = question.options[int.Parse(selectedLabel.Split('.')[0]) - 1];
+                    bool isCorrect = selectedOption.answerId == question.correctAnswerId;
+
+                    // Find the correct answer to display
+                    var correctOption = question.options.First(o => o.answerId == question.correctAnswerId);
+
+                    if (isCorrect)
+                    {
+                        AnsiConsole.MarkupLine("\n[green]✔ Correct![/]");
+                        int elapsedTime = (int)Math.Round(stopwatch.Elapsed.TotalSeconds);
+                        var totalScore = await SessionScores.UpdatePlayerScores(question.sessionId,timeLimit - elapsedTime);
+                        
+                        currentTotalScore = totalScore.NewTotalScore;
+                        
+                        DisplayTotalScorePanel(currentTotalScore);
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine($"\n[red]✘ Incorrect.[/]");
+                        AnsiConsole.MarkupLine($"[green]The correct answer was:[/] [bold green]{Array.FindIndex(question.options.ToArray(), o => o.answerId == question.correctAnswerId) + 1}. {correctOption.optionText}[/]");
+                    }
+
+                    AnsiConsole.MarkupLine($"[blue]Time taken: {stopwatch.Elapsed.TotalSeconds:F2} seconds[/]");
+                }
+                catch (TaskCanceledException)
+                {
+                    stopwatch.Stop();
+                    
+                    if (!promptCts.IsCancellationRequested)
+                    {
+                        promptCts.Cancel();
+                    }
+                    
+                    try
+                    {
+                        await Task.WhenAll(timerTask);
+                    }
+                    catch { }
+
+                    AnsiConsole.MarkupLine("\n[red]Time's up! Moving to next question...[/]");
+                    AnsiConsole.MarkupLine($"[blue]Time taken: {stopwatch.Elapsed.TotalSeconds:F2} seconds[/]");
+                }
+
+                await Task.Delay(2000);
+            }
+
+            AnsiConsole.MarkupLine("[bold green]✅ All questions completed[/]");
         }
 
-        var selectedLabel = AnsiConsole.Prompt(prompt);
-        var selectedOption = optionMap[selectedLabel];
-
-        bool isCorrect = selectedOption.answerId == question.correctAnswerId;
-        var resultColor = isCorrect ? "green" : "red";
-        var resultText = isCorrect ? "✔ Correct!" : "✘ Incorrect.";
-
-        AnsiConsole.MarkupLine($"\n[{resultColor}]{resultText}[/]");
-        await Task.Delay(2000);
-      }
-
-      AnsiConsole.Clear();
-      AnsiConsole.MarkupLine("[bold green]✅ All questions completed.[/]");
-    }
-
-    public static async Task DisplayPlayerStats(Task<List<PlayerStatsDTO>> data)
+        private static void DisplayTotalScorePanel(int totalScore)
+        {
+            int originalTop = Console.CursorTop;
+            int originalLeft = Console.CursorLeft;
+            
+            int leftPosition = 0;
+            int bottomPosition = Console.WindowHeight - 6; 
+            
+            Console.SetCursorPosition(leftPosition, bottomPosition);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("┌─────────────────┐");
+            Console.SetCursorPosition(leftPosition, bottomPosition + 1);
+            Console.WriteLine("│  TOTAL SCORE    │");
+            Console.SetCursorPosition(leftPosition, bottomPosition + 2);
+            Console.WriteLine("└─────────────────┘");
+            Console.SetCursorPosition(leftPosition, bottomPosition + 3);
+            Console.WriteLine($"    {totalScore} points    ");
+            Console.ResetColor();
+            
+            Console.SetCursorPosition(originalLeft, originalTop);
+        }
+        private static string BuildQuestionMarkup(SessionQuestionView question)
+        {
+            var markup = $"[bold underline]{question.questionText}[/]\n\n";
+            for (int i = 0; i < question.options.Count; i++)
+            {
+                markup += $"[blue]{i + 1}.[/] {question.options[i].optionText}\n";
+            }
+            return markup;
+        }
+        public static async Task DisplayPlayerStats(Task<List<PlayerStatsDTO>> data)
     {
       try
       {
@@ -450,117 +599,5 @@ namespace ConsoleApp1.Services
         AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
       }
 }
-
-
-
-private static string BuildQuestionMarkup(SessionQuestionView question)
-{
-  var markup = $"[bold underline]{question.questionText}[/]\n\n";
-
-  for (int i = 0; i < question.options.Count; i++)
-  {
-    markup += $"[blue]{i + 1}.[/] {question.options[i].optionText}\n";
-  }
-
-  return markup;
-}
-
-/// <summary>
-/// Displays a loading indicator with the specified message
-/// </summary>
-/// <param name="message">Message to display while loading</param>
-public static void ShowLoader(string message)
-{
-  int originalTop = Console.CursorTop;
-  int originalLeft = Console.CursorLeft;
-
-  // Save current console colors
-  ConsoleColor originalFg = Console.ForegroundColor;
-  ConsoleColor originalBg = Console.BackgroundColor;
-
-  // Create loading indicator line
-  Console.ForegroundColor = ConsoleColor.Cyan;
-  Console.Write($"\r🔄 {message}");
-
-  // Store the position info in static variables so HideLoader can access them
-  loaderActive = true;
-  loaderPosition = (Console.CursorLeft, Console.CursorTop);
-  loaderMessage = message;
-
-  // Reset colors
-  Console.ForegroundColor = originalFg;
-  Console.BackgroundColor = originalBg;
-
-  // Start animation task if not already running
-  if (loaderTask == null || loaderTask.IsCompleted)
-  {
-    loaderTask = StartLoaderAnimationAsync();
-  }
-}
-
-/// <summary>
-/// Hides the active loading indicator
-/// </summary>
-public static void HideLoader()
-{
-  // Stop the animation
-  loaderActive = false;
-
-  // Clear the loader line if it was displayed
-  if (loaderPosition.HasValue)
-  {
-    int currentTop = Console.CursorTop;
-    int currentLeft = Console.CursorLeft;
-
-    Console.SetCursorPosition(0, loaderPosition.Value.Top);
-    Console.Write(new string(' ', loaderMessage.Length + 10)); // Clear the line with spaces
-
-    // Reset cursor position
-    Console.SetCursorPosition(currentLeft, currentTop);
-
-    // Reset loader state
-    loaderPosition = null;
-    loaderMessage = string.Empty;
-  }
-}
-
-// Add these fields to the UIService class
-private static bool loaderActive = false;
-private static (int Left, int Top)? loaderPosition = null;
-private static string loaderMessage = string.Empty;
-private static Task loaderTask = null;
-
-/// <summary>
-/// Handles the loader animation
-/// </summary>
-private static async Task StartLoaderAnimationAsync()
-{
-  string[] animationFrames = new[] { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
-  int frameIndex = 0;
-
-  while (loaderActive)
-  {
-    if (loaderPosition.HasValue)
-    {
-      int currentTop = Console.CursorTop;
-      int currentLeft = Console.CursorLeft;
-
-      Console.SetCursorPosition(0, loaderPosition.Value.Top);
-
-      ConsoleColor originalFg = Console.ForegroundColor;
-      Console.ForegroundColor = ConsoleColor.Cyan;
-
-      Console.Write($"\r{animationFrames[frameIndex]} {loaderMessage}");
-
-      Console.ForegroundColor = originalFg;
-      Console.SetCursorPosition(currentLeft, currentTop);
-
-      frameIndex = (frameIndex + 1) % animationFrames.Length;
     }
-
-    await Task.Delay(100); // Update animation every 100ms
-  }
-}
-
-  }
 }

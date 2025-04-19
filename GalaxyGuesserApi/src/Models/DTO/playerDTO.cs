@@ -1,4 +1,4 @@
-namespace GalaxyGuesserApi.Models
+namespace GalaxyGuesserApi.Models.DTO
 {
     public class PlayerDTO
     {

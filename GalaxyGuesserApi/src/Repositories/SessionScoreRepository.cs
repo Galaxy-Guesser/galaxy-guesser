@@ -15,7 +15,7 @@ namespace GalaxyGuesserApi.Repositories
 
 
 
-        public async Task<int?> GetPlayerScoreAsync(int playerId, int sessionId)
+        public async Task<int?> GetPlayerScoreAsync(int? playerId, int sessionId)
         {
             var result = await _dbContext.QueryAsync<int>(
                 "SELECT score FROM SessionScores WHERE player_id = @playerId AND session_id = @sessionId",
@@ -36,7 +36,7 @@ namespace GalaxyGuesserApi.Repositories
                 TotalScore: totalScore);
         }
 
-        public async Task UpdatePlayerScoreAsync(int playerId, int sessionId, int points)
+        public async Task UpdatePlayerScoreAsync(int? playerId, int sessionId, int points)
         {
             await _dbContext.ExecuteNonQueryAsync(
                 "UPDATE SessionScores SET score = score + @points WHERE player_id = @playerId AND session_id = @sessionId",

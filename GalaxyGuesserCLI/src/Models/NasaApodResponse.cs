@@ -1,4 +1,4 @@
-namespace GalaxyGuesserCLI.Models
+namespace ConsoleApp1.Models
 {
     public class NasaApodResponse
     {

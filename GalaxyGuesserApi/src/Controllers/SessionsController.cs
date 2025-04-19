@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
 using System.Security.Claims;
-using GalaxyGuesserApi.Services.Interfaces; 
+using GalaxyGuesserApi.Services.Interfaces;
+using GalaxyGuesserApi.Models.DTO;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -50,20 +51,6 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<SessionDTO>>> GetSessions()
-        {
-            try
-            {
-                var sessions = await _sessionService.GetAllSessionsAsync();
-                return Ok(sessions);
-                
-            }catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error {ex.Message}"); 
-            }
-        }
-
         [HttpPost]
         public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest request)
         {
@@ -78,6 +65,20 @@ namespace GalaxyGuesserApi.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Join failed: {ex.Message}");
+            }
+        }
+
+         [HttpGet]
+        public async Task<ActionResult<IEnumerable<SessionView>>> GetAllActiveSessions()
+        {
+            try
+            {
+                var sessions = await _sessionService.GetAllActiveSessions();
+                return Ok(sessions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }
