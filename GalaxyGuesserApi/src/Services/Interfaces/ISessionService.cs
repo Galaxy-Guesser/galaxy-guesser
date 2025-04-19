@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using GalaxyGuesserApi.Models.DTO;
 using GalaxyGuesserApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,5 +13,7 @@ namespace GalaxyGuesserApi.Services.Interfaces
         Task UpdateSessionAsync(SessionDTO session);
         void DeleteSessionAsync(string session_code);
         Task JoinSessionAsync(string sessionCode, string playerGuid);
+        Task<List<SessionView>> GetAllActiveSessions();  
     }
+   
 }

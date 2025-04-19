@@ -65,7 +65,6 @@ builder.Services.AddSingleton<DatabaseContext>();
 
 builder.Services.AddScoped<IPlayerRepository,PlayerRepository>();
 builder.Services.AddScoped<ISessionRepository,SessionRepository>();
-builder.Services.AddScoped<ISessionViewRepository, SessionViewRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<ISessionScoreRepository, SessionScoreRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -76,7 +75,6 @@ builder.Services.AddScoped<ISessionQuestionViewRepository, SessionQuestionViewRe
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<SessionScoreService>();
 builder.Services.AddScoped<IPlayerService,PlayerService>();
-builder.Services.AddScoped<ISessionViewService,SessionViewService>();
 builder.Services.AddScoped<SessionQuestionsViewService>();
 builder.Services.AddScoped<IQuestionService,QuestionService>();
 builder.Services.AddScoped<CategoryService>();

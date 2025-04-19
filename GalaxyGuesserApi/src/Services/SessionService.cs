@@ -1,3 +1,4 @@
+using GalaxyGuesserApi.Models.DTO;
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using GalaxyGuesserApi.Services.Interfaces;
@@ -22,6 +23,11 @@ namespace GalaxyGuesserApi.Services
         public async Task<ActionResult<SessionDTO>> GetSessionAsync(string session_code)
         {
             return await _sessionRepository.GetSessionByCodeAsync(session_code);
+        }
+
+        public async Task<List<SessionView>> GetAllActiveSessions()
+        {
+            return await _sessionRepository.GetAllActiveSessions();
         }
 
         public async Task<List<SessionDTO>> GetAllSessionsAsync() {
