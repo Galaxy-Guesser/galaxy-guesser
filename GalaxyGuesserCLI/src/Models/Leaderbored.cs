@@ -17,7 +17,6 @@ namespace GalaxyGuesserCLI.Models
             public string UserName { get; set; } = string.Empty;
             public int TotalScore { get; set; }
             public int SessionsPlayed { get; set; }
-            public decimal AverageScore { get; set; }
             public int Rank { get; set; }
             public List<string> Sessions { get; set; } = new List<string>();
         }

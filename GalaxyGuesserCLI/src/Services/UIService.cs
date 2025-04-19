@@ -509,7 +509,7 @@ private static async Task StartLoaderAnimationAsync()
 
         public static async Task DisplayGlobalLeaderboard()
         {
-            try
+             try
             {
                 AnsiConsole.Status()
                     .Start("Loading global leaderboard...", ctx => 
@@ -519,12 +519,6 @@ private static async Task StartLoaderAnimationAsync()
                     });
 
                 var leaderboard = await LeaderboardService.GetGlobalLeaderboardAsync();
-                
-                AnsiConsole.MarkupLine("[yellow]DEBUG:[/] Received leaderboard entries: " + leaderboard.Count);
-                foreach (var entry in leaderboard.Take(3))
-                {
-                    AnsiConsole.MarkupLine($"[yellow]DEBUG:[/] {entry.Rank}. {entry.UserName} - {entry.TotalScore}");
-                }
 
                 AnsiConsole.Clear();
                 UIService.PrintGalaxyHeader();
@@ -540,7 +534,7 @@ private static async Task StartLoaderAnimationAsync()
 
                 if (leaderboard.Count == 0)
                 {
-                    table.AddRow("[red]No data available[/]", "", "", "", "");
+                    table.AddRow("[red]No data available[/]", "", "", "");
                 }
                 else
                 {
@@ -569,7 +563,6 @@ private static async Task StartLoaderAnimationAsync()
             catch (Exception ex)
             {
                 AnsiConsole.MarkupLine("[red]Error loading leaderboard:[/] " + ex.Message);
-                AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
             }
         }
 
