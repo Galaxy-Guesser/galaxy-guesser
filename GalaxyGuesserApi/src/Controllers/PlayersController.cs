@@ -154,7 +154,7 @@ namespace GalaxyGuesserApi.Controllers
                     return Forbid();
                 }
 
-                var updated = await _playerService.UpdatePlayerAsync(playerId, request.UserName);
+                var updated = await _playerService.UpdatePlayerUsernameAsync(playerId, request.UserName);
 
                 if (!updated)
                 {
@@ -259,5 +259,5 @@ namespace GalaxyGuesserApi.Controllers
         return StatusCode(500, $"Error: {ex.Message}");
       }
     }
-    
-}
+    }
+    }

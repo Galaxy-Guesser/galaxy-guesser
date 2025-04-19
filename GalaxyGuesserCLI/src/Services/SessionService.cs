@@ -240,7 +240,7 @@ namespace ConsoleApp1.Services
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var url = $"http://localhost:5010/api/players/2";
+        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/{playerId}";
         HttpResponseMessage response = await _httpClient.PutAsync(url, content);
         string responseContent = await response.Content.ReadAsStringAsync();
 
@@ -266,7 +266,7 @@ namespace ConsoleApp1.Services
     {
       try
       {
-        var url = $"http://localhost:5010/api/players/2/stats";
+        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/{playerId}/stats";
         HttpResponseMessage response = await _httpClient.GetAsync(url);
         string responseContent = await response.Content.ReadAsStringAsync();
         //response.EnsureSuccessStatusCode();
