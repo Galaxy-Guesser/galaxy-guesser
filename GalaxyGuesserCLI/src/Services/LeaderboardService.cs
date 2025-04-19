@@ -7,7 +7,7 @@ namespace GalaxyGuesserCLI.Services
     public static class LeaderboardService
     {
         private static readonly HttpClient _httpClient = new HttpClient();
-        private const string BaseUrl = "http://localhost:5010/api/leaderboard";
+        private const string BaseUrl = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/leaderboard";
 
         public static async Task<List<GlobalLeaderboardEntry>> GetGlobalLeaderboardAsync()
         {
