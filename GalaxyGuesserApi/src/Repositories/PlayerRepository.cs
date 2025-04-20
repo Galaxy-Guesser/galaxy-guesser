@@ -139,23 +139,7 @@ namespace GalaxyGuesserApi.Repositories
 
     public async Task<List<PlayerStatsDTO>> GetPlayersStats(int playerId)
     {
-      const string sql = @"SELECT DISTINCT ON (sessions.session_code)
-    sessions.session_code,
-    c.category,
-    s.score,
-    RANK() OVER (PARTITION BY s.session_id ORDER BY s.score DESC) AS rank,
-    MAX(s.score) OVER () AS overall_highest_score,
-    total.total_sessions
-FROM sessions
-LEFT JOIN categories c ON sessions.category_id = c.category_id
-LEFT JOIN players p ON sessions.created_by = p.player_id
-LEFT JOIN sessionscores s ON sessions.session_id = s.session_id
-CROSS JOIN (
-    SELECT COUNT(*) AS total_sessions FROM sessions
-) AS total
-WHERE s.player_id = @playerId
-ORDER BY sessions.session_code, s.score DESC
-		  ";
+      const string sql = @"SELECT * FROM player_stats_view WHERE player_id=@playerId)";
 
       var parameters = new Dictionary<string, object> { { "@playerId", playerId } };
 
