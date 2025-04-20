@@ -230,6 +230,9 @@ namespace GalaxyGuesserCLI.Services
     {
       try
       {
+        string jwt = Helper.GetStoredToken();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
         var requestBody = new Player
         {
           playerId = playerId,
@@ -243,20 +246,17 @@ namespace GalaxyGuesserCLI.Services
         var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/{playerId}";
         HttpResponseMessage response = await _httpClient.PutAsync(url, content);
         string responseContent = await response.Content.ReadAsStringAsync();
-        response.EnsureSuccessStatusCode();
 
         if (!response.IsSuccessStatusCode)
         {
           Console.WriteLine($"{requestBody}");
           Console.WriteLine($"{await response.Content.ReadAsStringAsync()}");
         }
-        //var updatedPlayer = await authService.GetPlayerById(player.playerId);
-        //player.userName = updatedPlayer.userName;
       }
       catch (Exception ex)
       {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"❌ Unexpected error: {ex.Message} YOUR ERROR HERE");
+        Console.WriteLine($"❌ Unexpected error: {ex.Message}");
         Console.WriteLine(ex.ToString());
       }
     }
@@ -265,10 +265,13 @@ namespace GalaxyGuesserCLI.Services
     {
       try
       {
+        string jwt = Helper.GetStoredToken();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
         var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/{playerId}/stats";
         HttpResponseMessage response = await _httpClient.GetAsync(url);
         string responseContent = await response.Content.ReadAsStringAsync();
-        //response.EnsureSuccessStatusCode();
+        response.EnsureSuccessStatusCode();
 
         if (!response.IsSuccessStatusCode)
         {
