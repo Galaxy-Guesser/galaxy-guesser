@@ -1,8 +1,6 @@
-using System;
-
-namespace GalaxyGuesserApi.Models
+namespace GalaxyGuesserCLI.Models
 {
-    public class Session
+    public class SessionModel
     {
         public int sessionId { get; set; }
         public required string sessionCode { get; set; }

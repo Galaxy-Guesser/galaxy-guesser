@@ -100,16 +100,18 @@ public static class SessionUIService
     return new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
 }
 
-  public static async Task<(string category, int questionCount, string startTime, decimal sessionDuration)> PromptSessionDetails()
+  public static async Task<(int categoryId, int questionCount, string startTime, decimal sessionDuration)> PromptSessionDetails()
 {
-    var category = await PromptCategory(); // Await here ✅
+    var category = await PromptCategory();
+    var categories = await CategoryService.GetCategoriesAsync();
+    var selectedCategory = categories.FirstOrDefault(c => c.category == category);
     var questionCount = PromptQuestionCount();
     decimal sessionDuration = (decimal)PromptSessionDuration(questionCount);
     var startTime = PromptStartDateTime();
 
     string formattedStartTime = startTime.ToString("yyyy-MM-ddTHH:mm:ss");
 
-    return (category, questionCount, formattedStartTime, sessionDuration);
+    return (selectedCategory.categoryId, questionCount, formattedStartTime, sessionDuration);
 }
 
 }
