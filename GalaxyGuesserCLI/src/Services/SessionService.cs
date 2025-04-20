@@ -136,10 +136,10 @@ namespace GalaxyGuesserCLI.Services
 
     private static readonly HttpClient _httpClient = new HttpClient();
 
-   public static async Task<string> CreateSessionAsync(int categoryId, int questionsCount, string startDate, decimal sessionDuration)
-{
-    try
+    public static async Task<ApiResponse<SessionModel>> CreateSessionAsync(int categoryId, int questionsCount, string startDate, decimal sessionDuration)
     {
+      try
+      {
         string jwt = Helper.GetStoredToken();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
         var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions";
@@ -163,37 +163,17 @@ namespace GalaxyGuesserCLI.Services
         };
 
         var apiResponse = JsonSerializer.Deserialize<ApiResponse<SessionModel>>(responseBody, options);
-
-        if (apiResponse != null && apiResponse.Success == true)
+        return apiResponse;
+      }
+      catch (Exception ex)
+      {
+        return new ApiResponse<SessionModel>
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"✅ Session created with code : {apiResponse.Data?.sessionCode}");
-            Console.ResetColor();
-            return apiResponse.Data?.sessionCode;
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"⚠️  Failed to create session: {apiResponse?.Message}");
-            if (apiResponse?.Errors != null && apiResponse.Errors.Any())
-            {
-                foreach (var error in apiResponse.Errors)
-                {
-                    Console.WriteLine($"   - {error}");
-                }
-            }
-            Console.ResetColor();
-            return "session creation failed";
-        }
+          Success = false,
+          Message = $"Internal server error: {ex.Message}"
+        };
+      }
     }
-    catch (Exception ex)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"❌ Error creating session: {ex.Message}");
-        Console.ResetColor();
-        return "session creation failed (exception)";
-    }
-}
 
     public static async Task JoinSessionAsync(string sessionCode)
     {
