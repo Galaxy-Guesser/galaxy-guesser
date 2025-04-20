@@ -134,17 +134,12 @@ namespace GalaxyGuesserCLI
 
                 var profileOptions = new Dictionary<string, Func<Task>>
                 {
-                    ["View Profile"] = () => {
-                        CommandService.ProcessCommand("myprofile", player);
-                        return Task.CompletedTask;
-                    },
-
                     ["View Total Stats"] = async () => {
-                        CommandService.ProcessCommand("totalstats", player);
+                        await CommandService.ProcessCommand("totalstats", player);
                     },
 
                     ["Change Username"] = async () => {
-                        CommandService.ProcessCommand("editusername", player);
+                        await CommandService.ProcessCommand("editusername", player);
                     },
 
                     ["↩️ Back to Main Menu"] = () => {

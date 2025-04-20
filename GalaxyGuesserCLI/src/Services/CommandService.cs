@@ -12,7 +12,7 @@ namespace GalaxyGuesserCLI.Services
   {
     public static readonly string CMD_PREFIX = "/";
 
-    internal static void ProcessCommand(string command, Player player)
+    internal static async Task ProcessCommand(string command, Player player)
     {
       switch (command)
       {
@@ -33,10 +33,10 @@ namespace GalaxyGuesserCLI.Services
           ViewMySessionHistory(player);
           break;
         case "editusername":
-          ChangeUsername(player);
+          player.userName = ChangeUsername(player);
           break;
         case "totalstats":
-          ViewTotalStats(player);
+          await ViewTotalStats(player);
           break;
         case "quit":
           Console.WriteLine("\n👋 Thanks for playing Galaxy Quiz! See you among the stars!");
@@ -55,8 +55,6 @@ namespace GalaxyGuesserCLI.Services
       }
     }
 
-
-
     private static void ViewSessions()
     {
       Console.WriteLine("\nThis feature is not yet implemented.");
@@ -74,19 +72,26 @@ namespace GalaxyGuesserCLI.Services
       Console.WriteLine($"GUID: {player.guid}");
     }
 
-    private static void ChangeUsername(Player player)
+    private static string ChangeUsername(Player player)
     {
       var username = AnsiConsole.Prompt(
           new TextPrompt<string>("Enter new username:")
       );
 
       SessionService.ChangeUsername((int)player.playerId, username, player.guid);
+
+      var authService = new AuthenticationService();
+      var updatedPlayer = authService.GetPlayerById(player.playerId);
+
+      AnsiConsole.MarkupLine($"[green]✅ Username successfully changed to: {username}[/]");
+
+      return username;
     }
 
-    public static void ViewTotalStats(Player player)
+    public static async Task ViewTotalStats(Player player)
     {
       var data = SessionService.ViewPlayerStats(player.playerId);
-      UIService.DisplayPlayerStats(data);
+      await UIService.DisplayPlayerStats(data);
     }
 
     private static void ViewMySessionHistory(Player player)
