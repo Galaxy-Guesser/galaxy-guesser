@@ -69,30 +69,24 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SessionView>>> GetAllActiveSessions()
+        public async Task<ActionResult<IEnumerable<SessionView>>> GetAllSessions(bool getActive = false)
         {
             try
             {
-                var sessions = await _sessionService.GetAllActiveSessions();
-                return Ok(sessions);
+                if (getActive)
+                {
+                    var activeSessions = await _sessionService.GetAllActiveSessions();
+                    return Ok(activeSessions);
+                }
+                else
+                {
+                    var allSessions = await _sessionService.GetAllSessionsAsync();
+                    return Ok(allSessions);
+                }
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        [HttpGet("all")] 
-        public async Task<ActionResult<List<SessionDTO>>> GetAllSessions()
-        {
-            try
-            {
-                var sessions = await _sessionService.GetAllSessionsAsync();
-                return Ok(sessions);
-            }
-            catch (Exception ex)
-            {
-                 return StatusCode(500, $"Internal server error: {ex.Message}");   
             }
         }
     }
