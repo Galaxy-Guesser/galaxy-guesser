@@ -95,9 +95,18 @@ namespace GalaxyGuesserApi.Repositories
             await _dbContext.ExecuteNonQueryAsync(sql);
         }
 
-          public async Task<List<SessionView>> GetAllActiveSessions()
+        public async Task<List<SessionView>> GetAllActiveSessions(int loggedInUserId)
         {
-            const string sql = "SELECT * FROM view_active_sessions";
+            const string sql = @"SELECT *
+                        FROM view_active_sessions vas
+                        WHERE NOT EXISTS (
+                         SELECT 1
+                        FROM SessionPlayers sp
+                        WHERE sp.session_id = vas.session_id
+                        AND sp.player_id = @loggedInUserId
+);
+";
+         var parameters = new Dictionary<string, object> { { "@loggedInUserId", loggedInUserId} };
 
             return await _dbContext.QueryAsync(sql, reader => new SessionView
             {
@@ -109,7 +118,7 @@ namespace GalaxyGuesserApi.Repositories
                 questionCount = reader.GetInt32(5),
                 highestScore = reader.IsDBNull(6) ? null : reader.GetInt32(6),
                 endsIn = reader.IsDBNull(7) ? null : reader.GetString(7)
-            });
+            },parameters);
         }
 
         public async Task DeleteSessionAsync(string sessionCode)

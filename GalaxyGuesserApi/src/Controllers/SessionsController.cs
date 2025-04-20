@@ -4,6 +4,7 @@ using GalaxyGuesserApi.Models;
 using System.Security.Claims;
 using GalaxyGuesserApi.Services.Interfaces;
 using GalaxyGuesserApi.Models.DTO;
+using GalaxyGuesserApi.Services;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -15,11 +16,13 @@ namespace GalaxyGuesserApi.Controllers
     {
         private readonly ISessionService _sessionService;
         private readonly IQuestionService _questionService;
+        private readonly IPlayerService _playerService;
 
-        public SessionsController(ISessionService sessionService, IQuestionService questionService)
+        public SessionsController(ISessionService sessionService, IQuestionService questionService, IPlayerService playerService)
         {
             _sessionService = sessionService;
             _questionService = questionService;
+            _playerService = playerService;
         }
 
         [HttpGet("code")]
@@ -100,25 +103,52 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(ApiResponse<SessionView>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<SessionView>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<SessionView>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<SessionView>>> GetAllSessions(bool getActive = false)
         {
-            try
+            var playerGuid = User.FindFirst("sub")?.Value
+                    ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
+            if (playerGuid == null)
             {
-                if (getActive)
-                {
-                    var activeSessions = await _sessionService.GetAllActiveSessions();
-                    return Ok(activeSessions);
-                }
+                return NotFound(ApiResponse<string>.ErrorResponse("User not authenticated"));
+
+            }
+            else
+            {
+
+                Player? player = await _playerService.GetPlayerByGuidAsync(playerGuid);
+                if (player == null)
+                    return Unauthorized(ApiResponse<string>.ErrorResponse("User not authenticated"));
                 else
                 {
-                    var allSessions = await _sessionService.GetAllSessionsAsync();
-                    return Ok(allSessions);
+                    try
+                    {
+                        if (getActive)
+                        {
+                            var activeSessions = await _sessionService.GetAllActiveSessions(player.playerId);
+                            return Ok(activeSessions);
+                        }
+                        else
+                        {
+                            var allSessions = await _sessionService.GetAllSessionsAsync();
+                            return Ok(allSessions);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, $"Internal server error: {ex.Message}");
+                    }
+
+
                 }
+
+
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+
         }
     }
 }
