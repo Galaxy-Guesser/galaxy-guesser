@@ -510,7 +510,7 @@ namespace GalaxyGuesserCLI.Services
       }
 
         AnsiConsole.MarkupLine("[bold green]✅ All questions completed[/]");
-        await DisplaySessionLeaderboard(sessionCode);
+        await DisplayCurrentSessionLeaderboard(sessionCode);
 
         var panel = new Panel(
             Align.Center(
@@ -730,6 +730,48 @@ namespace GalaxyGuesserCLI.Services
         catch (Exception ex)
         {
             AnsiConsole.MarkupLine("[red]Error loading session leaderboard:[/] " + ex.Message);
+        }
+    }
+
+    private static async Task DisplayCurrentSessionLeaderboard(string sessionCode)
+    {
+        try
+        {
+            AnsiConsole.Status()
+                .Start("Loading leaderboard...", ctx => 
+                {
+                    ctx.Spinner(Spinner.Known.Star);
+                    ctx.SpinnerStyle(Style.Parse("blue"));
+                });
+
+            var leaderboard = await LeaderboardService.GetSessionLeaderboardAsync(sessionCode);
+
+            AnsiConsole.Clear();
+            UIService.PrintGalaxyHeader();
+            AnsiConsole.MarkupLine($"\n[bold yellow]🚀 SESSION LEADERBOARD[/]");
+            AnsiConsole.MarkupLine($"[grey]Session: {sessionCode}[/]\n");
+
+            var table = new Table()
+                .Border(TableBorder.Rounded)
+                .BorderColor(Color.Blue)
+                .AddColumn(new TableColumn("[bold]Rank[/]").Centered())
+                .AddColumn(new TableColumn("[bold]Player[/]").Centered())
+                .AddColumn(new TableColumn("[bold]Score[/]").Centered());
+
+            foreach (var entry in leaderboard)
+            {
+                table.AddRow(
+                    $"[bold]#{entry.Rank}[/]",
+                    Markup.Escape(entry.UserName),
+                    entry.Score.ToString()
+                );
+            }
+
+            AnsiConsole.Write(table);
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine("[red]Error loading leaderboard:[/] " + ex.Message);
         }
     }
   }
