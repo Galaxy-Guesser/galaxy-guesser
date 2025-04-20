@@ -7,7 +7,7 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
     {
         Task<List<SessionDTO>> GetAllSessionsAsync();
         Task<SessionDTO> GetSessionByCodeAsync(string sessionCode);
-        Task CreateSessionAsync(CreateSessionRequestDTO requestBody,string guid);
+        Task <Session> CreateSessionAsync(CreateSessionRequestDTO requestBody,string guid);
         Task UpdateSessionAsync(SessionDTO session);
         Task DeleteSessionAsync(string sessionCode);
         Task JoinSessionAsync(string sessionCode, string playerGuid);
