@@ -13,7 +13,7 @@ namespace GalaxyGuesserApi.Services.Interfaces
         Task UpdateSessionAsync(SessionDTO session);
         void DeleteSessionAsync(string session_code);
         Task JoinSessionAsync(string sessionCode, string playerGuid);
-        Task<List<SessionView>> GetAllActiveSessions();  
+        Task<List<SessionView>> GetAllActiveSessions(int loggedInUserId);  
     }
    
 }
