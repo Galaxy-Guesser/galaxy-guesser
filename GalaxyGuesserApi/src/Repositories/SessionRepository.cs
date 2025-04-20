@@ -28,12 +28,13 @@ namespace GalaxyGuesserApi.Repositories
 
         public async Task<List<SessionDTO>> GetAllSessionsAsync()
         {
-            const string sql = "SELECT session_code, " +
-                              "category, " +
-                              "player.user_name" +
-                              "FROM sessions " +
-                              "INNER JOIN categories ON sessions.category_id = categories.category_id " +
-                              "INNER JOIN players on player.guid = session.player_guid";
+            const string sql = @"
+                SELECT s.session_code, 
+                    c.category, 
+                    p.user_name
+                FROM sessions s
+                INNER JOIN categories c ON s.category_id = c.category_id
+                LEFT JOIN players p ON s.created_by = p.player_id";
 
             return await _dbContext.QueryAsync(sql, reader => new SessionDTO
             {
@@ -42,19 +43,29 @@ namespace GalaxyGuesserApi.Repositories
                 userName = reader.GetString(2),
             });
         }
-        public async Task CreateSessionAsync(CreateSessionRequestDTO requestBody,string loggedInUserGuid)
+        public async Task<Session> CreateSessionAsync(CreateSessionRequestDTO requestBody, string loggedInUserGuid)
         {
-            const string sql = "CALL create_session (@category,@userGuid,@startDate,@sessionDuration,@questionCount)";
-            var parameters = new Dictionary<string, object>
-             {
-                { "@category", requestBody.category },
-                { "@questionCount", requestBody.questionsCount },
-                { "@userGuid", loggedInUserGuid},
-                {"@startDate" , requestBody.startDate },
-                {"@sessionDuration",requestBody.sessionDuration},
-            };
+            const string sql = "SELECT * FROM create_session (@categoryId,@userGuid,@startDate,@sessionDuration,@questionCount)";
 
-            await _dbContext.ExecuteNonQueryAsync(sql, parameters);
+            var parameters = new Dictionary<string, object>
+    {
+        { "@categoryId", requestBody.categoryId },
+        { "@questionCount", requestBody.questionsCount },
+        { "@userGuid", loggedInUserGuid },
+        { "@startDate", requestBody.startDate },
+        { "@sessionDuration", requestBody.sessionDuration },
+    };
+
+            var result = await _dbContext.QueryAsync(sql, reader => new Session
+            {
+                sessionId = reader.GetInt32(0),
+                sessionCode = reader.GetString(1),
+                categoryId = reader.GetInt32(2),
+                startDate = reader.GetDateTime(3),
+                endDate = reader.GetDateTime(4)
+            }, parameters);
+
+            return result.FirstOrDefault();
         }
 
         public async Task<SessionDTO> GetSessionByCodeAsync(string sessionCode)

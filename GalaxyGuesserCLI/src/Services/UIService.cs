@@ -1,7 +1,5 @@
 using Spectre.Console;
 using System.Diagnostics;
-using System;
-using System.Collections.Generic;
 using GalaxyGuesserCLI.Models;
 using System.Text;
 using GalaxyGuesserCLI.Services;
@@ -618,124 +616,121 @@ namespace GalaxyGuesserCLI.Services
     public static async Task DisplayGlobalLeaderboard()
     {
       try
-      {
-        AnsiConsole.Status()
-            .Start("Loading global leaderboard...", ctx =>
-            {
-              ctx.Spinner(Spinner.Known.Star);
-              ctx.SpinnerStyle(Style.Parse("green"));
-            });
-
-        var leaderboard = await LeaderboardService.GetGlobalLeaderboardAsync();
-
-        AnsiConsole.Clear();
-        UIService.PrintGalaxyHeader();
-        AnsiConsole.MarkupLine("\n[bold yellow]🌌 GLOBAL LEADERBOARD[/]\n");
-
-        var table = new Table()
-            .Border(TableBorder.Rounded)
-            .BorderColor(Color.Purple)
-            .AddColumn(new TableColumn("[bold]Rank[/]").Centered())
-            .AddColumn(new TableColumn("[bold]Player[/]").Centered())
-            .AddColumn(new TableColumn("[bold]Total Score[/]").Centered())
-            .AddColumn(new TableColumn("[bold]Sessions[/]").Centered());
-
-        if (leaderboard.Count == 0)
         {
-          table.AddRow("[red]No data available[/]", "", "", "");
-        }
-        else
-        {
-          foreach (var entry in leaderboard)
-          {
-            var sessionsList = entry.Sessions?.Any() == true
-                ? string.Join("\n", entry.Sessions.Take(3))
-                : "None";
+            AnsiConsole.Status()
+                .Start("Loading global leaderboard...", ctx => 
+                {
+                    ctx.Spinner(Spinner.Known.Star);
+                    ctx.SpinnerStyle(Style.Parse("green"));
+                });
 
-            if (entry.Sessions?.Count > 3)
+            var leaderboard = (await LeaderboardService.GetGlobalLeaderboardAsync())
+                .Where(p => p.TotalScore > 0 && p.Sessions.Any())
+                .ToList();
+
+            AnsiConsole.Clear();
+            UIService.PrintGalaxyHeader();
+            AnsiConsole.MarkupLine("\n[bold yellow]🌌 ACTIVE PLAYERS LEADERBOARD[/]\n");
+
+            var table = new Table()
+                .Border(TableBorder.Rounded)
+                .BorderColor(Color.Purple)
+                .AddColumn(new TableColumn("[bold]Rank[/]").Centered())
+                .AddColumn(new TableColumn("[bold]Player[/]").Centered())
+                .AddColumn(new TableColumn("[bold]Total Score[/]").Centered())
+                .AddColumn(new TableColumn("[bold]Sessions[/]").Centered());
+
+            if (leaderboard.Count == 0)
             {
-              sessionsList += $"\n...and {entry.Sessions.Count - 3} more";
+                table.AddRow("[yellow]No active players found[/]", "", "", "");
+            }
+            else
+            {
+                for (int i = 0; i < leaderboard.Count; i++)
+                {
+                    var entry = leaderboard[i];
+                    var sessionsList = string.Join("\n", entry.Sessions.Take(3));
+                    
+                    if (entry.Sessions.Count > 3)
+                    {
+                        sessionsList += $"\n...and {entry.Sessions.Count - 3} more";
+                    }
+
+                    table.AddRow(
+                        $"[bold]#{entry.Rank}[/]",
+                        Markup.Escape(entry.UserName),
+                        entry.TotalScore.ToString(),
+                        sessionsList
+                    );
+
+                    if (i < leaderboard.Count - 1)
+                    {
+                        table.AddEmptyRow();
+                    }
+                }
             }
 
-            table.AddRow(
-                $"[bold]#{entry.Rank}[/]",
-                Markup.Escape(entry.UserName),
-                entry.TotalScore.ToString(),
-                sessionsList
-            );
-          }
+            AnsiConsole.Write(table);
         }
-        
-        AnsiConsole.Write(table);
-      }
-      catch (Exception ex)
-      {
-        AnsiConsole.MarkupLine("[red]Error loading leaderboard:[/] " + ex.Message);
-      }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine("[red]Error loading leaderboard:[/] " + ex.Message);
+        }
     }
 
     public static async Task DisplaySessionLeaderboard(string? session)
     {
-      try
-      {
-        string sessionCode;
-        if (string.IsNullOrWhiteSpace(session)) {
-            sessionCode = AnsiConsole.Ask<string>("Enter session code:");
-        } else {
-            sessionCode = session;
-        }
-
-        AnsiConsole.Status()
-            .Start("Loading session leaderboard...", ctx =>
+       try
+        {
+            var activeSessions = await SessionViewService.GetAllSessions();
+                        
+            if (!activeSessions.Any())
             {
-              ctx.Spinner(Spinner.Known.Star);
-              ctx.SpinnerStyle(Style.Parse("blue"));
-            });
+                AnsiConsole.MarkupLine("[red]No active sessions available[/]");
+                return;
+            }
 
-        var leaderboard = await LeaderboardService.GetSessionLeaderboardAsync(sessionCode);
+            var prompt = new SelectionPrompt<SessionView>()
+                .Title("Select a session to view leaderboard")
+                .PageSize(10)
+                .UseConverter(s => $"{s.sessionCode} - {s.category} ({s.playerCount} players)");
+            
+            prompt.AddChoices(activeSessions);
 
-        if (leaderboard != null)
-        {
-          foreach (var entry in leaderboard.Take(3))
-          {
-            Console.WriteLine($"DEBUG: {entry.Rank}. {entry.UserName} - {entry.Score}");
-          }
+            var selectedSession = AnsiConsole.Prompt(prompt);
+
+            AnsiConsole.Status()
+                .Start("Loading...", ctx => ctx.Spinner(Spinner.Known.Star));
+
+            var leaderboard = await LeaderboardService.GetSessionLeaderboardAsync(selectedSession.sessionCode);
+
+            AnsiConsole.Clear();
+            UIService.PrintGalaxyHeader();
+            AnsiConsole.MarkupLine($"\n[bold yellow]🚀 SESSION LEADERBOARD: {selectedSession.sessionCode}[/]");
+            AnsiConsole.MarkupLine($"[grey]Category: {selectedSession.category}[/]\n");
+
+            var table = new Table()
+                .Border(TableBorder.Rounded)
+                .BorderColor(Color.Blue)
+                .AddColumn(new TableColumn("[bold]Rank[/]").Centered())
+                .AddColumn(new TableColumn("[bold]Player[/]").Centered())
+                .AddColumn(new TableColumn("[bold]Score[/]").Centered());
+
+            foreach (var entry in leaderboard)
+            {
+                table.AddRow(
+                    $"[bold]#{entry.Rank}[/]",
+                    Markup.Escape(entry.UserName),
+                    entry.Score.ToString()
+                );
+            }
+
+            AnsiConsole.Write(table);
         }
-
-        AnsiConsole.Clear();
-        UIService.PrintGalaxyHeader();
-        AnsiConsole.MarkupLine($"\n[bold yellow]🚀 SESSION LEADERBOARD: {sessionCode}[/]\n");
-
-        var table = new Table()
-            .Border(TableBorder.Rounded)
-            .BorderColor(Color.Blue)
-            .AddColumn(new TableColumn("[bold]Rank[/]").Centered())
-            .AddColumn(new TableColumn("[bold]Player[/]").Centered())
-            .AddColumn(new TableColumn("[bold]Score[/]").Centered());
-
-        if (leaderboard == null || leaderboard.Count == 0)
+        catch (Exception ex)
         {
-          table.AddRow("[red]No data available[/]", "Try a different session code", "");
+            AnsiConsole.MarkupLine("[red]Error loading session leaderboard:[/] " + ex.Message);
         }
-        else
-        {
-          foreach (var entry in leaderboard)
-          {
-            table.AddRow(
-                $"[bold]#{entry.Rank}[/]",
-                Markup.Escape(entry.UserName ?? "Unknown"),
-                entry.Score.ToString()
-            );
-          }
-        }
-
-        AnsiConsole.Write(table);
-      }
-      catch (Exception ex)
-      {
-        AnsiConsole.MarkupLine("[red]Error loading session leaderboard:[/]");
-        AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
-      }
     }
   }
 }

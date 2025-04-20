@@ -136,43 +136,64 @@ namespace GalaxyGuesserCLI.Services
 
     private static readonly HttpClient _httpClient = new HttpClient();
 
-    public static async Task<string?> CreateSessionAsync(string category, int questionsCount, string startDate, decimal sessionDuration)
+   public static async Task<string> CreateSessionAsync(int categoryId, int questionsCount, string startDate, decimal sessionDuration)
+{
+    try
     {
-      try
-      {
         string jwt = Helper.GetStoredToken();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions/session";
+        var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions";
 
         var request = new CreateSessionRequest
         {
-          category = category,
-          questionsCount = questionsCount,
-          startDate = startDate,
-          sessionDuration = sessionDuration
+            categoryId = categoryId,
+            questionsCount = questionsCount,
+            startDate = startDate,
+            sessionDuration = sessionDuration
         };
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await _httpClient.PostAsync(url, content);
-        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
 
-        string sessionCode = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"✅ Session created: {sessionCode}");
-        Console.ResetColor();
+        var apiResponse = JsonSerializer.Deserialize<ApiResponse<SessionModel>>(responseBody, options);
 
-        return sessionCode;
-      }
-      catch (Exception ex)
-      {
+        if (apiResponse != null && apiResponse.Success == true)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"✅ Session created with code : {apiResponse.Data?.sessionCode}");
+            Console.ResetColor();
+            return apiResponse.Data?.sessionCode;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"⚠️  Failed to create session: {apiResponse?.Message}");
+            if (apiResponse?.Errors != null && apiResponse.Errors.Any())
+            {
+                foreach (var error in apiResponse.Errors)
+                {
+                    Console.WriteLine($"   - {error}");
+                }
+            }
+            Console.ResetColor();
+            return "session creation failed";
+        }
+    }
+    catch (Exception ex)
+    {
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"❌ Error creating session: {ex.Message}");
         Console.ResetColor();
-        return null;
-      }
+        return "session creation failed (exception)";
     }
+}
 
     public static async Task JoinSessionAsync(string sessionCode)
     {
@@ -198,7 +219,7 @@ namespace GalaxyGuesserCLI.Services
 
 
         var url = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessions";
-        HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+        HttpResponseMessage response = await _httpClient.PutAsync(url, content);
         string responseContent = await response.Content.ReadAsStringAsync();
 
         if (response.IsSuccessStatusCode)

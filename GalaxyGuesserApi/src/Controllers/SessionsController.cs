@@ -14,10 +14,12 @@ namespace GalaxyGuesserApi.Controllers
     public class SessionsController : ControllerBase
     {
         private readonly ISessionService _sessionService;
+        private readonly IQuestionService _questionService;
 
-        public SessionsController(ISessionService sessionService)
+        public SessionsController(ISessionService sessionService, IQuestionService questionService)
         {
             _sessionService = sessionService;
+            _questionService = questionService;
         }
 
         [HttpGet("code")]
@@ -34,29 +36,44 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-        [HttpPost("session")]
-        public async Task<ActionResult<string>> CreateSession([FromBody] CreateSessionRequestDTO request)
+        [HttpPost]
+        [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse<Session>>> CreateSession([FromBody] CreateSessionRequestDTO request)
         {
-            try
+            var googleId = User.FindFirst("sub")?.Value 
+                       ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var availableQuestionsCount = await _questionService.GetQuestionCountForCategory(request.categoryId);
+            if (googleId == null)
             {
-                var googleId = User.FindFirst("sub")?.Value 
-                        ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                await _sessionService.CreateSessionAsync(request,googleId);
-
-                return Ok("created");
+                return Unauthorized(ApiResponse<string>.ErrorResponse("User not authenticated"));
             }
-            catch (Exception ex)
+            else if (request.questionsCount > availableQuestionsCount)
             {
-                return BadRequest(ex);
+                return BadRequest(ApiResponse<Session>.ErrorResponse("Not enough questions available for the selected category"));
+            }
+            else
+            {
+                try
+                {
+                    Session createdSession = await _sessionService.CreateSessionAsync(request, googleId);
+                    return Ok(ApiResponse<Session>.SuccessResponse(createdSession, "Successfully created session "));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        ApiResponse<Session>.ErrorResponse("Internal server error", new List<string> { ex.Message }));
+                }
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest request)
         {
             try
             {
-                var playerGuid = User.FindFirst("sub")?.Value 
+                var playerGuid = User.FindFirst("sub")?.Value
                     ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 await _sessionService.JoinSessionAsync(request.sessionCode, playerGuid);
@@ -68,13 +85,21 @@ namespace GalaxyGuesserApi.Controllers
             }
         }
 
-         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SessionView>>> GetAllActiveSessions()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<SessionView>>> GetAllSessions(bool getActive = false)
         {
             try
             {
-                var sessions = await _sessionService.GetAllActiveSessions();
-                return Ok(sessions);
+                if (getActive)
+                {
+                    var activeSessions = await _sessionService.GetAllActiveSessions();
+                    return Ok(activeSessions);
+                }
+                else
+                {
+                    var allSessions = await _sessionService.GetAllSessionsAsync();
+                    return Ok(allSessions);
+                }
             }
             catch (Exception ex)
             {
