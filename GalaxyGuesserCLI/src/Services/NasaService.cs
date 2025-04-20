@@ -16,9 +16,8 @@ namespace ConsoleApp1.Services
         public async Task<NasaApodResponse> GetSpaceFactAsync()
         {
            
-                var response = await _httpClient.GetFromJsonAsync<NasaApodResponse>($"{ApodUrl}?api_key={ApiKey}");
-                return response;
-           
+            var response = await _httpClient.GetFromJsonAsync<NasaApodResponse>($"{ApodUrl}?api_key={ApiKey}");
+            return response;
         }
     }
 }

@@ -108,7 +108,7 @@ namespace ConsoleApp1.Services
             
             Console.WriteLine("A browser window has been opened. Please login with your Google account.");
             
-            var context = await listener.GetContextAsync();
+            HttpListenerContext context = await listener.GetContextAsync();
             
             var query = HttpUtility.ParseQueryString(context.Request.Url.Query);
             var returnedState = query["state"];
@@ -154,22 +154,22 @@ namespace ConsoleApp1.Services
         public class TokenResponse
         {
             [JsonPropertyName("access_token")]
-            public string AccessToken { get; set; }
+            public required string AccessToken { get; set; }
             
             [JsonPropertyName("token_type")]
-            public string TokenType { get; set; }
+            public required string TokenType { get; set; }
             
             [JsonPropertyName("expires_in")]
             public int ExpiresIn { get; set; }
             
             [JsonPropertyName("refresh_token")]
-            public string RefreshToken { get; set; }
+            public required string RefreshToken { get; set; }
         }
 
         public class TokenRequest
         {
-            public string Code { get; set; }
-            public string RedirectUri { get; set; }
+            public required string Code { get; set; }
+            public required string RedirectUri { get; set; }
         }
         private async Task StoreTokenInFile(TokenResponse tokenData)
         {

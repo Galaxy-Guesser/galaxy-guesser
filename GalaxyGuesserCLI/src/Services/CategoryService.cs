@@ -26,7 +26,7 @@ namespace ConsoleApp1.Services
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var categories = JsonSerializer.Deserialize<List<Categories>>(responseBody,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<Categories>();
 
                 return categories;
             }

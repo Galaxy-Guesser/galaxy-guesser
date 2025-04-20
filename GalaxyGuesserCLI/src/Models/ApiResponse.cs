@@ -16,7 +16,7 @@ namespace ConsoleApp1.Models
     /// <summary>
     /// The data returned by the API
     /// </summary>
-    public T Data { get; set; } = default;
+    public T? Data { get; set; } = default;
 
     /// <summary>
     /// A message describing the result of the operation
@@ -44,7 +44,7 @@ namespace ConsoleApp1.Models
     /// <summary>
     /// Creates a failed response with error messages
     /// </summary>
-    public static ApiResponse<T> ErrorResponse(string message, List<string> errors = null)
+    public static ApiResponse<T> ErrorResponse(string message, List<string>? errors = null)
     {
       return new ApiResponse<T>
       {

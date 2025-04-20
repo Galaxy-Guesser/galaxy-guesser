@@ -1,8 +1,8 @@
 public class CreateSessionRequest
 {
-    public string category { get; set; }
+    public required string category { get; set; }
     public int questionsCount { get; set; }
-    public string userGuid { get; set; }
-    public string startDate { get; set; }
+    public string? userGuid { get; set; }
+    public required string startDate { get; set; }
    public decimal sessionDuration { get; set; }
 }

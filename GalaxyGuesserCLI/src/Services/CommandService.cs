@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using ConsoleApp1.Models;
 using ConsoleApp1.Services;
 using Spectre.Console;
@@ -12,19 +13,14 @@ namespace ConsoleApp1.Services
   {
     public static readonly string CMD_PREFIX = "/";
 
-    internal static void ProcessCommand(string command, Player player)
+    internal static async void ProcessCommand(string command, Player player)
     {
       switch (command)
       {
 
-        case "sessions":
-          ViewSessions();
-          break;
+       
         case "howtoplay":
           UIService.ShowHowToPlay();
-          break;
-        case "leaderboard":
-          ViewLeaderboard();
           break;
         case "myprofile":
           ViewProfile(player);
@@ -36,15 +32,12 @@ namespace ConsoleApp1.Services
           ChangeUsername(player);
           break;
         case "totalstats":
-          ViewTotalStats(player);
+          await ViewTotalStats(player);
           break;
         case "quit":
           Console.WriteLine("\n👋 Thanks for playing Galaxy Quiz! See you among the stars!");
           Thread.Sleep(2000);
           Environment.Exit(0);
-          break;
-        case "stats":
-          ViewGameStats();
           break;
         default:
           Console.ForegroundColor = ConsoleColor.Red;
@@ -55,17 +48,6 @@ namespace ConsoleApp1.Services
       }
     }
 
-
-
-    private static void ViewSessions()
-    {
-      Console.WriteLine("\nThis feature is not yet implemented.");
-    }
-
-    private static void ViewLeaderboard()
-    {
-      Console.WriteLine("\nThis feature is not yet implemented.");
-    }
 
     private static void ViewProfile(Player player)
     {
@@ -83,10 +65,10 @@ namespace ConsoleApp1.Services
       SessionService.ChangeUsername((int)player.playerId, username, player.guid);
     }
 
-    public static void ViewTotalStats(Player player)
+    public static async Task ViewTotalStats(Player player)
     {
       var data = SessionService.ViewPlayerStats(player.playerId);
-      UIService.DisplayPlayerStats(data);
+      await UIService.DisplayPlayerStats(data);
     }
 
     private static void ViewMySessionHistory(Player player)
@@ -94,10 +76,6 @@ namespace ConsoleApp1.Services
       Console.WriteLine("\nThis feature is not yet implemented.");
     }
 
-    private static void ViewGameStats()
-    {
-      Console.WriteLine("\nThis feature is not yet implemented.");
-    }
 
     public static bool IsCommand(string input)
     {

@@ -10,16 +10,6 @@ namespace ConsoleApp1.Services
 {
   public static class UIService
   {
-    private const string CMD_PREFIX = "/";
-    private static readonly (string Key, string Description)[] COMMANDS = new[]
-    {
-            ("help", "Show help information"),
-            ("howtoplay", "Show how to play instructions"),
-            ("categories", "List available categories"),
-            ("sessions", "List or join quiz sessions"),
-            ("quit", "Exit the application")
-        };
-
     public static void ShowHowToPlay()
     {
       AnsiConsole.Clear();
@@ -165,28 +155,6 @@ namespace ConsoleApp1.Services
       Console.ForegroundColor = originalFg;
     }
 
-    public static void ShowHelp(Dictionary<string, string> COMMANDS)
-    {
-      Console.Clear();
-      PrintGalaxyHeader();
-
-      Console.ForegroundColor = ConsoleColor.Cyan;
-      Console.WriteLine("\n📖 AVAILABLE COMMANDS");
-      Console.ResetColor();
-
-      Console.WriteLine($"\nUse {CMD_PREFIX}[command] to execute any of these commands:");
-
-      foreach (var cmd in COMMANDS)
-      {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write($"{CMD_PREFIX}{cmd.Key,-15}");
-        Console.ResetColor();
-        Console.WriteLine($" - {cmd.Value}");
-      }
-
-      Console.WriteLine("\nYou can use commands at any input prompt in the application.");
-    }
-
     public static void ShowFeedback(string message, ConsoleColor color)
     {
       Console.ForegroundColor = color;
@@ -198,91 +166,6 @@ namespace ConsoleApp1.Services
     {
       Console.WriteLine("\nReturn to main menu...");
       Console.ReadKey(true);
-    }
-
-    static void DisplayFullQuestion(Question q, int current, int total, int secondsRemaining)
-    {
-      Console.Clear();
-      PrintGalaxyHeader();
-
-      Console.WriteLine($"⏱ Time: {secondsRemaining}s [" + new string(' ', Console.WindowWidth - 20) + "]");
-
-      Console.ForegroundColor = ConsoleColor.Cyan;
-      Console.WriteLine($"\nQuestion {current}/{total}:");
-      Console.ResetColor();
-
-      Console.ForegroundColor = ConsoleColor.White;
-      Console.WriteLine($"\n{q.Text}\n");
-      Console.ResetColor();
-      Console.WriteLine(); // Extra spacing
-      Console.WriteLine("Answer options:");
-      for (int i = 0; i < q.Options.Length; i++)
-      {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write($"{(char)('A' + i)}) ");
-        Console.ResetColor();
-        Console.WriteLine(q.Options[i]);
-      }
-
-      Console.WriteLine();
-      Console.ForegroundColor = ConsoleColor.DarkCyan;
-      Console.Write("\n👉 Press A, B, C or D to select your answer: ");
-      Console.ResetColor();
-
-      // Make answer input area very visible
-      Console.BackgroundColor = ConsoleColor.DarkGray;
-      Console.ForegroundColor = ConsoleColor.White;
-      Console.Write("     ");
-      Console.ResetColor();
-    }
-
-    internal static void ShowFinalResults(Player player, Session session)
-    {
-      Console.Clear();
-      PrintGalaxyHeader();
-
-      SessionScore playerScore = SessionService.GetPlayerScore(player.playerId, session.Id);
-      int score = playerScore != null ? playerScore.Score : 0;
-      int timeBonus = playerScore != null ? playerScore.TimeRemaining : 0;
-
-      int totalQuestions = SessionService.GetSessionQuestionsCount(session.Id);
-
-      Console.ForegroundColor = ConsoleColor.Magenta;
-      Console.WriteLine($"\n🌟 Final Score: {score}/{totalQuestions} correct answers");
-      Console.WriteLine($"⏱ Time Bonus: {timeBonus} points");
-      Console.WriteLine($"🏆 Total Score: {score + timeBonus} points\n");
-
-      Console.WriteLine("🏆 Leaderboard:");
-      var leaderboard = SessionService.GetSessionLeaderboard(session.Id, AuthenticationService.GetAllPlayers());
-
-      for (int i = 0; i < leaderboard.Count; i++)
-      {
-        var entry = leaderboard[i];
-        Console.WriteLine($"{i + 1}. {entry.Name}: {entry.Score} correct + {entry.TimeBonus} time bonus = {entry.Total} points");
-      }
-
-      Console.ResetColor();
-    }
-
-    internal static void UpdateTimerOnly(int row, int secondsRemaining, int totalSeconds)
-    {
-      int originalRow = Console.CursorTop;
-      int originalCol = Console.CursorLeft;
-
-      Console.SetCursorPosition(0, row);
-
-      int barWidth = Console.WindowWidth - 20;
-      int filledWidth = (int)((double)secondsRemaining / totalSeconds * barWidth);
-
-      Console.ForegroundColor = secondsRemaining > 10 ? ConsoleColor.Green :
-                              secondsRemaining > 5 ? ConsoleColor.Yellow : ConsoleColor.Red;
-      Console.Write($"⏱ Time: {secondsRemaining}s [");
-      Console.Write(new string('■', filledWidth));
-      Console.Write(new string('□', barWidth - filledWidth));
-      Console.Write("]");
-      Console.ResetColor();
-
-      Console.SetCursorPosition(originalCol, originalRow);
     }
 
     public static async Task DisplayActiveSessionsAsync(List<SessionView> sessions)
@@ -688,7 +571,7 @@ namespace ConsoleApp1.Services
         }
 
         AnsiConsole.Clear();
-        UIService.PrintGalaxyHeader();
+        PrintGalaxyHeader();
         AnsiConsole.MarkupLine($"\n[bold yellow]🚀 SESSION LEADERBOARD: {sessionCode}[/]\n");
 
         var table = new Table()

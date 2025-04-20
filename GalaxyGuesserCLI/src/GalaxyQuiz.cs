@@ -146,13 +146,14 @@ namespace ConsoleApp1
                         return Task.CompletedTask;
                     },
 
-                    ["View Total Stats"] = async () => {
-                        CommandService.ProcessCommand("totalstats", player);
+                   ["View Total Stats"] = async () => {
+                        await Task.Run(() => CommandService.ProcessCommand("totalstats", player));
                     },
 
                     ["Change Username"] = async () => {
-                        CommandService.ProcessCommand("editusername", player);
+                        await Task.Run(() => CommandService.ProcessCommand("editusername", player));
                     },
+
 
                     ["↩️ Back to Main Menu"] = () => {
                         backToMainMenu = true;
