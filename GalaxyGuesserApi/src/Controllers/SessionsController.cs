@@ -38,7 +38,7 @@ namespace GalaxyGuesserApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<Session>>> CreateSession([FromBody] CreateSessionRequestDTO request)
         {
@@ -69,20 +69,34 @@ namespace GalaxyGuesserApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest request)
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest requestBody)
         {
-            try
-            {
-                var playerGuid = User.FindFirst("sub")?.Value
+            var playerGuid = User.FindFirst("sub")?.Value
                     ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                await _sessionService.JoinSessionAsync(request.sessionCode, playerGuid);
-                return Ok("Player successfully joined the session.");
-            }
-            catch (Exception ex)
+            if (playerGuid == null)
             {
-                return BadRequest($"Join failed: {ex.Message}");
+                return Unauthorized(ApiResponse<string>.ErrorResponse("User not authenticated"));
+
             }
+            else
+            {
+                try
+                {
+                    await _sessionService.JoinSessionAsync(requestBody.sessionCode, playerGuid);
+                    return Ok(ApiResponse<string>.SuccessResponse("Successfully joined session"));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                         ApiResponse<Session>.ErrorResponse("Internal server error", new List<string> { ex.Message }));
+                }
+
+            }
+
         }
 
         [HttpGet]
