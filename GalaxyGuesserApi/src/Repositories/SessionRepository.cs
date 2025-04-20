@@ -28,12 +28,13 @@ namespace GalaxyGuesserApi.Repositories
 
         public async Task<List<SessionDTO>> GetAllSessionsAsync()
         {
-            const string sql = "SELECT session_code, " +
-                              "category, " +
-                              "player.user_name" +
-                              "FROM sessions " +
-                              "INNER JOIN categories ON sessions.category_id = categories.category_id " +
-                              "INNER JOIN players on player.guid = session.player_guid";
+            const string sql = @"
+                SELECT s.session_code, 
+                    c.category, 
+                    p.user_name
+                FROM sessions s
+                INNER JOIN categories c ON s.category_id = c.category_id
+                LEFT JOIN players p ON s.created_by = p.player_id";
 
             return await _dbContext.QueryAsync(sql, reader => new SessionDTO
             {
