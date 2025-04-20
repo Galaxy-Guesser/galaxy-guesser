@@ -682,7 +682,7 @@ namespace GalaxyGuesserCLI.Services
     {
        try
         {
-            var activeSessions = await SessionViewService.GetActiveSessions();
+            var activeSessions = await SessionViewService.GetAllSessions();
                         
             if (!activeSessions.Any())
             {
