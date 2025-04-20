@@ -51,7 +51,7 @@ namespace GalaxyGuesserApi.Controllers
             }
             else if (request.questionsCount > availableQuestionsCount)
             {
-                return BadRequest(ApiResponse<Session>.ErrorResponse("Not enough questions available for the selected category"));
+                return BadRequest(ApiResponse<Session>.ErrorResponse($"Not enough questions available for the selected category. Available questions : {availableQuestionsCount}"));
             }
             else
             {

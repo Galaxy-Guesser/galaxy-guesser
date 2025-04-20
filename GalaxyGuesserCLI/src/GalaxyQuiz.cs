@@ -50,9 +50,30 @@ namespace GalaxyGuesserCLI
 
                 var menuActions = new Dictionary<string, Func<Task>>
                 {
-                    ["Create new quiz session"] = async () => {
+                    ["Create new quiz session"] = async () =>
+                    {
+                        ApiResponse<SessionModel> result = new ApiResponse<SessionModel>();
                         var (categoryId, questionCount, startTime, sessionDuration) = await SessionUIService.PromptSessionDetails();
-                         await SessionService.CreateSessionAsync(categoryId, questionCount, startTime, sessionDuration);
+                        await AnsiConsole.Status()
+                        .Spinner(Spinner.Known.Dots)
+                        .StartAsync("Creating session...", async (tx) =>
+                        {
+                             result = await SessionService.CreateSessionAsync(categoryId, questionCount, startTime, sessionDuration);
+                        });
+                        if (result.Success)
+                        {
+                            AnsiConsole.MarkupLine($"[green]✅ Session created with code: {result.Data.sessionCode}[/]");
+                        }
+                        else
+                        {
+                            AnsiConsole.MarkupLine($"[orange1]⚠️  Failed to create session: {result.Message}[/]");
+                            if (result.Errors != null)
+                            {
+                                foreach (var err in result.Errors)
+                                    AnsiConsole.MarkupLine($"[orange1]⚠️   - {err}[/]");
+                            }
+                        }
+
                     },
 
                     ["Join existing session"] = async () => {
