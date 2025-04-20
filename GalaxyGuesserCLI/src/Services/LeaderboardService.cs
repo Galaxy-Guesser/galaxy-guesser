@@ -1,7 +1,7 @@
 
 using System.Net.Http.Headers;
 using System.Text.Json;
-using ConsoleApp1.Helpers;
+using GalaxyGuesserCLI.Helpers;
 using static GalaxyGuesserCLI.Models.Leaderbored;
 
 namespace GalaxyGuesserCLI.Services

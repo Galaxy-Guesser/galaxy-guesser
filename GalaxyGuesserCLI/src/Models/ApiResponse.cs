@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ConsoleApp1.Models
+namespace GalaxyGuesserCLI.Models
 {
   /// <summary>
   /// Standard API response model for consistent responses across all endpoints

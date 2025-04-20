@@ -1,10 +1,10 @@
 using Spectre.Console;
 using System.Diagnostics;
-using ConsoleApp1.Models;
+using GalaxyGuesserCLI.Models;
 using System.Text;
 using GalaxyGuesserCLI.Services;
 
-namespace ConsoleApp1.Services
+namespace GalaxyGuesserCLI.Services
 {
   public static class UIService
   {

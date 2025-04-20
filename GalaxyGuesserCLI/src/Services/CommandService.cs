@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using ConsoleApp1.Models;
-using ConsoleApp1.Services;
+using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.Services;
 using Spectre.Console;
 
 
-namespace ConsoleApp1.Services
+namespace GalaxyGuesserCLI.Services
 {
   public class CommandService
   {
