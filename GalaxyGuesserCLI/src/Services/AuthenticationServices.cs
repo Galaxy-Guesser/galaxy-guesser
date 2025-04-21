@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using GalaxyGuesserCLI.Models;
 using GalaxyGuesserCLI.Helpers;
@@ -9,29 +6,17 @@ using System.Web;
 using System.Security;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Net.Http.Headers;
-using Microsoft.Extensions.Configuration;
-
-
 
 namespace GalaxyGuesserCLI.Services
 {
   public class AuthenticationService
   {
     private static List<Player> players = new List<Player>();
-    private readonly IConfiguration _configuration;
     private static readonly HttpClient _httpClient = new HttpClient();
 
-    private SessionService sessionService = new SessionService();
 
-    public AuthenticationService()
-    {
-      _configuration = _configuration = new ConfigurationBuilder()
-          .AddJsonFile("appsettings.json")
-          .Build();
-    }
-
+    public AuthenticationService(){}
 
     internal static List<Player> GetAllPlayers()
     {
@@ -56,8 +41,11 @@ namespace GalaxyGuesserCLI.Services
           Console.CursorVisible = true;
           displayName = Console.ReadLine();
           Console.CursorVisible = false;
+          if(!string.IsNullOrWhiteSpace(displayName))
+          {
+           SessionService.ChangeUsername(player.playerId,displayName,player.guid);
+          }
         }
-        SessionService.ChangeUsername(player.playerId,displayName,player.guid);
         player.userName = displayName;
         player.guid = playerResponse.guid;
         player.playerId = playerResponse.playerId;
@@ -166,27 +154,7 @@ namespace GalaxyGuesserCLI.Services
       }
     }
 
-      public class TokenResponse
-    {
-      [JsonPropertyName("access_token")]
-      public string AccessToken { get; set; }
-
-      [JsonPropertyName("token_type")]
-      public string TokenType { get; set; }
-
-      [JsonPropertyName("expires_in")]
-      public int ExpiresIn { get; set; }
-
-      [JsonPropertyName("refresh_token")]
-      public string RefreshToken { get; set; }
-    }
-
-    public class TokenRequest
-    {
-      public string Code { get; set; }
-      public string RedirectUri { get; set; }
-    }
-    private async Task StoreTokenInFile(TokenResponse tokenData)
+  private async Task StoreTokenInFile(TokenResponse tokenData)
     {
       var tokenJson = JsonSerializer.Serialize(tokenData, new JsonSerializerOptions { WriteIndented = true });
       await File.WriteAllTextAsync("token.json", tokenJson);
