@@ -18,16 +18,6 @@ namespace GalaxyGuesserApi.Controllers
     {
       _playerService = playerService ?? throw new ArgumentNullException(nameof(playerService));
     }
-
-    /// <summary>
-    /// Gets the Google ID from the current user's claims
-    /// </summary>
-    /// <returns>The Google ID if found, null otherwise</returns>
-  
-    /// <summary>
-    /// Validates that the current user is authenticated with a valid Google ID
-    /// </summary>
-    /// <returns>An unauthorized result if not authenticated, null if authenticated</returns>
     private ActionResult<ApiResponse<T>>? ValidateAuthentication<T>()
     {
       var googleId = GetGoogleIdFromClaims();
