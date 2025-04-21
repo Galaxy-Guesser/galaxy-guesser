@@ -1,6 +1,6 @@
 using Spectre.Console;
 using System.Diagnostics;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 using System.Text;
 using GalaxyGuesserCLI.Services;
 

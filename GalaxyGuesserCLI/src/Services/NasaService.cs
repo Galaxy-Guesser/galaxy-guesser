@@ -1,4 +1,4 @@
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 
 namespace GalaxyGuesserCLI.Services
 {

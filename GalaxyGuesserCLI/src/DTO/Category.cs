@@ -1,4 +1,4 @@
- namespace GalaxyGuesserCLI.Models
+ namespace GalaxyGuesserCLI.DTO
 {
      public class Category
     {
@@ -15,7 +15,7 @@
     public class Categories
     {
         public int categoryId { get; set; }
-        public string category { get; set; }
+        public string category { get; set; } = string.Empty;
 
     }
 }

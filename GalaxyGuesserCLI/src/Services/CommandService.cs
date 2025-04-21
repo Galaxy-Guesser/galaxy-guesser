@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 using GalaxyGuesserCLI.Services;
 using Spectre.Console;
 

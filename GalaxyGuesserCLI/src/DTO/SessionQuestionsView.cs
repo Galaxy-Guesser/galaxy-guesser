@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace GalaxyGuesserCLI.Models
+namespace GalaxyGuesserCLI.DTO
 {
     public class SessionQuestionView
     {
         public int sessionId { get; set; }
-        public string sessionCode { get; set; }
+        public string sessionCode { get; set; } = string.Empty;
 
         public int questionId { get; set; }
 
-        public string questionText { get; set; }
+        public string questionText { get; set; } = string.Empty;
 
         public int categoryId { get; set; }
 
-        public string categoryName { get; set; }
+        public string categoryName { get; set; } = string.Empty;
 
         public int correctAnswerId { get; set; }
 
@@ -25,7 +25,7 @@ namespace GalaxyGuesserCLI.Models
     public class Option
     {
         public int optionId { get; set; }
-        public string optionText { get; set; }
+        public string optionText { get; set; } = string.Empty;
         public int answerId { get; set; }
     }
 }
