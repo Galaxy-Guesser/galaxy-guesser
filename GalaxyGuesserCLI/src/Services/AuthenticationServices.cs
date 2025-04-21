@@ -44,7 +44,7 @@ namespace GalaxyGuesserCLI.Services
           Console.CursorVisible = false;
           if(!string.IsNullOrWhiteSpace(displayName))
           {
-           SessionService.ChangeUsername(player.playerId,displayName,player.guid);
+           SessionService.ChangeUsername(playerResponse.playerId,displayName,playerResponse.guid);
           }
         }
         player.userName = displayName;
