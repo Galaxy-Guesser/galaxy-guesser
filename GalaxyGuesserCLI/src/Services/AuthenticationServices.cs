@@ -1,5 +1,5 @@
 using System.Text;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 using GalaxyGuesserCLI.Helpers;
 using System.Net;
 using System.Web;
@@ -137,6 +137,7 @@ namespace GalaxyGuesserCLI.Services
 
         if (!response.IsSuccessStatusCode)
         {
+          Console.WriteLine($"{await response.Content.ReadAsStringAsync()}");
           Console.WriteLine($"{await response.Content.ReadAsStringAsync()}");
           return null;
         }

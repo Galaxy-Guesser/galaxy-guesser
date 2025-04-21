@@ -1,5 +1,5 @@
 using System.Text;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 using GalaxyGuesserCLI.Services;
 using GalaxyGuesserCLI.Utilities;
 using Spectre.Console;

@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace GalaxyGuesserCLI.Models
+namespace GalaxyGuesserCLI.DTO
 {
 
     public class Result<T>

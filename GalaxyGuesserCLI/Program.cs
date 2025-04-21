@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 using GalaxyGuesserCLI.Services;
 
 namespace GalaxyGuesserCLI

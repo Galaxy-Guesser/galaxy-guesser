@@ -1,6 +1,6 @@
 using Spectre.Console;
 using System.Diagnostics;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 using System.Text;
 using GalaxyGuesserCLI.Services;
 
@@ -303,11 +303,14 @@ namespace GalaxyGuesserCLI.Services
         int minutes = int.TryParse(timeParts[0], out var parsedMinutes) ? parsedMinutes : 0;
 
         var color = minutes < 5 ? "red" : "green";
-
+        var displayPlayers = session.playerUserNames.Count == 0 ? "No players" : string.Join(", ", session.playerUserNames);
         return new Panel(new Markup(
             $"[bold]{session.category}[/]\n" +
             $"[blue]Code:[/] {session.sessionCode}\n" +
-            $"[blue]Ends In:[/] [{color}]{minutes}m[/]"))
+            $"[blue]Number of players:[/] {session.playerCount}\n" +
+            $"[blue]Number of questions:[/] {session.questionCount}\n" +
+            $"[blue]Highest score:[/] {session.highestScore}\n" +
+            $"[blue]Players:[/] {displayPlayers}\n"))
         {
           Border = BoxBorder.Double,
           Padding = new Padding(1, 0, 1, 0)
@@ -324,9 +327,18 @@ namespace GalaxyGuesserCLI.Services
 
       AnsiConsole.Write(grid);
 
-      var sessionCode = AnsiConsole.Ask<string>("\n▶️ [bold yellow]Enter a session code to join or press Enter to cancel:[/]");
-
-      if (!string.IsNullOrWhiteSpace(sessionCode))
+      var sessionCodes = sessions.Select(session=>session.sessionCode).ToList();
+      sessionCodes.Add("return to main menu");
+              
+                        var sessionCode = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                            .Title("Select a session to join or return to main menu")
+                            .PageSize(10)
+                            .AddChoices(sessionCodes));
+      if(sessionCode == "return to main menu")  {
+        Continue();
+      }
+      else if (!string.IsNullOrWhiteSpace(sessionCode))
       {
         var selectedSession = sessions.FirstOrDefault(s => s.sessionCode.Equals(sessionCode, StringComparison.OrdinalIgnoreCase));
         if (selectedSession != null)
@@ -693,7 +705,7 @@ namespace GalaxyGuesserCLI.Services
             var prompt = new SelectionPrompt<SessionView>()
                 .Title("Select a session to view leaderboard")
                 .PageSize(10)
-                .UseConverter(s => $"{s.sessionCode} - {s.category} ({s.playerCount} players)");
+                .UseConverter(s => $"{s.sessionCode} - {s.category}");
             
             prompt.AddChoices(activeSessions);
 

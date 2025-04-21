@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 using GalaxyGuesserCLI.Helpers;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 
 namespace GalaxyGuesserCLI.Services
 {
