@@ -7,6 +7,7 @@ using System.Security;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Net.Http.Headers;
+using GalaxyGuesserCLI.Models;
 
 namespace GalaxyGuesserCLI.Services
 {
