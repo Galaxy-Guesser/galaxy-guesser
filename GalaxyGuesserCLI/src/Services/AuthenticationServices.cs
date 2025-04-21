@@ -66,7 +66,6 @@ namespace GalaxyGuesserCLI.Services
           Console.WriteLine($"Authentication failed: {error}");
         }
       });
-      Console.WriteLine(player);
       return player!;
     }
 
