@@ -23,6 +23,8 @@ namespace GalaxyGuesserCLI.Services
     private readonly IConfiguration _configuration;
     private static readonly HttpClient _httpClient = new HttpClient();
 
+    private SessionService sessionService = new SessionService();
+
     public AuthenticationService()
     {
       _configuration = _configuration = new ConfigurationBuilder()
@@ -47,17 +49,18 @@ namespace GalaxyGuesserCLI.Services
       Player player = new Player();
       result.OnSuccess(playerResponse =>
       {
-        if (playerResponse.userName == " ")
+        var displayName = playerResponse.userName;
+        while (string.IsNullOrWhiteSpace(displayName))
         {
           Console.Write("\n🌟 Enter your display name: ");
           Console.CursorVisible = true;
-          var displayName = Console.ReadLine();
+          displayName = Console.ReadLine();
           Console.CursorVisible = false;
         }
-        player.userName = playerResponse.userName;
+        SessionService.ChangeUsername(player.playerId,displayName,player.guid);
+        player.userName = displayName;
         player.guid = playerResponse.guid;
         player.playerId = playerResponse.playerId;
-
       })
       .OnFailure(errors =>
       {
@@ -66,7 +69,6 @@ namespace GalaxyGuesserCLI.Services
           Console.WriteLine($"Authentication failed: {error}");
         }
       });
-      Console.WriteLine(player);
       return player!;
     }
 
