@@ -25,9 +25,9 @@ namespace GalaxyGuesserApi.Services
             return await _sessionRepository.GetSessionByCodeAsync(session_code);
         }
 
-        public async Task<List<SessionView>> GetAllActiveSessions()
+        public async Task<List<SessionView>> GetAllActiveSessions(int loggedInUserId)
         {
-            return await _sessionRepository.GetAllActiveSessions();
+            return await _sessionRepository.GetAllActiveSessions(loggedInUserId);
         }
 
         public async Task<List<SessionDTO>> GetAllSessionsAsync() {

@@ -2,17 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GalaxyGuesserApi.Models;
 using GalaxyGuesserApi.Models.DTO;
-using System.Security.Claims;
 using GalaxyGuesserApi.Services;
 using System.ComponentModel.DataAnnotations;
-using GalaxyGuesserApi.Models.DTO;
 
 namespace GalaxyGuesserApi.Controllers
 {
   [ApiController]
   [Route("api/[controller]")]
   [Produces("application/json")]
-  public class PlayersController : ControllerBase
+  public class PlayersController : BaseController
   {
     private readonly IPlayerService _playerService;
 
@@ -25,12 +23,7 @@ namespace GalaxyGuesserApi.Controllers
     /// Gets the Google ID from the current user's claims
     /// </summary>
     /// <returns>The Google ID if found, null otherwise</returns>
-    private string? GetGoogleIdFromClaims()
-    {
-      return User.FindFirst("sub")?.Value
-          ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    }
-
+  
     /// <summary>
     /// Validates that the current user is authenticated with a valid Google ID
     /// </summary>

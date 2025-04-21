@@ -11,7 +11,7 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
         Task UpdateSessionAsync(SessionDTO session);
         Task DeleteSessionAsync(string sessionCode);
         Task JoinSessionAsync(string sessionCode, string playerGuid);
-        Task<List<SessionView>> GetAllActiveSessions();
+        Task<List<SessionView>> GetAllActiveSessions(int loggedInUserId);
       
     }
 }
