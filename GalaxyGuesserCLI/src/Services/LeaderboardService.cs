@@ -9,7 +9,7 @@ namespace GalaxyGuesserCLI.Services
     public static class LeaderboardService
     {
         private static readonly HttpClient _httpClient = new HttpClient();
-        private const string BaseUrl = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/leaderboard";
+        private const string BaseUrl = "http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/session-scores";
 
 
         public static async Task<List<GlobalLeaderboardEntry>> GetGlobalLeaderboardAsync()
@@ -19,7 +19,7 @@ namespace GalaxyGuesserCLI.Services
                 string jwt = Helper.GetStoredToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
-                var response = await _httpClient.GetAsync($"{BaseUrl}/global");
+                var response = await _httpClient.GetAsync($"{BaseUrl}");
                 response.EnsureSuccessStatusCode();
 
                 var responseBody = await response.Content.ReadAsStringAsync();
@@ -50,7 +50,7 @@ namespace GalaxyGuesserCLI.Services
                 string jwt = Helper.GetStoredToken();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
-                var response = await _httpClient.GetAsync($"{BaseUrl}/session/{sessionCode}");
+                var response = await _httpClient.GetAsync($"{BaseUrl}/{sessionCode}");
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();

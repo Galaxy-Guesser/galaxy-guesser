@@ -9,5 +9,7 @@ namespace GalaxyGuesserApi.Repositories.Interfaces
         Task<int?> GetPlayerScoreAsync(int? playerId, int sessionId);
         Task UpdatePlayerScoreAsync(int? playerId, int sessionId, int points);
         Task<SessionStats> GetSessionStatsAsync(int playerId, int sessionId);
+         Task<List<LeaderboardEntry>> GetSessionLeaderboardAsync(string sessionCode);
+        Task<List<GlobalLeaderboardEntry>> GetGlobalLeaderboardAsync();
     }
 }

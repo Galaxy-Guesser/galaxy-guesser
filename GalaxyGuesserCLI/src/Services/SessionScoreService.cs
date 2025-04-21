@@ -25,7 +25,7 @@ public class SessionScores
 
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/sessionscore", content);
+        var response = await _httpClient.PutAsync("http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/session-scores", content);
 
         if (response.IsSuccessStatusCode)
         {

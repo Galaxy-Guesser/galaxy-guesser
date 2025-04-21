@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using GalaxyGuesserApi.Repositories.Interfaces;
-using System.Text.Json.Serialization;
 using System.Text.Json;
 using GalaxyGuesserApi.Configuration;
+using GalaxyGuesserApi.Models.DTO;
 
 namespace GalaxyGuesserApi.Controllers
 {
@@ -55,44 +55,33 @@ namespace GalaxyGuesserApi.Controllers
                         if (!response.IsSuccessStatusCode)
                         {
                             var errorContent = await response.Content.ReadAsStringAsync();
-                            return BadRequest("Failed to exchange code for token" + request.RedirectUri);
+                            return Unauthorized("Failed to exchange code for token" + request.RedirectUri);
                         }
 
                         var responseContent = await response.Content.ReadAsStringAsync();
 
-                        var googleTokens = JsonSerializer.Deserialize<GoogleTokenResponse>(responseContent);
-
-                        
-                        return Ok(new { access_token = googleTokens.IdToken });
-                    }
-                    catch (Exception ex)
+                    var googleTokens = JsonSerializer.Deserialize<GoogleTokenResponse>(responseContent);
+                    if (googleTokens == null)
                     {
-                        return StatusCode(500, "Internal server error");
+                        return Unauthorized("Failed to exchange code for token" + request.RedirectUri);
+
+
+                    }
+                    else
+                    {
+                        return Ok(new { access_token = googleTokens.IdToken });
+
+                    }
+
+
+                }
+                catch (Exception ex)
+                    {
+                        return StatusCode(500, $"Internal server error : {ex.Message}");
                     }
             }
         }
         
-        public class TokenRequest
-        {
-            public string Code { get; set; }
-            public string RedirectUri { get; set; }
-        }
-
-        public class GoogleTokenResponse
-        {
-            [JsonPropertyName("access_token")]
-            public string AccessToken { get; set; }
-            
-            [JsonPropertyName("id_token")]
-            public string IdToken { get; set; }
-            
-            [JsonPropertyName("refresh_token")]
-            public string RefreshToken { get; set; }
-            
-            [JsonPropertyName("expires_in")]
-            public int ExpiresIn { get; set; }
-        }
-
         [HttpGet("login")]
         public IActionResult Login( )
         {
