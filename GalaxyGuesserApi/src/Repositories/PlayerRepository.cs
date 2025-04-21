@@ -139,7 +139,7 @@ namespace GalaxyGuesserApi.Repositories
 
     public async Task<List<PlayerStatsDTO>> GetPlayersStats(int playerId)
     {
-      const string sql = @"SELECT * FROM player_stats_view WHERE player_id=@playerId)";
+      const string sql = @"SELECT * FROM player_stats_view WHERE player_id=@playerId";
 
       var parameters = new Dictionary<string, object> { { "@playerId", playerId } };
 
