@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GalaxyGuesserCLI.Helpers;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 
 public class SessionScores
 {

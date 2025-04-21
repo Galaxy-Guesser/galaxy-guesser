@@ -2,7 +2,7 @@ using Spectre.Console;
 using System.Text;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 using GalaxyGuesserCLI.Helpers;
 using GalaxyGuesserCLI.Services;
 using System.Security.Claims;
@@ -250,7 +250,6 @@ namespace GalaxyGuesserCLI.Services
 
         if (!response.IsSuccessStatusCode)
         {
-          Console.WriteLine($"{requestBody}");
           Console.WriteLine($"{await response.Content.ReadAsStringAsync()}");
         }
       }

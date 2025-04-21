@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using GalaxyGuesserCLI.Helpers;
-using GalaxyGuesserCLI.Models;
+using GalaxyGuesserCLI.DTO;
 
 namespace GalaxyGuesserCLI.Services
 {
