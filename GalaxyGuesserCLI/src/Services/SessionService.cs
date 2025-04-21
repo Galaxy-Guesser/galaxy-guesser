@@ -146,10 +146,10 @@ namespace GalaxyGuesserCLI.Services
 
         var request = new CreateSessionRequest
         {
-            categoryId = categoryId,
-            questionsCount = questionsCount,
-            startDate = startDate,
-            sessionDuration = sessionDuration
+          categoryId = categoryId,
+          questionsCount = questionsCount,
+          startDate = startDate,
+          sessionDuration = sessionDuration
         };
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -159,7 +159,7 @@ namespace GalaxyGuesserCLI.Services
 
         var options = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+          PropertyNameCaseInsensitive = true
         };
 
         var apiResponse = JsonSerializer.Deserialize<ApiResponse<SessionModel>>(responseBody, options);
@@ -246,12 +246,16 @@ namespace GalaxyGuesserCLI.Services
 
         var url = $"http://ec2-13-244-67-213.af-south-1.compute.amazonaws.com/api/players/{playerId}";
         HttpResponseMessage response = await _httpClient.PutAsync(url, content);
-        string responseContent = await response.Content.ReadAsStringAsync();
 
-        if (!response.IsSuccessStatusCode)
+        var result = await Result<Player>.FromApiResponseAsync(response);
+        result.OnFailure(errors =>
         {
-          Console.WriteLine($"{await response.Content.ReadAsStringAsync()}");
-        }
+          foreach (var error in errors)
+          {
+            Console.WriteLine($"Changing username failed: {error}");
+          }
+        });
+
       }
       catch (Exception ex)
       {
