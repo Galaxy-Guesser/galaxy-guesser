@@ -12,7 +12,7 @@ namespace GalaxyGuesserApi.Controllers
     [Route("api/[controller]")]
     [Authorize] 
 
-    public class SessionsController : ControllerBase
+    public class SessionsController : BaseController
     {
         private readonly ISessionService _sessionService;
         private readonly IQuestionService _questionService;
@@ -45,8 +45,7 @@ namespace GalaxyGuesserApi.Controllers
         [ProducesResponseType(typeof(ApiResponse<Session>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<Session>>> CreateSession([FromBody] CreateSessionRequestDTO request)
         {
-            var googleId = User.FindFirst("sub")?.Value 
-                       ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var googleId = GetGoogleIdFromClaims();
             var availableQuestionsCount = await _questionService.GetQuestionCountForCategory(request.categoryId);
             if (googleId == null)
             {
@@ -77,9 +76,7 @@ namespace GalaxyGuesserApi.Controllers
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> JoinSession([FromBody] JoinSessionRequest requestBody)
         {
-            var playerGuid = User.FindFirst("sub")?.Value
-                    ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+            var playerGuid= GetGoogleIdFromClaims();
             if (playerGuid == null)
             {
                 return Unauthorized(ApiResponse<string>.ErrorResponse("User not authenticated"));
@@ -108,10 +105,7 @@ namespace GalaxyGuesserApi.Controllers
         [ProducesResponseType(typeof(ApiResponse<SessionView>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<SessionView>>> GetAllSessions(bool getActive = false)
         {
-            var playerGuid = User.FindFirst("sub")?.Value
-                    ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-
+            var playerGuid= GetGoogleIdFromClaims();
             if (playerGuid == null)
             {
                 return NotFound(ApiResponse<string>.ErrorResponse("User not authenticated"));

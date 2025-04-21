@@ -9,7 +9,7 @@ namespace GalaxyGuesserApi.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class SessionScoreController : ControllerBase
+    public class SessionScoreController : BaseController
     {
         private readonly SessionScoreService _sessionScoreService;
 
@@ -25,10 +25,8 @@ namespace GalaxyGuesserApi.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateScore([FromBody] ScoreUpdateRequest request)
         {
-            var googleId = User.FindFirst("sub")?.Value 
-                        ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var player = (await _playerService.GetPlayerByGuidAsync(googleId));
+            var googleId = GetGoogleIdFromClaims();
+            var player = await _playerService.GetPlayerByGuidAsync(googleId);
             if(player!=null){
                 var response = await _sessionScoreService.UpdateScoreAsync(request, player?.playerId);
                 return response.Success ? Ok(response) : BadRequest(response);
