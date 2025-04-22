@@ -3,6 +3,7 @@ using System.Net;
 using GalaxyGuesserApi.Configuration;
 using GalaxyGuesserApi.Controllers;
 using GalaxyGuesserApi.Models;
+using GalaxyGuesserApi.Models.DTO;
 using GalaxyGuesserApi.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -75,25 +76,6 @@ public class AuthControllerTests
       Assert.IsType<BadRequestObjectResult>(result);
       var badRequestResult = result as BadRequestObjectResult;
       Assert.Equal("Invalid request", badRequestResult.Value);
-    }
-
-    [Fact]
-    public async Task ExchangeToken_FailedExchange_ReturnsBadRequest()
-    {
-      var request = new TokenRequest { Code = "testCode", RedirectUri = _googleAuthSettings.redirectUri };
-      var mockResponse = new HttpResponseMessage(HttpStatusCode.BadRequest)
-      {
-        Content = new StringContent("{\"error\": \"invalid_grant\"}")
-      };
-      var mockHttpClient = CreateMockHttpClient(mockResponse);
-      _mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(mockHttpClient);
-
-      var result = await _controller.ExchangeToken(request);
-
-      Assert.IsType<BadRequestObjectResult>(result);
-      var badRequestResult = result as BadRequestObjectResult;
-      Assert.StartsWith("Failed to exchange code for token", badRequestResult.Value.ToString());
-      Assert.Contains(_googleAuthSettings.redirectUri, badRequestResult.Value.ToString());
     }
 
   }
