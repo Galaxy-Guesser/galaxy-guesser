@@ -1,116 +1,103 @@
-//using System.Collections.Generic;
-//using System.Threading.Tasks;
-//using GalaxyGuesserApi.Models;
-//using GalaxyGuesserApi.Repositories.Interfaces;
-//using GalaxyGuesserApi.Services;
-//using Moq;
-//using Xunit;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using GalaxyGuesserApi.Models;
+using GalaxyGuesserApi.Models.DTO;
+using GalaxyGuesserApi.Repositories.Interfaces;
+using GalaxyGuesserApi.Services;
+using Moq;
+using Xunit;
 
-//namespace GalaxyGuesserApi.Tests.Services
-//{
-//  public class PlayerServiceTests
-//  {
-//    private readonly Mock<IPlayerRepository> _playerRepoMock;
-//    private readonly PlayerService _playerService;
+namespace GalaxyGuesserApi.tests.Services
+{
+  public class PlayerServiceTests
+  {
+    private readonly Mock<IPlayerRepository> _mockRepo;
+    private readonly PlayerService _service;
 
-//    public PlayerServiceTests()
-//    {
-//      _playerRepoMock = new Mock<IPlayerRepository>();
-//      _playerService = new PlayerService(_playerRepoMock.Object);
-//    }
+    public PlayerServiceTests()
+    {
+      _mockRepo = new Mock<IPlayerRepository>();
+      _service = new PlayerService(_mockRepo.Object);
+    }
 
-//    [Fact]
-//    public async Task GetAllPlayersAsync_ReturnsPlayers()
-//    {
-//      var players = new List<Player>
-//            {
-//                new Player { playerId = 1, userName = "Alice", guid = "guid1" },
-//                new Player { playerId = 2, userName = "Bob", guid = "guid2" }
-//            };
+    [Fact]
+    public async Task GetAllPlayersAsync_ReturnsAllPlayers()
+    {
+      var players = new List<Player> { new Player() { guid = "googleguid", userName = "user1"}, new Player() { guid = "googleguid2", userName = "user2"} };
+      _mockRepo.Setup(repo => repo.GetAllPlayersAsync()).ReturnsAsync(players);
 
-//      _playerRepoMock.Setup(repo => repo.GetAllPlayersAsync()).ReturnsAsync(players);
+      var result = await _service.GetAllPlayersAsync();
 
-//      var result = await _playerService.GetAllPlayersAsync();
+      Assert.Equal(2, result.Count);
+    }
 
-//      Assert.Equal(2, result.Count);
-//      Assert.Equal("Alice", result[0].userName);
-//    }
+    [Fact]
+    public async Task GetPlayerByIdAsync_ReturnsPlayer()
+    {
+      var player = new Player { playerId = 1, guid = "googleguid", userName = "user1" };
+      _mockRepo.Setup(repo => repo.GetPlayerByIdAsync(1)).ReturnsAsync(player);
 
-//    [Fact]
-//    public async Task GetPlayerByIdAsync_ReturnsPlayer()
-//    {
-//      var player = new Player { playerId = 1, userName = "Alice", guid = "guid1" };
-//      _playerRepoMock.Setup(r => r.GetPlayerByIdAsync(1)).ReturnsAsync(player);
+      var result = await _service.GetPlayerByIdAsync(1);
 
-//      var result = await _playerService.GetPlayerByIdAsync(1);
+      Assert.Equal(1, result.playerId);
+    }
 
-//      Assert.Equal("Alice", result.userName);
-//    }
+    [Fact]
+    public async Task CreatePlayerAsync_ReturnsCreatedPlayer()
+    {
+      var player = new Player { playerId = 1, guid = "abc123", userName = "test" };
+      _mockRepo.Setup(repo => repo.CreatePlayerAsync("abc123", "test")).ReturnsAsync(player);
 
-//    [Fact]
-//    public async Task GetPlayerByGuidAsync_ReturnsPlayer()
-//    {
-//      var player = new Player { playerId = 3, userName = "Charlie", guid = "abc123" };
-//      _playerRepoMock.Setup(r => r.GetPlayerByGuidAsync("abc123")).ReturnsAsync(player);
+      var result = await _service.CreatePlayerAsync("abc123", "test");
 
-//      var result = await _playerService.GetPlayerByGuidAsync("abc123");
+      Assert.Equal("test", result.userName);
+    }
 
-//      Assert.Equal("Charlie", result?.userName);
-//    }
+    [Fact]
+    public async Task UpdatePlayerUsernameAsync_WhenPlayerExists_ReturnsTrue()
+    {
+      var player = new Player { playerId = 1, userName = "OldName", guid = "googleguid" };
+      _mockRepo.Setup(repo => repo.GetPlayerByIdAsync(1)).ReturnsAsync(player);
+      _mockRepo.Setup(repo => repo.UpdatePlayerUsernameAsync(1, "NewName")).ReturnsAsync(true);
 
-//    [Fact]
-//    public async Task CreatePlayerAsync_CreatesAndReturnsPlayer()
-//    {
-//      var player = new Player { playerId = 4, userName = "NewPlayer", guid = "newguid" };
-//      _playerRepoMock.Setup(r => r.CreatePlayerAsync("newguid", "NewPlayer")).ReturnsAsync(player);
+      var result = await _service.UpdatePlayerUsernameAsync(1, "NewName");
 
-//      var result = await _playerService.CreatePlayerAsync("newguid", "NewPlayer");
+      Assert.True(result);
+    }
 
-//      Assert.Equal("NewPlayer", result.userName);
-//    }
 
-//    [Fact]
-//    public async Task UpdatePlayerAsync_ReturnsTrue_WhenPlayerExists()
-//    {
-//      var player = new Player { playerId = 5, userName = "OldName", guid = "g123" };
-//      _playerRepoMock.Setup(r => r.GetPlayerByIdAsync(5)).ReturnsAsync(player);
-//      _playerRepoMock.Setup(r => r.UpdatePlayerAsync(5, "UpdatedName")).ReturnsAsync(true);
+    [Fact]
+    public async Task GetPlayerByGuidAsync_ReturnsPlayer()
+    {
+      var player = new Player { guid = "abc123", userName = "user1" };
+      _mockRepo.Setup(repo => repo.GetPlayerByGuidAsync("abc123")).ReturnsAsync(player);
 
-//      var result = await _playerService.UpdatePlayerAsync(5, "UpdatedName");
+      var result = await _service.GetPlayerByGuidAsync("abc123");
 
-//      Assert.True(result);
-//    }
+      Assert.Equal("abc123", result.guid);
+    }
 
-//    [Fact]
-//    public async Task UpdatePlayerAsync_ReturnsFalse_WhenPlayerNotFound()
-//    {
-//      _playerRepoMock.Setup(r => r.GetPlayerByIdAsync(99)).ReturnsAsync(default(Player));
+    [Fact]
+    public async Task DeletePlayerAsync_WhenPlayerExists_ReturnsTrue()
+    {
+      var player = new Player { playerId = 1, userName = "user1", guid="googleguid" };
+      _mockRepo.Setup(repo => repo.GetPlayerByIdAsync(1)).ReturnsAsync(player);
+      _mockRepo.Setup(repo => repo.DeletePlayerAsync(1)).ReturnsAsync(true);
 
-//      var result = await _playerService.UpdatePlayerAsync(99, "Name");
+      var result = await _service.DeletePlayerAsync(1);
 
-//      Assert.False(result);
-//    }
+      Assert.True(result);
+    }
 
-//    [Fact]
-//    public async Task DeletePlayerAsync_ReturnsTrue_WhenPlayerExists()
-//    {
-//      var player = new Player { playerId = 6, userName = "DeleteMe", guid = "gdel" };
-//      _playerRepoMock.Setup(r => r.GetPlayerByIdAsync(6)).ReturnsAsync(player);
-//      _playerRepoMock.Setup(r => r.DeletePlayerAsync(6)).ReturnsAsync(true);
+    [Fact]
+    public async Task GetPlayersStats_ReturnsStats()
+    {
+      var stats = new List<PlayerStatsDTO> { new PlayerStatsDTO(), new PlayerStatsDTO() };
+      _mockRepo.Setup(repo => repo.GetPlayersStats(1)).ReturnsAsync(stats);
 
-//      var result = await _playerService.DeletePlayerAsync(6);
+      var result = await _service.GetPlayersStats(1);
 
-//      Assert.True(result);
-//    }
-
-//    [Fact]
-//    public async Task DeletePlayerAsync_ReturnsFalse_WhenPlayerNotFound()
-//    {
-//      _playerRepoMock.Setup(r => r.GetPlayerByIdAsync(100)).ReturnsAsync(default(Player));
-
-//      var result = await _playerService.DeletePlayerAsync(100);
-
-//      Assert.False(result);
-//    }
-//  }
-//}
+      Assert.Equal(2, result.Count);
+    }
+  }
+}
